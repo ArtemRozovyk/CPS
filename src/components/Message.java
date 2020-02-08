@@ -7,5 +7,12 @@ public class Message implements MessageI {
 		this.msg = msg;
 	}
 
-	String msg;
+	public String msg;
+
+	@Override
+	public String toString() {
+		return "Message{" +
+				"msg='" + msg + '\'' +
+				'}';
+	}
 }

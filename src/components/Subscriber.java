@@ -63,7 +63,7 @@ public class Subscriber extends AbstractComponent{
 		}
 	
 	public void acceptMessage(MessageI m) throws Exception {
-		System.out.print("WE GOT IT "+m);
+		logMessage("Getting message "+m);
 	}
 
 }

@@ -82,6 +82,7 @@ public class Broker extends AbstractComponent {
 	
 	
 	public void publish(MessageI m, String topic) throws Exception {
+		logMessage("Transferring message "+m+" to subscriber");
 		brop.acceptMessage(m);
 	}
 
