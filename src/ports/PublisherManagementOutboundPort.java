@@ -23,49 +23,49 @@ implements ManagementCI {
 	}
 
 	@Override
-	public void createTopic(String topic) {
+	public void createTopic(String topic) throws Exception {
 		((ManagementCI)this.connector).createTopic(topic);
 	}
 
 	@Override
-	public void createTopics(String[] topics) {
+	public void createTopics(String[] topics) throws Exception {
 		((ManagementCI)this.connector).createTopics(topics);
 	}
 
 	@Override
-	public void destroyTopic(String topic) {
+	public void destroyTopic(String topic) throws Exception {
 		((ManagementCI)this.connector).destroyTopic(topic);
 	}
 
 	@Override
-	public boolean isTopic(String topic) {
+	public boolean isTopic(String topic) throws Exception {
 		return ((ManagementCI)this.connector).isTopic(topic);
 	}
 
 	@Override
-	public String[] getTopics() {
+	public String[] getTopics() throws Exception {
 		return ((ManagementCI)this.connector).getTopics();
 	}
 
 	@Override
-	public void subscribe(String topic, String inboundPortURI) {
+	public void subscribe(String topic, String inboundPortURI) throws Exception {
 		((ManagementCI)this.connector).subscribe(topic, inboundPortURI);
 		
 	}
 
 	@Override
-	public void subscribe(String[] topics, String inboutPortURI) {
+	public void subscribe(String[] topics, String inboutPortURI) throws Exception {
 		((ManagementCI)this.connector).subscribe(topics, inboutPortURI);
 	}
 
 	@Override
-	public void subscribe(String topic, MessageFilterI filter, String inboutPortURI) {
+	public void subscribe(String topic, MessageFilterI filter, String inboutPortURI) throws Exception {
 		((ManagementCI)this.connector).subscribe(topic, filter, inboutPortURI);
 		
 	}
 
 	@Override
-	public void unsubscribe(String topic, String inboundPortURI) {
+	public void unsubscribe(String topic, String inboundPortURI) throws Exception {
 		((ManagementCI)this.connector).unsubscribe(topic, inboundPortURI);
 	}
  
