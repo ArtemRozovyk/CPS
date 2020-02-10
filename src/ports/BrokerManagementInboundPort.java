@@ -143,4 +143,17 @@ implements ManagementCI {
 				});
 	}
 
+	@Override
+	public void modifyFilter(String topic, MessageFilterI newFilter, String inboundPortUri) throws Exception {
+		this.owner.handleRequestAsync(
+				new AbstractComponent.AbstractService<Void>() {
+
+					@Override
+					public Void call() throws Exception {
+						((Broker)this.getServiceOwner()).modifyFilter(topic, newFilter, inboundPortUri);
+						return null;
+					}
+				});
+	}
+
 }

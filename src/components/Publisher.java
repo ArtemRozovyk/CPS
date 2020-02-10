@@ -1,12 +1,18 @@
 package components;
 
+import java.util.concurrent.TimeUnit;
+
 import fr.sorbonne_u.components.AbstractComponent;
+import fr.sorbonne_u.components.annotations.AddPlugin;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
+import fr.sorbonne_u.components.examples.basic_cs.components.URIConsumer;
+import fr.sorbonne_u.components.plugins.dconnection.example.components.ServerSideExample;
 import interfaces.MessageI;
 import message.Message;
 import ports.PublisherManagementOutboundPort;
 import ports.PublisherPublicationOutboundPort;
-
+@AddPlugin(pluginClass = ServerSideExample.ServerSidePlugin.class,
+pluginURI = ServerSideExample.DYNAMIC_CONNECTION_PLUGIN_URI)
 public class Publisher extends AbstractComponent{
 	
 	protected PublisherPublicationOutboundPort ppop;
@@ -50,7 +56,18 @@ public class Publisher extends AbstractComponent{
 	
 	public void publish(MessageI m, String topic) throws Exception {
 		logMessage("Publishing message "+m);
-
+		for (int i =0; i <5;i ++) {
+			this.scheduleTask(new AbstractComponent.AbstractTask() {
+				@Override
+				public void run() {
+					try {
+						((Publisher)this.getTaskOwner()).publish(m, topic);							
+					} catch (Exception e) {
+						throw new RuntimeException(e) ;
+					}
+				}
+			}, 1000, TimeUnit.MILLISECONDS) ;
+		}
 		ppop.publish(m, topic);
 
 	}

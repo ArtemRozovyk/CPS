@@ -68,4 +68,9 @@ implements  ManagementCI
 		((ManagementCI)this.connector).unsubscribe(topic, inboundPortURI);
 	}
 
+	@Override
+	public void modifyFilter(String topic, MessageFilterI newFilter, String inboundPortUri) throws Exception {
+		((ManagementCI)this.connector).modifyFilter(topic, newFilter, inboundPortUri);
+	}
+
 }

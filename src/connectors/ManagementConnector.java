@@ -52,5 +52,11 @@ implements ManagementCI  {
 	public void unsubscribe(String topic, String inboundPortURI) throws Exception {
 		((ManagementCI)this.offering).unsubscribe(topic, inboundPortURI);
 	}
+
+	@Override
+	public void modifyFilter(String topic, MessageFilterI newFilter, String inboundPortUri) throws Exception {
+		((ManagementCI)this.offering).modifyFilter(topic, newFilter, inboundPortUri);
+		
+	}
 	
 }
