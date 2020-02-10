@@ -24,56 +24,50 @@ implements ManagementCI {
 
 	@Override
 	public void createTopic(String topic) {
-		// TODO Auto-generated method stub
+		((ManagementCI)this.connector).createTopic(topic);
 		
 	}
 
 	@Override
-	public void createTopics(String[] topic) {
-		// TODO Auto-generated method stub
-		
+	public void createTopics(String[] topics) {
+		((ManagementCI)this.connector).createTopics(topics);
 	}
 
 	@Override
 	public void destroyTopic(String topic) {
-		// TODO Auto-generated method stub
-		
+		((ManagementCI)this.connector).destroyTopic(topic);
 	}
 
 	@Override
 	public boolean isTopic(String topic) {
-		// TODO Auto-generated method stub
-		return false;
+		return ((ManagementCI)this.connector).isTopic(topic);
 	}
 
 	@Override
 	public String[] getTopics() {
-		// TODO Auto-generated method stub
-		return null;
+		return ((ManagementCI)this.connector).getTopics();
 	}
 
 	@Override
 	public void subscribe(String topic, String inboundPortURI) {
-		// TODO Auto-generated method stub
+		((ManagementCI)this.connector).subscribe(topic, inboundPortURI);
 		
 	}
 
 	@Override
 	public void subscribe(String[] topics, String inboutPortURI) {
-		// TODO Auto-generated method stub
-		
+		((ManagementCI)this.connector).subscribe(topics, inboutPortURI);
 	}
 
 	@Override
 	public void subscribe(String topic, MessageFilterI filter, String inboutPortURI) {
-		// TODO Auto-generated method stub
+		((ManagementCI)this.connector).subscribe(topic, filter, inboutPortURI);
 		
 	}
 
 	@Override
 	public void unsubscribe(String topic, String inboundPortURI) {
-		// TODO Auto-generated method stub
-		
+		((ManagementCI)this.connector).unsubscribe(topic, inboundPortURI);
 	}
  
 }
