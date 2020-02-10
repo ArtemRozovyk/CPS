@@ -39,8 +39,16 @@ implements ReceptionCI{
 	}
 
 	@Override
-	public void acceptMessage(MessageI[] ms) {
-		// TODO Auto-generated method stub
+	public void acceptMessage(MessageI[] ms) throws Exception {
+		this.owner.handleRequestAsync(
+				new AbstractComponent.AbstractService<Void>() {
+
+					@Override
+					public Void call() throws Exception {
+						((Subscriber)this.getServiceOwner()).acceptMessage(ms);
+						return null;
+					}
+				});
 		
 	}
 

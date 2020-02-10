@@ -14,21 +14,18 @@ implements PublicationCI{
 	}
 
 	@Override
-	public void publish(MessageI m, String[] topics) {
-		// TODO Auto-generated method stub
-		
+	public void publish(MessageI m, String[] topics) throws Exception {
+		((PublicationCI)this.offering).publish(m, topics);
 	}
 
 	@Override
-	public void publish(MessageI[] ms, String topic) {
-		// TODO Auto-generated method stub
-		
+	public void publish(MessageI[] ms, String topic) throws Exception {
+		((PublicationCI)this.offering).publish(ms, topic);
 	}
 
 	@Override
-	public void publish(MessageI[] ms, String[] topics) {
-		// TODO Auto-generated method stub
-		
+	public void publish(MessageI[] ms, String[] topics) throws Exception {
+		((PublicationCI)this.offering).publish(ms, topics);
 	}
 
 }

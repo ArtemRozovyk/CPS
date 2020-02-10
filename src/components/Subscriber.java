@@ -65,5 +65,12 @@ public class Subscriber extends AbstractComponent{
 	public void acceptMessage(MessageI m) throws Exception {
 		logMessage("Getting message "+m);
 	}
+	
+	public void acceptMessage(MessageI[] ms) throws Exception 
+	{
+		for (int i = 0; i < ms.length; i++) {
+			logMessage("Getting message " + ms[i]);
+		}
+	}
 
 }
