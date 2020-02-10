@@ -2,13 +2,12 @@ package message;
 
 public class TimeStamp {
 
-	protected long time;
+	protected long time=0;
 
 	protected String timestamper;
 
 	public boolean isInitialised() {
-		Long a = new Long(this.time);
-		return !a.equals(null);
+		return time!= 0 && timestamper != null;
 	}
 
 	public long getTime() {
