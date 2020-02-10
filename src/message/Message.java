@@ -59,11 +59,5 @@ public class Message implements MessageI {
 
 
 
-	public TimeStamp getTs() {
-		return ts;
-	}
 
-	public void setTs(TimeStamp ts) {
-		this.ts = ts;
-	}
 }
