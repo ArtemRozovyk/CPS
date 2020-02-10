@@ -134,39 +134,59 @@ public class Broker extends AbstractComponent {
 	}
 	
 	public void createTopic(String topic) {
-		
+		topicSubsUri.put(topic,new HashSet<>());
 	}
 	
-	public void createTopics(String[] topic) {
-		
+	public void createTopics(String[] topics) {
+		for(String t : topics){
+			createTopic(t);
+		}
 	}
 
 	public void destroyTopic(String topic) {
-		
+		topicSubsUri.remove(topic);
 	}
 
 	public boolean isTopic(String topic) {
-		return false;
+		return topicSubsUri.containsKey(topic);
 	}
 
 	public String[] getTopics() {
-		return null;
+
+		Set<String > tset= topicSubsUri.keySet();
+		String [] topics = new String [tset.size()];
+		return tset.toArray(topics);
+
 	}
 
 	public void subscribe(String topic, String inboundPortURI) {
-		
+		topicSubsUri.get(topic).add(inboundPortURI);
 	}
 
 	public void subscribe(String[] topics, String inboutPortURI) {
-		
+		for(String topic : topics ){
+			subscribe(topic,inboutPortURI);
+		}
 	}
 
 	public void subscribe(String topic, MessageFilterI filter, String inboutPortURI) {
-		
+		topicSubsUri.get(topic).add(inboutPortURI);
+		subUriFilter.put(inboutPortURI,filter);
+
 	}
 
 	public void unsubscribe(String topic, String inboundPortURI) {
-		
+		topicSubsUri.get(topic).remove(inboundPortURI);
+
+	}
+
+	public void modifyFilter(String topic,
+						MessageFilterI newFilter,
+						String inboundPort ){
+
+		subUriFilter.remove(inboundPort);
+		subUriFilter.put(inboundPort,newFilter);
+
 	}
 
 }
