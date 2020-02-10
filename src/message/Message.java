@@ -8,30 +8,29 @@ public class Message implements MessageI {
 	
 	private static final long serialVersionUID = -2687757832261453813L;
 	
-	private String msg;
-	
+	private Serializable content;
 	private TimeStamp ts;
-	
+	private String URI;
+
+	public Message(Serializable content, TimeStamp ts, String URI, Properties prop) {
+		this.content = content;
+		this.ts = ts;
+		this.URI = URI;
+		this.prop = prop;
+	}
+
 	private Properties prop;
 
 	public Message(String msg) {
 		super();
-		this.msg = msg;
 	}
 	
-	public Message(String msg, TimeStamp t) {
-		super();
-		this.msg = msg;
-		this.ts = t;
-		this.prop = new Properties();
-	}
+
 
 	
 	@Override
 	public String toString() {
-		return "Message{" +
-				"msg='" + msg + '\'' +
-				'}';
+		return "Message{"+ts.timestamper;
 	}
 
 	@Override
@@ -58,13 +57,7 @@ public class Message implements MessageI {
 		return null;
 	}
 
-	public String getMsg() {
-		return msg;
-	}
 
-	public void setMsg(String msg) {
-		this.msg = msg;
-	}
 
 	public TimeStamp getTs() {
 		return ts;

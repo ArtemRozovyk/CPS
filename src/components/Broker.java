@@ -23,11 +23,11 @@ public class Broker extends AbstractComponent {
 	
 	protected String brokerPublicationInboundPortURI;
 
-	public Broker(int nbThreads, int nbSchedulableThreads) {
+	protected Broker(int nbThreads, int nbSchedulableThreads) {
 		super(nbThreads, nbSchedulableThreads);
 	}
 	
-	public Broker(String uri, 
+	protected Broker(String uri,
 			String receptionOutboundPortURI,
 			String publicationInboundPortURI) throws Exception
 	{

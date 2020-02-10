@@ -11,13 +11,13 @@ public class Publisher extends AbstractComponent{
 	protected PublisherPublicationOutboundPort ppop;
 	
 	//protected String publisherPublicationOutboundPortURI;
-	
-	public Publisher(int nbThreads, int nbSchedulableThreads) {
+
+	protected Publisher(int nbThreads, int nbSchedulableThreads) {
 		super(nbThreads, nbSchedulableThreads);
 		// TODO Auto-generated constructor stub
 	}
-	
-	public Publisher(String uri, 
+
+	protected Publisher(String uri,
 			String publicationOutboundPortURI) throws Exception
 	{
 		super(uri, 0, 1) ;
