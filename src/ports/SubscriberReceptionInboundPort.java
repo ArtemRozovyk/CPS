@@ -1,6 +1,5 @@
 package ports;
 
-import components.Broker;
 import components.Subscriber;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;

@@ -25,7 +25,6 @@ implements ManagementCI {
 	@Override
 	public void createTopic(String topic) {
 		((ManagementCI)this.connector).createTopic(topic);
-		
 	}
 
 	@Override

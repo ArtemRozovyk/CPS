@@ -8,6 +8,7 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
 import fr.sorbonne_u.components.exceptions.PreconditionException;
 import fr.sorbonne_u.components.ports.PortI;
+import interfaces.MessageFilterI;
 import interfaces.MessageI;
 import interfaces.PublicationCI;
 import ports.BrokerPublicationInboundPort;
@@ -78,9 +79,6 @@ public class Broker extends AbstractComponent {
 		
 	}
 	
-	
-	
-	
 	public void publish(MessageI m, String topic) throws Exception {
 		logMessage("Transferring message "+m+" to subscriber");
 		brop.acceptMessage(m);
@@ -96,6 +94,42 @@ public class Broker extends AbstractComponent {
 
 	public void publish(MessageI[] ms, String[] topics) throws Exception {
 
+	}
+	
+	public void createTopic(String topic) {
+		
+	}
+	
+	public void createTopics(String[] topic) {
+		
+	}
+
+	public void destroyTopic(String topic) {
+		
+	}
+
+	public boolean isTopic(String topic) {
+		return false;
+	}
+
+	public String[] getTopics() {
+		return null;
+	}
+
+	public void subscribe(String topic, String inboundPortURI) {
+		
+	}
+
+	public void subscribe(String[] topics, String inboutPortURI) {
+		
+	}
+
+	public void subscribe(String topic, MessageFilterI filter, String inboutPortURI) {
+		
+	}
+
+	public void unsubscribe(String topic, String inboundPortURI) {
+		
 	}
 
 }

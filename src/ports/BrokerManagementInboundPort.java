@@ -1,5 +1,8 @@
 package ports;
 
+import components.Broker;
+import components.Subscriber;
+import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import interfaces.ManagementCI;
@@ -16,13 +19,23 @@ implements ManagementCI {
 
 	public BrokerManagementInboundPort(Class<?> implementedInterface, ComponentI owner) throws Exception {
 		super(implementedInterface, owner);
-		// TODO Auto-generated constructor stub
+	}
+	
+	public BrokerManagementInboundPort(String uri, ComponentI owner) throws Exception {
+		super(uri, ManagementCI.class, owner);
 	}
 
 	@Override
-	public void createTopic(String topic) {
-		// TODO Auto-generated method stub
-		
+	public void createTopic(String topic) throws Exception {
+		this.owner.handleRequestAsync(
+				new AbstractComponent.AbstractService<Void>() {
+
+					@Override
+					public Void call() throws Exception {
+						((Broker)this.getServiceOwner()).createTopic(topic);
+						return null;
+					}
+				});
 	}
 
 	@Override
