@@ -3,6 +3,7 @@ package components;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 import interfaces.MessageI;
+import message.Message;
 import ports.PublisherPublicationOutboundPort;
 
 public class Publisher extends AbstractComponent{
