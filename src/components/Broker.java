@@ -11,15 +11,38 @@ import fr.sorbonne_u.components.ports.PortI;
 import interfaces.MessageFilterI;
 import interfaces.MessageI;
 import interfaces.PublicationCI;
+import message.Message;
 import ports.BrokerPublicationInboundPort;
 import ports.BrokerReceptionOutboundPort;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class Broker extends AbstractComponent {
 
 	//protected BrokerPublicationInboundPort bpip;
 	
 	protected BrokerReceptionOutboundPort brop;
-	
+
+	private Map<String, Set<String >> topicSubsUri;
+	private Map<String, Set<MessageI>> topicMessageStorage;
+	private Map<String, MessageFilterI> subUriFilter;
+
+	public Broker(String reflectionInboundPortURI,
+				  int nbThreads,
+				  int nbSchedulableThreads,
+				  Map<String, Set<String>> topicSubsUri,
+				  Map<String, Set<MessageI>> topicMessageStorage,
+				  Map<String, MessageFilterI> subUriFilter) {
+		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
+		this.topicSubsUri = topicSubsUri;
+		this.topicMessageStorage = topicMessageStorage;
+		this.subUriFilter = subUriFilter;
+	}
+
+
+
 	protected String brokerReceptionOutboundPortURI;
 	
 	protected String brokerPublicationInboundPortURI;
@@ -80,20 +103,34 @@ public class Broker extends AbstractComponent {
 	}
 	
 	public void publish(MessageI m, String topic) throws Exception {
-		logMessage("Transferring message "+m+" to subscriber");
-		brop.acceptMessage(m);
+		Set<MessageI> storedMsgs;
+		if( (storedMsgs=topicMessageStorage.get(topic))!=null){
+			storedMsgs.add(m);
+		}else {
+			//topic doest exist
+			throw new Exception("Topic doesnt exist");
+		}
+
 	}
 
 	public void publish(MessageI m, String[] topics) throws Exception {
-
+		for(String topic : topics ){
+			publish(m,topic);
+		}
 	}
 
 	public void publish(MessageI[] ms, String topic) throws Exception {
-
+			for (MessageI m :ms){
+				publish(m,topic);
+			}
 	}
 
 	public void publish(MessageI[] ms, String[] topics) throws Exception {
-
+			for (MessageI m : ms ){
+				for(String topic : topics ){
+					publish(m,topic);
+				}
+			}
 	}
 	
 	public void createTopic(String topic) {
