@@ -2,19 +2,20 @@ package components;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
-import fr.sorbonne_u.components.examples.basic_cs.components.URIProvider;
-import fr.sorbonne_u.components.examples.basic_cs.interfaces.URIProviderI;
-import fr.sorbonne_u.components.examples.basic_cs.ports.URIProviderInboundPort;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
 import fr.sorbonne_u.components.exceptions.PreconditionException;
 import fr.sorbonne_u.components.ports.PortI;
 import interfaces.MessageI;
 import interfaces.ReceptionCI;
+import ports.PublisherManagementOutboundPort;
+import ports.SubscriberManagementOutbondPort;
 import ports.SubscriberReceptionInboundPort;
 
 public class Subscriber extends AbstractComponent{
 	
 	protected String subscriberReceptionInboundPortURI;
+	
+	protected SubscriberManagementOutbondPort smop;
 
 	public Subscriber(int nbThreads, int nbSchedulableThreads) {
 		super(nbThreads, nbSchedulableThreads);
@@ -22,7 +23,8 @@ public class Subscriber extends AbstractComponent{
 	
 	protected Subscriber(
 			String uri,
-			String receptionInboundPortURI) throws Exception
+			String receptionInboundPortURI,
+			String managementOutboundPortURI) throws Exception
 		{
 			super(uri, 1, 0);
 
@@ -32,6 +34,10 @@ public class Subscriber extends AbstractComponent{
 						new PreconditionException("receptionInboundPortURI can't be null!") ;
 
 			this.subscriberReceptionInboundPortURI = uri ;
+			
+			//Publish the management outbound port
+			this.smop = new SubscriberManagementOutbondPort(managementOutboundPortURI, this);
+			this.smop.localPublishPort();
 
 			//Publish the reception inbound port
 			PortI p = new SubscriberReceptionInboundPort(receptionInboundPortURI, this) ;
@@ -46,7 +52,7 @@ public class Subscriber extends AbstractComponent{
 			this.tracer.setTitle("subscriber") ;
 			this.tracer.setRelativePosition(0, 1) ;
 
-			URIProvider.checkInvariant(this) ;
+			Subscriber.checkInvariant(this) ;
 			assert	this.subscriberReceptionInboundPortURI.equals(uri) :
 						new PostconditionException("The URI prefix has not "
 													+ "been initialised!") ;

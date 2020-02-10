@@ -9,57 +9,48 @@ extends AbstractConnector
 implements ManagementCI  {
 
 	@Override
-	public void createTopic(String topic) {
-		// TODO Auto-generated method stub
-		
+	public void createTopic(String topic) throws Exception {
+		((ManagementCI)this.offering).createTopic(topic);
 	}
 
 	@Override
-	public void createTopics(String[] topic) {
-		// TODO Auto-generated method stub
-		
+	public void createTopics(String[] topic) throws Exception {
+		((ManagementCI)this.offering).createTopics(topic);
 	}
 
 	@Override
-	public void destroyTopic(String topic) {
-		// TODO Auto-generated method stub
-		
+	public void destroyTopic(String topic) throws Exception {
+		((ManagementCI)this.offering).destroyTopic(topic);
 	}
 
 	@Override
-	public boolean isTopic(String topic) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isTopic(String topic) throws Exception {
+		return ((ManagementCI)this.offering).isTopic(topic);
 	}
 
 	@Override
-	public String[] getTopics() {
-		// TODO Auto-generated method stub
-		return null;
+	public String[] getTopics() throws Exception {
+		return ((ManagementCI)this.offering).getTopics();
 	}
 
 	@Override
-	public void subscribe(String topic, String inboundPortURI) {
-		// TODO Auto-generated method stub
-		
+	public void subscribe(String topic, String inboundPortURI) throws Exception {
+		((ManagementCI)this.offering).subscribe(topic, inboundPortURI);
 	}
 
 	@Override
-	public void subscribe(String[] topics, String inboutPortURI) {
-		// TODO Auto-generated method stub
-		
+	public void subscribe(String[] topics, String inboutPortURI) throws Exception {
+		((ManagementCI)this.offering).subscribe(topics, inboutPortURI);
 	}
 
 	@Override
-	public void subscribe(String topic, MessageFilterI filter, String inboutPortURI) {
-		// TODO Auto-generated method stub
-		
+	public void subscribe(String topic, MessageFilterI filter, String inboutPortURI) throws Exception {
+		((ManagementCI)this.offering).subscribe(topic, filter, inboutPortURI);
 	}
 
 	@Override
-	public void unsubscribe(String topic, String inboundPortURI) {
-		// TODO Auto-generated method stub
-		
+	public void unsubscribe(String topic, String inboundPortURI) throws Exception {
+		((ManagementCI)this.offering).unsubscribe(topic, inboundPortURI);
 	}
 	
 }

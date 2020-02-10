@@ -4,11 +4,14 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 import interfaces.MessageI;
 import message.Message;
+import ports.PublisherManagementOutboundPort;
 import ports.PublisherPublicationOutboundPort;
 
 public class Publisher extends AbstractComponent{
 	
 	protected PublisherPublicationOutboundPort ppop;
+	
+	protected PublisherManagementOutboundPort pmop;
 	
 	//protected String publisherPublicationOutboundPortURI;
 
@@ -25,6 +28,9 @@ public class Publisher extends AbstractComponent{
 		//Publish the reception port (an outbound port is always local)
 		this.ppop = new PublisherPublicationOutboundPort(publicationOutboundPortURI, this);
 		this.ppop.localPublishPort();
+		
+		this.pmop = new PublisherManagementOutboundPort(publicationOutboundPortURI, this);
+		this.pmop.localPublishPort();
 		
 		if (AbstractCVM.isDistributed) {
 			this.executionLog.setDirectory(System.getProperty("user.dir")) ;
