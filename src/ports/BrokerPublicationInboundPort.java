@@ -32,7 +32,7 @@ implements PublicationCI{
 					@Override
 					public Void call() throws Exception {
 						((Broker)this.getServiceOwner()).publish(m, 
-								"notopic yet");
+								topic);
 						return null;
 						
 					}

@@ -60,7 +60,7 @@ extends AbstractPlugin
 				rop.getPortURI(), 
 				CVM.SUBSCRIBER_RECEPTION_INBOUND_PORT,
 				ReflectionConnector.class.getCanonicalName());
-		*/
+	    */
 		String[] uris = rop.findPortURIsFromInterface(ReceptionCI.class) ;
 		assert	uris != null && uris.length == 1 ;
 		

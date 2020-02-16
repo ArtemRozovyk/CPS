@@ -30,7 +30,7 @@ public class Message implements MessageI {
 
 	@Override
 	public String toString() {
-		return "Message{"+msg+"  ";
+		return "Message: "+msg+"  ";
 	}
 
 	@Override

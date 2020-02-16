@@ -1,14 +1,11 @@
 package components;
 
 import fr.sorbonne_u.components.AbstractComponent;
-import fr.sorbonne_u.components.annotations.AddPlugin;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
-import fr.sorbonne_u.components.examples.basic_cs.components.URIProvider;
-import fr.sorbonne_u.components.examples.basic_cs.interfaces.URIProviderI;
+import fr.sorbonne_u.components.examples.cps.components.ValueConsumer;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
 import fr.sorbonne_u.components.exceptions.PreconditionException;
-import fr.sorbonne_u.components.plugins.dconnection.example.components.ServerSideExample;
 import fr.sorbonne_u.components.ports.PortI;
 import interfaces.MessageFilterI;
 import interfaces.MessageI;
@@ -25,7 +22,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import connectors.ReceptionConnector;
-import ports.SubscriberManagementOutbondPort;
 
 public class Broker extends AbstractComponent {
 	private static int i;
@@ -33,7 +29,7 @@ public class Broker extends AbstractComponent {
 	//protected BrokerPublicationInboundPort bpip;
 	public final static String	DYNAMIC_CONNECTION_PLUGIN_URI =
 			"serverSidePLuginURI" ;
-	
+
 	public Broker(int nbThreads, int nbSchedulableThreads, BrokerReceptionOutboundPort brop,
 			Map<String, Set<String>> topicSubsUriMap, Map<String, Set<MessageI>> topicMessageStorageMap,
 			Map<String, MessageFilterI> subUriFilterMap, Map<String, BrokerReceptionOutboundPort> subUriPortObjMapMap,
@@ -55,7 +51,7 @@ public class Broker extends AbstractComponent {
 	private Map<String, Set<MessageI>> topicMessageStorageMap;
 	private Map<String, MessageFilterI> subUriFilterMap;
 	private Map<String,BrokerReceptionOutboundPort> subUriPortObjMap;
-	
+
 	public Broker(String reflectionInboundPortURI,
 				  int nbThreads,
 				  int nbSchedulableThreads,
@@ -76,7 +72,7 @@ public class Broker extends AbstractComponent {
 	protected Broker(int nbThreads, int nbSchedulableThreads) {
 		super(nbThreads, nbSchedulableThreads);
 	}
-	
+
 	protected Broker(String uri,
 			String publicationInboundPortURI,
 					 String managmentInboundPortURI) throws Exception
@@ -91,9 +87,9 @@ public class Broker extends AbstractComponent {
 			new PreconditionException("uri can't be null!") ;
 		assert	publicationInboundPortURI != null :
 			new PreconditionException("inbound port can't be null!") ;
-		
+
 		this.brokerPublicationInboundPortURI = uri;
-		
+
 		//Publish the reception port (an outbound port is always local)
 		/*this.brop = new BrokerReceptionOutboundPort(receptionOutboundPortURI, this);
 		this.brop.localPublishPort();
@@ -104,16 +100,16 @@ public class Broker extends AbstractComponent {
 
 		PortI m = new BrokerManagementInboundPort(managmentInboundPortURI, this);
 		m.publishPort();
-		
+
 		if (AbstractCVM.isDistributed) {
 			this.executionLog.setDirectory(System.getProperty("user.dir")) ;
 		} else {
 			this.executionLog.setDirectory(System.getProperty("user.home")) ;
 		}
-		
+
 		this.tracer.setTitle("broker") ;
 		this.tracer.setRelativePosition(1, 1) ;
-		
+
 		Broker.checkInvariant(this) ;
 
 		assert	this.brokerPublicationInboundPortURI.equals(uri) :
@@ -133,30 +129,121 @@ public class Broker extends AbstractComponent {
 
 	@Override
 	public void	start() throws ComponentStartException{
-		
+
 	}
 	@Override
 	public void execute() throws Exception{
 		int i = 0;
+			this.scheduleTask(
+					new AbstractComponent.AbstractTask() {
+						@Override
+						public void run() {
+							try {
+								//there are messages, find recepients
+								((Broker)this.getTaskOwner()).
+										acceptMessages() ;
+							} catch (Exception e) {
+								throw new RuntimeException(e) ;
+							}
+						}
+					},1000L, TimeUnit.MILLISECONDS) ; ;
 
 
 	}
-	
+	Integer nbstored =0 ;
+	public void acceptMessages() throws Exception {
+		new Thread(() -> {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			for(Map.Entry<String, Set<MessageI>> entry
+					: topicMessageStorageMap.entrySet()){
+				String topic = entry.getKey();
+				for(MessageI msg : entry.getValue()){
+					//all the msgs for this topic
+					//TODO include topic and filter
+					try {
+						for(String uriSub : topicSubsUriMap.get(topic)){
+							subUriPortObjMap.get(uriSub).acceptMessage(msg);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+
+
+			/*
+			for(Map.Entry<String, Set<MessageI>> entry
+					: topicMessageStorageMap.entrySet()){
+				for(MessageI msg : entry.getValue()){
+					//TODO include topic and filter
+						try {
+							for(Map.Entry<String, Set<String>> e
+									:topicSubsUriMap.entrySet()){
+								//for this topic
+
+								for(String sub : e.getValue()){
+									//all the subs to it
+									subUriPortObjMap.get(sub).acceptMessage(msg);
+								}
+
+
+
+							}
+
+
+
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
+				}
+			}
+
+			*/
+		}
+
+				 ).start();
+
+	}
+
+
+	/*
+		for(Map.Entry<String, Set<MessageI>> entry
+					: topicMessageStorageMap.entrySet()){
+		String topic = entry.getKey();
+		for(MessageI msg : entry.getValue()){
+			//all the msgs for this topic
+			//TODO include topic and filter
+			try {
+				for(String uriSub : topicSubsUriMap.get(topic)){
+					subUriPortObjMap.get(uriSub).acceptMessage(msg);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}*/
 	public void publish(MessageI m, String topic) throws Exception {
+
 		//voir le stockage et la publication
-		/*
-		Set<MessageI> storedMsgs;
-		if((storedMsgs=topicMessageStorageMap.get(topic))!=null){
-			storedMsgs.add(m);
-		}else {
-			//topic doesn't exist
-			throw new Exception("Topic doesnt exist");
-		}
-		*/
-		System.out.println(m);
-		for (BrokerReceptionOutboundPort s:subUriPortObjMap.values()){
-			s.acceptMessage(m);
-		}
+			Set<MessageI> storedMsgs;
+			if((storedMsgs=topicMessageStorageMap.get(topic))!=null){
+				storedMsgs.add(m);
+			}else {
+				Set<MessageI> s=new HashSet<>();
+				s.add(m);
+				topicMessageStorageMap.put(topic, s);
+			}
+
+
+
+
+
 
 	}
 
@@ -179,11 +266,11 @@ public class Broker extends AbstractComponent {
 				}
 			}
 	}
-	
+
 	public void createTopic(String topic) {
 		topicSubsUriMap.put(topic,new HashSet<>());
 	}
-	
+
 	public void createTopics(String[] topics) {
 		for(String t : topics){
 			createTopic(t);
@@ -209,13 +296,16 @@ public class Broker extends AbstractComponent {
 	public void subscribe(String topic, String inboundPortURI) throws Exception {
 		String outUri="outbound-reception-broker-uri"+i;
 		i++;
-		BrokerReceptionOutboundPort brop = 
+		BrokerReceptionOutboundPort brop =
 				new BrokerReceptionOutboundPort(outUri, this);
 		brop.publishPort();
 		this.doPortConnection(outUri,inboundPortURI,ReceptionConnector.class.getCanonicalName() );
 		subUriPortObjMap.put(inboundPortURI, brop);
-		
-		//create outbound port for each subscriber 
+
+		Set <String> uriSet = new HashSet<>();
+		uriSet.add(inboundPortURI);
+		topicSubsUriMap.put(topic,uriSet);
+		//create outbound port for each subscriber
 		//topicSubsUriMap.get(topic).add(inboundPortURI);
 		logMessage(inboundPortURI+" has subscribed");
 		//brop.acceptMessage(new Message("you have been connected to "+outUri));
@@ -223,7 +313,7 @@ public class Broker extends AbstractComponent {
 			brop.acceptMessage(new Message("You have been connected to "+outUri));
 		}catch (Exception e){
 			e.printStackTrace();
-			System.out.println("Got the bitch");
+			System.out.println("Got the b*tch");
 		}
 	}
 

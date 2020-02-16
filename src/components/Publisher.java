@@ -48,24 +48,34 @@ public class Publisher extends AbstractComponent{
 	
 	@Override
 	public void execute() throws Exception{
-		publish(new Message("6 degrees in Florida"), "weather");
+		String topic = "weather0";
+		String msg = "120 degrees in Florida";
+		for (int i =0; i <10;i ++) {
+			if(i>4){
+
+				topic="weather1";
+				msg = "40 degrees in Alaska";
+			}
+			logMessage("Publishing message "+i);
+			publish(new Message(msg), topic);
+		}
 	}
 	
 	public void publish(MessageI m, String topic) throws Exception {
-		System.out.println("publish");
-		for (int i =0; i <10;i ++) {
-			logMessage("Publishing message "+i);
+
 			this.scheduleTask(new AbstractComponent.AbstractTask() {
 				@Override
 				public void run() {
 					try {
-						((Publisher)this.getTaskOwner()).ppop.publish(m,topic);
+
+						((Publisher)
+								this.getTaskOwner()).ppop.publish(m,topic);
 					} catch (Exception e) {
 						throw new RuntimeException(e) ;
 					}
 				}
 			}, 1000, TimeUnit.MILLISECONDS) ;
 		}
-	}
+
 
 }

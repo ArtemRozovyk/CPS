@@ -105,9 +105,9 @@ public class Subscriber extends AbstractComponent{
 
 	@Override
 	public void execute() throws Exception {
-		logMessage("Subscribing to weather");
+		logMessage("Subscribing to weather"+i);
 
-			subscribe("weather");
+			subscribe("weather"+i);
 
 	}
 	public void acceptMessage(MessageI m) throws Exception {
