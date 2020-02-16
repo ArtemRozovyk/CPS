@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.AddPlugin;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
-import fr.sorbonne_u.components.examples.basic_cs.components.URIConsumer;
 import fr.sorbonne_u.components.plugins.dconnection.example.components.ServerSideExample;
 import interfaces.MessageI;
 import message.Message;
@@ -19,11 +18,8 @@ public class Publisher extends AbstractComponent{
 	
 	protected PublisherManagementOutboundPort pmop;
 	
-	//protected String publisherPublicationOutboundPortURI;
-
 	protected Publisher(int nbThreads, int nbSchedulableThreads) {
 		super(nbThreads, nbSchedulableThreads);
-		// TODO Auto-generated constructor stub
 	}
 
 	protected Publisher(String uri,

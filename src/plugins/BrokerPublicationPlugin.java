@@ -1,21 +1,14 @@
 package plugins;
 
-import connectors.PublicationConnector;
-import cvm.CVM;
 import fr.sorbonne_u.components.AbstractPlugin;
 import fr.sorbonne_u.components.ComponentI;
-import fr.sorbonne_u.components.reflection.connectors.ReflectionConnector;
-import fr.sorbonne_u.components.reflection.interfaces.ReflectionI;
-import fr.sorbonne_u.components.reflection.ports.ReflectionOutboundPort;
 import interfaces.MessageI;
 import interfaces.PublicationCI;
-import interfaces.PublicationsImplementationI;
 import ports.BrokerPublicationInboundPortForPlugin;
-import ports.PublisherPublicationOutboundPort;
 
 public class BrokerPublicationPlugin 
 extends AbstractPlugin
-implements PublicationsImplementationI
+implements PublicationCI
 {
 
 	private static final long serialVersionUID = 1L;
@@ -32,7 +25,7 @@ implements PublicationsImplementationI
 	{
 		super.installOn(owner);
 		
-		// We add the required interface and publish the outbound port
+		// We add the required interface and publish the inbound port
 		this.addOfferedInterface(PublicationCI.class);
 		this.bpipfp = new BrokerPublicationInboundPortForPlugin(
 											this.getPluginURI(), this.owner);
@@ -61,9 +54,9 @@ implements PublicationsImplementationI
 		this.removeOfferedInterface(PublicationCI.class);
 	}
 	
-	private PublicationsImplementationI getOwner()
+	private PublicationCI getOwner()
 	{
-		return (PublicationsImplementationI)this.getOwner();
+		return (PublicationCI)this.getOwner();
 	}
 
 

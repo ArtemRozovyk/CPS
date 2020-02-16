@@ -10,7 +10,7 @@ import fr.sorbonne_u.components.reflection.ports.ReflectionOutboundPort;
 import interfaces.PublicationCI;
 import ports.PublisherPublicationOutboundPort;
 
-public class PublisherClientPlugin 
+public class PublisherPublicationClientPlugin 
 extends AbstractPlugin
 {
 
