@@ -53,7 +53,7 @@ public class Publisher extends AbstractComponent{
 	
 	public void publish(MessageI m, String topic) throws Exception {
 		System.out.println("publish");
-		for (int i =0; i <1000;i ++) {
+		for (int i =0; i <10;i ++) {
 			logMessage("Publishing message "+i);
 			this.scheduleTask(new AbstractComponent.AbstractTask() {
 				@Override

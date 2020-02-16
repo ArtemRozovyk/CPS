@@ -55,12 +55,12 @@ extends AbstractPlugin
 		this.addRequiredInterface(ReflectionI.class);
 		ReflectionOutboundPort rop = new ReflectionOutboundPort(this.owner);
 		rop.publishPort();
-		
+		/*
 		this.owner.doPortConnection(
 				rop.getPortURI(), 
 				CVM.SUBSCRIBER_RECEPTION_INBOUND_PORT,
 				ReflectionConnector.class.getCanonicalName());
-		
+		*/
 		String[] uris = rop.findPortURIsFromInterface(ReceptionCI.class) ;
 		assert	uris != null && uris.length == 1 ;
 		
