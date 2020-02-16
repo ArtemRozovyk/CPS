@@ -23,7 +23,8 @@ public class Publisher extends AbstractComponent{
 	}
 
 	protected Publisher(String uri,
-			String publicationOutboundPortURI) throws Exception
+			String publicationOutboundPortURI,
+						String managementOutboundPort) throws Exception
 	{
 		super(uri, 0, 1) ;
 		
@@ -31,7 +32,7 @@ public class Publisher extends AbstractComponent{
 		this.ppop = new PublisherPublicationOutboundPort(publicationOutboundPortURI, this);
 		this.ppop.localPublishPort();
 		
-		this.pmop = new PublisherManagementOutboundPort(publicationOutboundPortURI, this);
+		this.pmop = new PublisherManagementOutboundPort(managementOutboundPort, this);
 		this.pmop.localPublishPort();
 		
 		if (AbstractCVM.isDistributed) {
@@ -47,25 +48,24 @@ public class Publisher extends AbstractComponent{
 	
 	@Override
 	public void execute() throws Exception{
-		publish(new Message("Hello bro"), "nothing");
+		publish(new Message("6 degrees in Florida"), "weather");
 	}
 	
 	public void publish(MessageI m, String topic) throws Exception {
-		logMessage("Publishing message "+m);
-		for (int i =0; i <5;i ++) {
+		System.out.println("publish");
+		for (int i =0; i <1000;i ++) {
+			logMessage("Publishing message "+i);
 			this.scheduleTask(new AbstractComponent.AbstractTask() {
 				@Override
 				public void run() {
 					try {
-						((Publisher)this.getTaskOwner()).publish(m, topic);							
+						((Publisher)this.getTaskOwner()).ppop.publish(m,topic);
 					} catch (Exception e) {
 						throw new RuntimeException(e) ;
 					}
 				}
 			}, 1000, TimeUnit.MILLISECONDS) ;
 		}
-		ppop.publish(m, topic);
-
 	}
 
 }

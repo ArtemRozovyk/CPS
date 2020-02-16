@@ -17,7 +17,7 @@ implements ReceptionCI{
 	@Override
 	public void acceptMessage(MessageI[] ms) {
 		// TODO Auto-generated method stub
-		
+		System.out.println("lol");
 	}
 
 }

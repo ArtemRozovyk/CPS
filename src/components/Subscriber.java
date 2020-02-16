@@ -1,12 +1,15 @@
 package components;
 
+import connectors.ManagementConnector;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
+import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
 import fr.sorbonne_u.components.exceptions.PreconditionException;
 import fr.sorbonne_u.components.ports.PortI;
 import interfaces.MessageI;
 import interfaces.ReceptionCI;
+import ports.BrokerManagementInboundPort;
 import ports.PublisherManagementOutboundPort;
 import ports.SubscriberManagementOutbondPort;
 import ports.SubscriberReceptionInboundPort;
@@ -14,8 +17,11 @@ import ports.SubscriberReceptionInboundPort;
 public class Subscriber extends AbstractComponent{
 	
 	protected String subscriberReceptionInboundPortURI;
-	
+	protected String myManagementOutbondPortURI;
+	protected String brokerManagementInboundPortURI;
+
 	protected SubscriberManagementOutbondPort smop;
+	protected BrokerManagementInboundPort bmip;
 
 	public Subscriber(int nbThreads, int nbSchedulableThreads) {
 		super(nbThreads, nbSchedulableThreads);
@@ -23,25 +29,27 @@ public class Subscriber extends AbstractComponent{
 	
 	protected Subscriber(
 			String uri,
-			String receptionInboundPortURI,
-			String managementOutboundPortURI) throws Exception
+			String managementOutboundPortURI,
+			String brokerManagementInboundPortURi) throws Exception
 		{
 			super(uri, 1, 0);
 
 			assert	uri != null :
 						new PreconditionException("uri can't be null!") ;
-			assert	receptionInboundPortURI != null :
-						new PreconditionException("receptionInboundPortURI can't be null!") ;
+			//assert	receptionInboundPortURI != null :
+			//			new PreconditionException("receptionInboundPortURI can't be null!") ;
 
-			this.subscriberReceptionInboundPortURI = uri ;
-			
+
 			//Publish the management outbound port
+			myManagementOutbondPortURI=managementOutboundPortURI;
+			this.brokerManagementInboundPortURI=brokerManagementInboundPortURi;
+
 			this.smop = new SubscriberManagementOutbondPort(managementOutboundPortURI, this);
 			this.smop.localPublishPort();
 
 			//Publish the reception inbound port
-			PortI p = new SubscriberReceptionInboundPort(receptionInboundPortURI, this) ;
-			p.publishPort() ;
+			//PortI p = new SubscriberReceptionInboundPort(receptionInboundPortURI, this) ;
+			//p.publishPort() ;
 
 			if (AbstractCVM.isDistributed) {
 				this.executionLog.setDirectory(System.getProperty("user.dir")) ;
@@ -53,23 +61,56 @@ public class Subscriber extends AbstractComponent{
 			this.tracer.setRelativePosition(0, 1) ;
 
 			Subscriber.checkInvariant(this) ;
-			assert	this.subscriberReceptionInboundPortURI.equals(uri) :
-						new PostconditionException("The URI prefix has not "
-													+ "been initialised!") ;
-			assert	this.isPortExisting(receptionInboundPortURI) :
+
+
+			assert	this.isPortExisting(managementOutboundPortURI) :
 						new PostconditionException("The component must have a "
-								+ "port with URI " + receptionInboundPortURI) ;
-			assert	this.findPortFromURI(receptionInboundPortURI).
+								+ "port with URI " + managementOutboundPortURI) ;
+			assert	this.findPortFromURI(managementOutboundPortURI).
 						getImplementedInterface().equals(ReceptionCI.class) :
 						new PostconditionException("The component must have a "
 								+ "port with implemented interface URIProviderI") ;
-			assert	this.findPortFromURI(receptionInboundPortURI).isPublished() :
+			assert	this.findPortFromURI(managementOutboundPortURI).isPublished() :
 						new PostconditionException("The component must have a "
-								+ "port published with URI " + receptionInboundPortURI) ;
+								+ "port published with URI " + managementOutboundPortURI) ;
 		}
-	
+
+	@Override
+	public void start() throws ComponentStartException {
+		super.start();
+
+		try {
+			this.doPortConnection(
+					myManagementOutbondPortURI,
+					brokerManagementInboundPortURI,
+					ManagementConnector.class.getCanonicalName());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+		/*
+	@Override
+	public void start() throws ComponentStartException {
+		super.start();
+		logMessage("Subscribing to weather");
+		try {
+			subscribe("weather");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}*/
+
+
+	@Override
+	public void execute() throws Exception {
+		logMessage("Subscribing to weather");
+
+			subscribe("weather");
+
+	}
 	public void acceptMessage(MessageI m) throws Exception {
-		
 		logMessage("Getting message "+m);
 	}
 	
@@ -79,10 +120,27 @@ public class Subscriber extends AbstractComponent{
 			logMessage("Getting message " + ms[i]);
 		}
 	}
-	public void subscribe() {
+	static int i = 0;
+	public void subscribe(String topic) throws Exception {
 		
-		//TODO 
-		//smop.subscribe(topic, inboundPortURI);
+		//TODO
+		i++;
+		this.subscriberReceptionInboundPortURI = "subscriber-reception-inbound-port-uri-"+i;
+
+		PortI p = new SubscriberReceptionInboundPort(subscriberReceptionInboundPortURI, this) ;
+		p.publishPort() ;
+
+		smop.subscribe(topic, subscriberReceptionInboundPortURI);
+
+		assert	this.subscriberReceptionInboundPortURI.equals("subscriber-reception-inbound-port-uri-"+i) :
+				new PostconditionException("The URI prefix has not "
+						+ "been initialised!") ;
+		assert	this.isPortExisting(subscriberReceptionInboundPortURI) :
+				new PostconditionException("The component must have a "
+						+ "port with URI " + subscriberReceptionInboundPortURI) ;
+		assert	this.findPortFromURI(subscriberReceptionInboundPortURI).isPublished() :
+				new PostconditionException("The component must have a "
+						+ "port published with URI " + subscriberReceptionInboundPortURI) ;
 	}
 	
 

@@ -2,6 +2,7 @@ package cvm;
 import components.Broker;
 import components.Publisher;
 import components.Subscriber;
+import connectors.ManagementConnector;
 import connectors.PublicationConnector;
 import connectors.ReceptionConnector;
 import fr.sorbonne_u.components.AbstractComponent;
@@ -17,21 +18,26 @@ public class CVM extends AbstractCVM{
 	}
 	public static final String PUBLISHER_COMPONENT_URI="my-URI-publisher";
 	public static final String BROKER_COMPONENT_URI="my-URI-broker";
-	public static final String SUBSCRIBER_COMPONENT_URI="my-URI-subscriber";
-	
+	public static final String SUBSCRIBER1_COMPONENT_URI="my-URI-subscriber1";
+	public static final String SUBSCRIBER2_COMPONENT_URI="my-URI-subscriber2";
+
 	public static final String BROKER_PUBLICATION_INBOUND_PORT="i-broker-publication";
+	public static final String BROKER_MANAGEMENT_INBOUND_PORT="i-broker-management";
+	public static final String PUBLISHER_MANAGEMENT_INBOUND_PORT="i-publisher-management";
 	public static final String BROKER_RECEPTION_OUTBOUND_PORT="o-broker-reception";
 	public static final String PUBLISHER_PUBLICATION_OUTBOUND_PORT="o-publisher-publication";
-	public static final String SUBSCRIBER_RECEPTION_INBOUND_PORT="i-subscriber-reception";
-	
+	public static final String SUBSCRIBER1_MANAGEMENT_OUTBOUND_PORT="o-subscriber1-management";
+	public static final String SUBSCRIBER2_MANAGEMENT_OUTBOUND_PORT="o-subscriber2-management";
+
 	public CVM()throws Exception {
 		super();
 	}
 	
 	protected String brokerURI;
 	protected String publisherURI;
-	protected String subscriberURI;
-	
+	protected String subscriberURI1;
+	protected String subscriberURI2;
+
 	/**
 	 * Creates the components, publishes theirs ports 
 	 * and links them together
@@ -44,8 +50,8 @@ public class CVM extends AbstractCVM{
 		this.brokerURI = AbstractComponent.createComponent(
 				Broker.class.getCanonicalName(),
 				new Object[] {BROKER_COMPONENT_URI,
-						BROKER_RECEPTION_OUTBOUND_PORT,
-						BROKER_PUBLICATION_INBOUND_PORT});
+						BROKER_PUBLICATION_INBOUND_PORT,
+						BROKER_MANAGEMENT_INBOUND_PORT});
 		
 		assert this.isDeployedComponent(this.brokerURI);
 		this.toggleTracing(this.brokerURI);
@@ -55,39 +61,74 @@ public class CVM extends AbstractCVM{
 		this.publisherURI = AbstractComponent.createComponent(
 				Publisher.class.getCanonicalName(),
 				new Object[] {PUBLISHER_COMPONENT_URI,
-						PUBLISHER_PUBLICATION_OUTBOUND_PORT});
+						PUBLISHER_PUBLICATION_OUTBOUND_PORT,
+						PUBLISHER_MANAGEMENT_INBOUND_PORT});
 		
 		assert this.isDeployedComponent(this.publisherURI);
 		this.toggleTracing(this.publisherURI);
 		this.toggleLogging(this.publisherURI);
 		
 		
-		//Create the Subscriber Component
-		this.subscriberURI = AbstractComponent.createComponent(
+		//Create the Subscriber1 Component
+		this.subscriberURI1 = AbstractComponent.createComponent(
 				Subscriber.class.getCanonicalName(),
-				new Object[] {SUBSCRIBER_COMPONENT_URI,
-						SUBSCRIBER_RECEPTION_INBOUND_PORT});
+				new Object[] {SUBSCRIBER1_COMPONENT_URI,
+						SUBSCRIBER1_MANAGEMENT_OUTBOUND_PORT,
+						BROKER_MANAGEMENT_INBOUND_PORT
+				});
 		
-		assert this.isDeployedComponent(this.subscriberURI);
-		this.toggleTracing(this.subscriberURI);
-		this.toggleLogging(this.subscriberURI);
-		
-		//Port connections
-		//Reception
+		assert this.isDeployedComponent(this.subscriberURI1);
+		this.toggleTracing(this.subscriberURI1);
+		this.toggleLogging(this.subscriberURI1);
+
+
+		//Create the Subscriber1 Component
+		this.subscriberURI2 = AbstractComponent.createComponent(
+				Subscriber.class.getCanonicalName(),
+				new Object[] {SUBSCRIBER2_COMPONENT_URI,
+						SUBSCRIBER2_MANAGEMENT_OUTBOUND_PORT
+						,BROKER_MANAGEMENT_INBOUND_PORT
+				});
+
+		assert this.isDeployedComponent(this.subscriberURI2);
+		this.toggleTracing(this.subscriberURI2);
+		this.toggleLogging(this.subscriberURI2);
+
+
+/*
+	Exception :Attempt to connect a server component port i-broker-management
+		//Conect the ports
 		this.doPortConnection(
 				this.brokerURI,
-				BROKER_RECEPTION_OUTBOUND_PORT,
-				SUBSCRIBER_RECEPTION_INBOUND_PORT,
-				ReceptionConnector.class.getCanonicalName());
-		
-		//Publication
+				BROKER_MANAGEMENT_INBOUND_PORT,
+				SUBSCRIBER1_MANAGEMENT_OUTBOUND_PORT,
+				ManagementConnector.class.getCanonicalName());
+
+		this.doPortConnection(
+				this.brokerURI,
+				BROKER_MANAGEMENT_INBOUND_PORT,
+				SUBSCRIBER2_MANAGEMENT_OUTBOUND_PORT,
+				ManagementConnector.class.getCanonicalName());*/
+
 		this.doPortConnection(
 				this.publisherURI,
 				PUBLISHER_PUBLICATION_OUTBOUND_PORT,
 				BROKER_PUBLICATION_INBOUND_PORT,
 				PublicationConnector.class.getCanonicalName());
+
+		//Port connections
+		//Reception IT IS DONE WHEN SUBSCRIBING
+	/*	this.doPortConnection(
+				this.brokerURI,
+				BROKER_RECEPTION_OUTBOUND_PORT,
+				SUBSCRIBER_RECEPTION_INBOUND_PORT,
+				ReceptionConnector.class.getCanonicalName());*/
+		
+		//Publication
 		
 		//Deployment
+
+
 		super.deploy();
 		assert this.deploymentDone();
 	}

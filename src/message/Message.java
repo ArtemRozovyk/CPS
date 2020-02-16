@@ -22,14 +22,15 @@ public class Message implements MessageI {
 	}
 
 	private Properties prop;
-
+	String msg;
 	public Message(String msg) {
-		super();
+		//super();
+		this.msg=msg;
 	}
 
 	@Override
 	public String toString() {
-		return "Message{" + ts.timestamper;
+		return "Message{"+msg+"  ";
 	}
 
 	@Override
