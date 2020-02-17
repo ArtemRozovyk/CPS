@@ -70,7 +70,6 @@ implements PublicationCI{
 	public void publish(MessageI[] ms, String[] topics) throws Exception {
 		this.owner.handleRequestAsync(
 				new AbstractComponent.AbstractService<Void>(this.pluginURI) {
-					String[] a = {"no topics yet"};
 					@Override
 					public Void call() throws Exception {
 						((Broker)this.getServiceOwner()).publish(ms, topics);

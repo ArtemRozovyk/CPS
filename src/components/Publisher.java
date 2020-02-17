@@ -8,6 +8,7 @@ import fr.sorbonne_u.components.cvm.AbstractCVM;
 import fr.sorbonne_u.components.plugins.dconnection.example.components.ServerSideExample;
 import interfaces.MessageI;
 import message.Message;
+import plugins.PublisherPublicationClientPlugin;
 import ports.PublisherManagementOutboundPort;
 import ports.PublisherPublicationOutboundPort;
 @AddPlugin(pluginClass = ServerSideExample.ServerSidePlugin.class,
@@ -17,6 +18,9 @@ public class Publisher extends AbstractComponent{
 	protected PublisherPublicationOutboundPort ppop;
 	
 	protected PublisherManagementOutboundPort pmop;
+	
+	public final static String	PUBLISHER_CLIENT_PUBLICATION_PLUGIN =
+			"publisher-publication-plugin-uri" ;
 	
 	protected Publisher(int nbThreads, int nbSchedulableThreads) {
 		super(nbThreads, nbSchedulableThreads);
@@ -34,6 +38,11 @@ public class Publisher extends AbstractComponent{
 		
 		this.pmop = new PublisherManagementOutboundPort(managementOutboundPort, this);
 		this.pmop.localPublishPort();
+		
+		// Install the plugin
+		/*PublisherPublicationClientPlugin pluginPublication = new PublisherPublicationClientPlugin();
+		pluginPublication.setPluginURI(PUBLISHER_CLIENT_PUBLICATION_PLUGIN);
+		this.installPlugin(pluginPublication);*/
 		
 		if (AbstractCVM.isDistributed) {
 			this.executionLog.setDirectory(System.getProperty("user.dir")) ;

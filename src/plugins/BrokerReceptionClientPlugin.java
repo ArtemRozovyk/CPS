@@ -51,7 +51,6 @@ extends AbstractPlugin
 	public void initialise() throws Exception
 	{
 		// We use the reflection approach to get the URI of the inbound port
-		// of the hash map component.
 		this.addRequiredInterface(ReflectionI.class);
 		ReflectionOutboundPort rop = new ReflectionOutboundPort(this.owner);
 		rop.publishPort();

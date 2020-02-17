@@ -9,6 +9,7 @@ import fr.sorbonne_u.components.exceptions.PreconditionException;
 import fr.sorbonne_u.components.ports.PortI;
 import interfaces.MessageI;
 import interfaces.ReceptionCI;
+import plugins.SubscriberReceptionPlugin;
 import ports.BrokerManagementInboundPort;
 import ports.PublisherManagementOutboundPort;
 import ports.SubscriberManagementOutbondPort;
@@ -22,6 +23,9 @@ public class Subscriber extends AbstractComponent{
 
 	protected SubscriberManagementOutbondPort smop;
 	protected BrokerManagementInboundPort bmip;
+	
+	public final static String	SUBSCRIBER_RECEPTION_PLUGIN =
+			"subscriber-reception-plugin-uri" ;
 
 	public Subscriber(int nbThreads, int nbSchedulableThreads) {
 		super(nbThreads, nbSchedulableThreads);
@@ -46,6 +50,11 @@ public class Subscriber extends AbstractComponent{
 
 			this.smop = new SubscriberManagementOutbondPort(managementOutboundPortURI, this);
 			this.smop.localPublishPort();
+			
+			// Install the plugin
+			/*SubscriberReceptionPlugin receptionPlugin = new SubscriberReceptionPlugin();
+			receptionPlugin.setPluginURI(SUBSCRIBER_RECEPTION_PLUGIN);
+			this.installPlugin(receptionPlugin);*/
 
 			//Publish the reception inbound port
 			//PortI p = new SubscriberReceptionInboundPort(receptionInboundPortURI, this) ;

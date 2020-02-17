@@ -11,6 +11,8 @@ import interfaces.MessageFilterI;
 import interfaces.MessageI;
 import interfaces.PublicationCI;
 import message.Message;
+import plugins.BrokerPublicationPlugin;
+import plugins.BrokerReceptionClientPlugin;
 import ports.BrokerManagementInboundPort;
 import ports.BrokerPublicationInboundPort;
 import ports.BrokerReceptionOutboundPort;
@@ -29,6 +31,12 @@ public class Broker extends AbstractComponent {
 	//protected BrokerPublicationInboundPort bpip;
 	public final static String	DYNAMIC_CONNECTION_PLUGIN_URI =
 			"serverSidePLuginURI" ;
+	
+	public final static String	BROKER_CLIENT_RECEPTION_PLUGIN =
+			"broker-recepetion-plugin-uri" ;
+	
+	public final static String	BROKER_PUBLICATION_PLUGIN =
+			"broker-publication-plugin-uri" ;
 
 	public Broker(int nbThreads, int nbSchedulableThreads, BrokerReceptionOutboundPort brop,
 			Map<String, Set<String>> topicSubsUriMap, Map<String, Set<MessageI>> topicMessageStorageMap,
@@ -100,6 +108,15 @@ public class Broker extends AbstractComponent {
 
 		PortI m = new BrokerManagementInboundPort(managmentInboundPortURI, this);
 		m.publishPort();
+		
+		// Install the plugins
+		/*BrokerReceptionClientPlugin pluginReception = new BrokerReceptionClientPlugin();
+		pluginReception.setPluginURI(BROKER_CLIENT_RECEPTION_PLUGIN);
+		this.installPlugin(pluginReception);
+		
+		BrokerPublicationPlugin pluginPublication = new BrokerPublicationPlugin();
+		pluginPublication.setPluginURI(BROKER_PUBLICATION_PLUGIN);
+		this.installPlugin(pluginPublication);*/
 
 		if (AbstractCVM.isDistributed) {
 			this.executionLog.setDirectory(System.getProperty("user.dir")) ;
