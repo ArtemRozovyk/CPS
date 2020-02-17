@@ -7,6 +7,7 @@ import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.reflection.connectors.ReflectionConnector;
 import fr.sorbonne_u.components.reflection.interfaces.ReflectionI;
 import fr.sorbonne_u.components.reflection.ports.ReflectionOutboundPort;
+import interfaces.MessageI;
 import interfaces.PublicationCI;
 import ports.PublisherPublicationOutboundPort;
 
@@ -96,6 +97,22 @@ extends AbstractPlugin
 		this.ppop.unpublishPort();
 		this.ppop.destroyPort();
 		this.removeRequiredInterface(PublicationCI.class);
+	}
+	
+	public void publish(MessageI m, String topic) throws Exception {
+		this.ppop.publish(m, topic);
+	}
+
+	public void publish(MessageI m, String[] topics) throws Exception {
+		this.ppop.publish(m, topics);
+	}
+
+	public void publish(MessageI[] ms, String topic) throws Exception {
+		this.ppop.publish(ms, topic);
+	}
+
+	public void publish(MessageI[] ms, String[] topics) throws Exception {
+		this.ppop.publish(ms, topics);
 	}
 	
 }

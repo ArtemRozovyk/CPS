@@ -84,7 +84,55 @@ public class Publisher extends AbstractComponent{
 					}
 				}
 			}, 1000, TimeUnit.MILLISECONDS) ;
-		}
+	}
+	
+	public void publish(MessageI[] ms, String topic) throws Exception {
+
+		this.scheduleTask(new AbstractComponent.AbstractTask() {
+			@Override
+			public void run() {
+				try {
+
+					((Publisher)
+							this.getTaskOwner()).ppop.publish(ms,topic);
+				} catch (Exception e) {
+					throw new RuntimeException(e) ;
+				}
+			}
+		}, 1000, TimeUnit.MILLISECONDS) ;
+	}
+	
+	public void publish(MessageI m, String[] topics) throws Exception {
+
+		this.scheduleTask(new AbstractComponent.AbstractTask() {
+			@Override
+			public void run() {
+				try {
+
+					((Publisher)
+							this.getTaskOwner()).ppop.publish(m,topics);
+				} catch (Exception e) {
+					throw new RuntimeException(e) ;
+				}
+			}
+		}, 1000, TimeUnit.MILLISECONDS) ;
+	}
+	
+	public void publish(MessageI[] ms, String[] topics) throws Exception {
+
+		this.scheduleTask(new AbstractComponent.AbstractTask() {
+			@Override
+			public void run() {
+				try {
+
+					((Publisher)
+							this.getTaskOwner()).ppop.publish(ms,topics);
+				} catch (Exception e) {
+					throw new RuntimeException(e) ;
+				}
+			}
+		}, 1000, TimeUnit.MILLISECONDS) ;
+	}
 
 
 }
