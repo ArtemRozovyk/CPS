@@ -105,9 +105,8 @@ public class Subscriber extends AbstractComponent{
 
 	@Override
 	public void execute() throws Exception {
-		logMessage("Subscribing to weather"+i);
 
-			subscribe("weather"+i);
+			subscribe("weather");
 
 	}
 	public void acceptMessage(MessageI m) throws Exception {
@@ -121,11 +120,18 @@ public class Subscriber extends AbstractComponent{
 		}
 	}
 	static int i = 0;
+	static Object iGuard = new Object();
 	public void subscribe(String topic) throws Exception {
 		
 		//TODO
-		i++;
-		this.subscriberReceptionInboundPortURI = "subscriber-reception-inbound-port-uri-"+i;
+		synchronized (iGuard){
+
+			this.subscriberReceptionInboundPortURI = "subscriber-reception-inbound-port-uri-"+i;
+			logMessage("Subscribing to weather"+i);
+			topic+=i;
+			i++;
+		}
+
 
 		PortI p = new SubscriberReceptionInboundPort(subscriberReceptionInboundPortURI, this) ;
 		p.publishPort() ;
