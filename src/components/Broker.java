@@ -7,10 +7,10 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
 import fr.sorbonne_u.components.exceptions.PreconditionException;
 import fr.sorbonne_u.components.ports.PortI;
-import interfaces.MessageFilterI;
 import interfaces.MessageI;
 import interfaces.PublicationCI;
 import message.Message;
+import message.MessageFilterI;
 import plugins.BrokerPublicationPlugin;
 import plugins.BrokerReceptionClientPlugin;
 import ports.BrokerManagementInboundPort;
@@ -183,6 +183,7 @@ public class Broker extends AbstractComponent {
 					//TODO include topic and filter
 					try {
 						for(String uriSub : topicSubsUriMap.get(topic)){
+							//trouver le filte 
 							subUriPortObjMap.get(uriSub).acceptMessage(msg);
 						}
 					} catch (Exception e) {
@@ -340,9 +341,10 @@ public class Broker extends AbstractComponent {
 		}
 	}
 
-	public void subscribe(String topic, MessageFilterI filter, String inboutPortURI) {
+	public void subscribe(String topic, MessageFilterI filter, String inboutPortURI) throws Exception {
 		topicSubsUriMap.get(topic).add(inboutPortURI);
 		subUriFilterMap.put(inboutPortURI,filter);
+		subscribe(topic, inboutPortURI);
 
 	}
 

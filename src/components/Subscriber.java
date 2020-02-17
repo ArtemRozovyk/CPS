@@ -146,6 +146,7 @@ public class Subscriber extends AbstractComponent{
 		p.publishPort() ;
 
 		smop.subscribe(topic, subscriberReceptionInboundPortURI);
+		//smop.subscribe(topic, m -> m.location == floride, subscriberReceptionInboundPortURI);
 
 		assert	this.subscriberReceptionInboundPortURI.equals("subscriber-reception-inbound-port-uri-"+i) :
 				new PostconditionException("The URI prefix has not "

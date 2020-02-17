@@ -2,7 +2,7 @@ package connectors;
 
 import fr.sorbonne_u.components.connectors.AbstractConnector;
 import interfaces.ManagementCI;
-import interfaces.MessageFilterI;
+import message.MessageFilterI;
 
 public class ManagementConnector 
 extends AbstractConnector 

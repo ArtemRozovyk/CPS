@@ -5,7 +5,7 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import interfaces.ManagementCI;
-import interfaces.MessageFilterI;
+import message.MessageFilterI;
 
 public class BrokerManagementInboundPort 
 extends AbstractInboundPort 

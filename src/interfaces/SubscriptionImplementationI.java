@@ -1,5 +1,7 @@
 package interfaces;
 
+import message.MessageFilterI;
+
 public interface SubscriptionImplementationI {
 
 	void subscribe(String topic, String inboundPortURI) throws Exception;

@@ -3,7 +3,7 @@ package ports;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
 import interfaces.ManagementCI;
-import interfaces.MessageFilterI;
+import message.MessageFilterI;
 
 public class SubscriberManagementOutbondPort 
 extends AbstractOutboundPort 
