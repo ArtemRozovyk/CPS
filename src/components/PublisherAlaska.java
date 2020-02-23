@@ -2,10 +2,12 @@ package components;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import message.Message;
-import plugins.PublisherPlugin;
+import plugins.PublisherManagementPlugin;
+import plugins.PublisherPublicationPlugin;
 
 public class PublisherAlaska extends AbstractComponent {
-    protected final static String	ALASKA_PLUGIN_URI = "publisher-alaska-plugin-uri" ;
+    protected final static String	ALASKA_PUB_PLUGIN_URI = "publisher-alaska-pub-plugin-uri" ;
+    protected final static String	ALASKA_MAN_PLUGIN_URI = "publisher-alaska-man-plugin-uri" ;
 
     protected PublisherAlaska(int nbThreads, int nbSchedulableThreads) {
         super(nbThreads, nbSchedulableThreads);
@@ -13,16 +15,23 @@ public class PublisherAlaska extends AbstractComponent {
 
     protected PublisherAlaska(String reflectionInboundPortURI) throws Exception {
         super(reflectionInboundPortURI, 0, 1);
-        PublisherPlugin pluginPublication = new PublisherPlugin();
-        pluginPublication.setPluginURI(ALASKA_PLUGIN_URI);
+        PublisherPublicationPlugin pluginPublication = new PublisherPublicationPlugin();
+        pluginPublication.setPluginURI(ALASKA_PUB_PLUGIN_URI);
         this.installPlugin(pluginPublication);
+
+        PublisherManagementPlugin managementPlugin = new PublisherManagementPlugin();
+        managementPlugin.setPluginURI(ALASKA_MAN_PLUGIN_URI);
+        this.installPlugin(managementPlugin);
+
         this.tracer.setTitle("publisher-alaska") ;
         this.tracer.setRelativePosition(2, 1) ;
     }
 
     @Override
     public void execute() throws Exception{
+
         String topic = "weather0";
+        createTopic(topic);
         String msg = "120 degrees in Florida";
         for (int i =0; i <10;i ++) {
             if(i>4){
@@ -37,7 +46,10 @@ public class PublisherAlaska extends AbstractComponent {
 
 
     private void publish(Message message, String topic) throws Exception {
-        ((PublisherPlugin)this.getPlugin(ALASKA_PLUGIN_URI)).publish(message,topic);
+        ((PublisherPublicationPlugin)this.getPlugin(ALASKA_PUB_PLUGIN_URI)).publish(message,topic);
+    }
+    public void createTopic(String topic) throws Exception {
+        ((PublisherManagementPlugin)this.getPlugin(ALASKA_MAN_PLUGIN_URI)).createTopic(topic);
     }
 
 }
