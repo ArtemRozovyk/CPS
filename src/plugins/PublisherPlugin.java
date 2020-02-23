@@ -1,5 +1,6 @@
 package plugins;
 
+import connectors.ManagementConnector;
 import connectors.PublicationConnector;
 import cvm.CVM;
 import fr.sorbonne_u.components.AbstractPlugin;
@@ -7,11 +8,13 @@ import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.reflection.connectors.ReflectionConnector;
 import fr.sorbonne_u.components.reflection.interfaces.ReflectionI;
 import fr.sorbonne_u.components.reflection.ports.ReflectionOutboundPort;
+import interfaces.ManagementCI;
 import interfaces.MessageI;
 import interfaces.PublicationCI;
+import ports.PublisherManagementOutboundPort;
 import ports.PublisherPublicationOutboundPort;
 
-public class PublisherPublicationClientPlugin 
+public class PublisherPlugin
 extends AbstractPlugin
 {
 
@@ -19,7 +22,8 @@ extends AbstractPlugin
 	
 	/** Outbound port required to connect to the Broker component **/
 	protected PublisherPublicationOutboundPort ppop;
-	
+	protected PublisherManagementOutboundPort pmop;
+
 	
 	/**
 	 * Used in components to install the plugin
@@ -33,6 +37,10 @@ extends AbstractPlugin
 		this.addRequiredInterface(PublicationCI.class);
 		this.ppop = new PublisherPublicationOutboundPort(this.owner);
 		this.ppop.publishPort();
+		//management
+		this.addRequiredInterface(ManagementCI.class);
+		this.pmop = new PublisherManagementOutboundPort(this.owner);
+		this.pmop.publishPort();
 	}
 	
 	/**
@@ -58,11 +66,14 @@ extends AbstractPlugin
 		
 		this.owner.doPortConnection(
 				rop.getPortURI(), 
-				CVM.BROKER_PUBLICATION_INBOUND_PORT,
+				CVM.BROKER_COMPONENT_URI,
 				ReflectionConnector.class.getCanonicalName());
 		
-		String[] uris = rop.findPortURIsFromInterface(PublicationCI.class) ;
-		assert	uris != null && uris.length == 1 ;
+		String[] urisPub = rop.findPortURIsFromInterface(PublicationCI.class) ;
+		assert	urisPub != null && urisPub.length == 1 ;
+
+		String[] urisManage = rop.findPortURIsFromInterface(ManagementCI.class) ;
+		assert	urisManage != null && urisManage.length == 1 ;
 		
 		this.owner.doPortDisconnection(rop.getPortURI()) ;
 		rop.unpublishPort() ;
@@ -72,8 +83,12 @@ extends AbstractPlugin
 		// connect the outbound port.
 		this.owner.doPortConnection(
 				this.ppop.getPortURI(),
-				uris[0],
+				urisPub[0],
 				PublicationConnector.class.getCanonicalName()) ;
+		this.owner.doPortConnection(
+				this.pmop.getPortURI(),
+				urisManage[0],
+				ManagementConnector.class.getCanonicalName()) ;
 
 		super.initialise();
 	}

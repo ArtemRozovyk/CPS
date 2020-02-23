@@ -1,6 +1,7 @@
 package cvm;
 import components.Broker;
 import components.Publisher;
+import components.PublisherAlaska;
 import components.Subscriber;
 import connectors.ManagementConnector;
 import connectors.PublicationConnector;
@@ -17,6 +18,7 @@ public class CVM extends AbstractCVM{
 		super(isDistributed);
 	}
 	public static final String PUBLISHER_COMPONENT_URI="my-URI-publisher";
+	public static final String PUBLISHER_ALASKA_COMPONENT_URI="my-URI-publisher-alaska";
 	public static final String BROKER_COMPONENT_URI="my-URI-broker";
 	public static final String SUBSCRIBER1_COMPONENT_URI="my-URI-subscriber1";
 	public static final String SUBSCRIBER2_COMPONENT_URI="my-URI-subscriber2";
@@ -35,6 +37,7 @@ public class CVM extends AbstractCVM{
 	
 	protected String brokerURI;
 	protected String publisherURI;
+	protected String publisherAlaksaURI;
 	protected String subscriberURI1;
 	protected String subscriberURI2;
 
@@ -110,7 +113,7 @@ public class CVM extends AbstractCVM{
 				SUBSCRIBER2_MANAGEMENT_OUTBOUND_PORT,
 				ManagementConnector.class.getCanonicalName());*/
 
-		this.doPortConnection(
+		 this.doPortConnection(
 				this.publisherURI,
 				PUBLISHER_PUBLICATION_OUTBOUND_PORT,
 				BROKER_PUBLICATION_INBOUND_PORT,
@@ -127,6 +130,30 @@ public class CVM extends AbstractCVM{
 		//Publication
 		
 		//Deployment
+
+
+
+		//TODO PLUGIN TESTING
+
+
+		this.publisherAlaksaURI= AbstractComponent.createComponent(
+				PublisherAlaska.class.getCanonicalName(),
+				new Object[] {PUBLISHER_ALASKA_COMPONENT_URI});
+
+
+
+		assert this.isDeployedComponent(this.publisherAlaksaURI);
+		this.toggleTracing(this.publisherAlaksaURI);
+		this.toggleLogging(this.publisherAlaksaURI);
+
+
+
+
+
+
+
+
+
 
 
 		super.deploy();

@@ -9,6 +9,7 @@ import fr.sorbonne_u.components.exceptions.PreconditionException;
 import fr.sorbonne_u.components.ports.PortI;
 import interfaces.MessageI;
 import interfaces.PublicationCI;
+import interfaces.ReceptionCI;
 import message.Message;
 import message.MessageFilterI;
 import plugins.BrokerPublicationPlugin;
@@ -37,19 +38,6 @@ public class Broker extends AbstractComponent {
 	
 	public final static String	BROKER_PUBLICATION_PLUGIN =
 			"broker-publication-plugin-uri" ;
-
-	public Broker(int nbThreads, int nbSchedulableThreads, BrokerReceptionOutboundPort brop,
-			Map<String, Set<String>> topicSubsUriMap, Map<String, Set<MessageI>> topicMessageStorageMap,
-			Map<String, MessageFilterI> subUriFilterMap, Map<String, BrokerReceptionOutboundPort> subUriPortObjMapMap,
-			 String brokerPublicationInboundPortURI) {
-		super(nbThreads, nbSchedulableThreads);
-		this.brop = brop;
-		this.topicSubsUriMap = topicSubsUriMap;
-		this.topicMessageStorageMap = topicMessageStorageMap;
-		this.subUriFilterMap = subUriFilterMap;
-		this.subUriPortObjMap = subUriPortObjMapMap;
-		this.brokerPublicationInboundPortURI = brokerPublicationInboundPortURI;
-	}
 
 
 
@@ -167,7 +155,7 @@ public class Broker extends AbstractComponent {
 
 
 	}
-	Integer nbstored =0 ;
+
 	public void acceptMessages() throws Exception {
 		new Thread(() -> {
 			try {
@@ -183,8 +171,15 @@ public class Broker extends AbstractComponent {
 					//TODO include topic and filter
 					try {
 						for(String uriSub : topicSubsUriMap.get(topic)){
-							//trouver le filte 
-							subUriPortObjMap.get(uriSub).acceptMessage(msg);
+							//trouver le filte
+							MessageFilterI filter ;
+							if((filter=subUriFilterMap.get(uriSub))!=null){
+								if(filter.filter(msg)){
+									subUriPortObjMap.get(uriSub).acceptMessage(msg);
+								}
+							}else{
+								subUriPortObjMap.get(uriSub).acceptMessage(msg);
+							}
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -193,61 +188,12 @@ public class Broker extends AbstractComponent {
 			}
 
 
-
-			/*
-			for(Map.Entry<String, Set<MessageI>> entry
-					: topicMessageStorageMap.entrySet()){
-				for(MessageI msg : entry.getValue()){
-					//TODO include topic and filter
-						try {
-							for(Map.Entry<String, Set<String>> e
-									:topicSubsUriMap.entrySet()){
-								//for this topic
-
-								for(String sub : e.getValue()){
-									//all the subs to it
-									subUriPortObjMap.get(sub).acceptMessage(msg);
-								}
-
-
-
-							}
-
-
-
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-
-				}
-			}
-
-			*/
 		}
-
 				 ).start();
-
 	}
 
 
-	/*
-		for(Map.Entry<String, Set<MessageI>> entry
-					: topicMessageStorageMap.entrySet()){
-		String topic = entry.getKey();
-		for(MessageI msg : entry.getValue()){
-			//all the msgs for this topic
-			//TODO include topic and filter
-			try {
-				for(String uriSub : topicSubsUriMap.get(topic)){
-					subUriPortObjMap.get(uriSub).acceptMessage(msg);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}*/
 	public void publish(MessageI m, String topic) throws Exception {
-
 		//voir le stockage et la publication
 			Set<MessageI> storedMsgs;
 			if((storedMsgs=topicMessageStorageMap.get(topic))!=null){
@@ -257,12 +203,6 @@ public class Broker extends AbstractComponent {
 				s.add(m);
 				topicMessageStorageMap.put(topic, s);
 			}
-
-
-
-
-
-
 	}
 
 	public void publish(MessageI m, String[] topics) throws Exception {
@@ -304,16 +244,15 @@ public class Broker extends AbstractComponent {
 	}
 
 	public String[] getTopics() {
-
 		Set<String > tset= topicSubsUriMap.keySet();
 		String [] topics = new String [tset.size()];
 		return tset.toArray(topics);
-
 	}
 
 	public void subscribe(String topic, String inboundPortURI) throws Exception {
 		String outUri="outbound-reception-broker-uri"+i;
 		i++;
+		this.addRequiredInterface(ReceptionCI.class);
 		BrokerReceptionOutboundPort brop =
 				new BrokerReceptionOutboundPort(outUri, this);
 		brop.publishPort();
@@ -331,7 +270,6 @@ public class Broker extends AbstractComponent {
 			brop.acceptMessage(new Message("You have been connected to "+outUri));
 		}catch (Exception e){
 			e.printStackTrace();
-			System.out.println("Got the b*tch");
 		}
 	}
 

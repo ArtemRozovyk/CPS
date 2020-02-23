@@ -3,20 +3,15 @@ package components;
 import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
-import fr.sorbonne_u.components.annotations.AddPlugin;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
-import fr.sorbonne_u.components.plugins.dconnection.example.components.ServerSideExample;
 import interfaces.MessageI;
 import message.Message;
-import plugins.PublisherPublicationClientPlugin;
 import ports.PublisherManagementOutboundPort;
 import ports.PublisherPublicationOutboundPort;
-@AddPlugin(pluginClass = ServerSideExample.ServerSidePlugin.class,
-pluginURI = ServerSideExample.DYNAMIC_CONNECTION_PLUGIN_URI)
+
 public class Publisher extends AbstractComponent{
 	
 	protected PublisherPublicationOutboundPort ppop;
-	
 	protected PublisherManagementOutboundPort pmop;
 	
 	public final static String	PUBLISHER_CLIENT_PUBLICATION_PLUGIN =
@@ -49,7 +44,6 @@ public class Publisher extends AbstractComponent{
 		} else {
 			this.executionLog.setDirectory(System.getProperty("user.home")) ;
 		}
-		
 		this.tracer.setTitle("publisher") ;
 		this.tracer.setRelativePosition(1, 0) ;
 	}
@@ -58,12 +52,11 @@ public class Publisher extends AbstractComponent{
 	@Override
 	public void execute() throws Exception{
 		String topic = "weather0";
-		String msg = "120 degrees in Florida";
+		String msg = "110 degrees in Denver";
 		for (int i =0; i <10;i ++) {
 			if(i>4){
-
 				topic="weather1";
-				msg = "40 degrees in Alaska";
+				msg = "150 degrees in Acapulco";
 			}
 			logMessage("Publishing message "+i);
 			publish(new Message(msg), topic);
@@ -71,12 +64,10 @@ public class Publisher extends AbstractComponent{
 	}
 	
 	public void publish(MessageI m, String topic) throws Exception {
-
 			this.scheduleTask(new AbstractComponent.AbstractTask() {
 				@Override
 				public void run() {
 					try {
-
 						((Publisher)
 								this.getTaskOwner()).ppop.publish(m,topic);
 					} catch (Exception e) {
@@ -87,7 +78,6 @@ public class Publisher extends AbstractComponent{
 	}
 	
 	public void publish(MessageI[] ms, String topic) throws Exception {
-
 		this.scheduleTask(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
@@ -103,12 +93,10 @@ public class Publisher extends AbstractComponent{
 	}
 	
 	public void publish(MessageI m, String[] topics) throws Exception {
-
 		this.scheduleTask(new AbstractComponent.AbstractTask() {
 			@Override
 			public void run() {
 				try {
-
 					((Publisher)
 							this.getTaskOwner()).ppop.publish(m,topics);
 				} catch (Exception e) {

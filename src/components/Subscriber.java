@@ -134,7 +134,6 @@ public class Subscriber extends AbstractComponent{
 		
 		//TODO
 		synchronized (iGuard){
-
 			this.subscriberReceptionInboundPortURI = "subscriber-reception-inbound-port-uri-"+i;
 			logMessage("Subscribing to weather"+i);
 			topic+=i;

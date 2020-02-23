@@ -14,8 +14,8 @@ implements ManagementCI {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public PublisherManagementOutboundPort(Class<?> implementedInterface, ComponentI owner) throws Exception {
-		super(implementedInterface, owner);
+	public PublisherManagementOutboundPort( ComponentI owner) throws Exception {
+		super(ManagementCI.class, owner);
 	}
 	
 	public PublisherManagementOutboundPort(String uri, ComponentI owner) throws Exception {
