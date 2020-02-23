@@ -31,7 +31,7 @@ implements ReceptionCI{
 
 					@Override
 					public Void call() throws Exception {
-						((Subscriber)this.getServiceOwner()).acceptMessage(m);
+						((ReceptionCI)this.getServiceOwner()).acceptMessage(m);
 						return null;
 					}
 				});
@@ -44,7 +44,7 @@ implements ReceptionCI{
 
 					@Override
 					public Void call() throws Exception {
-						((Subscriber)this.getServiceOwner()).acceptMessage(ms);
+						((ReceptionCI)this.getServiceOwner()).acceptMessage(ms);
 						return null;
 					}
 				});

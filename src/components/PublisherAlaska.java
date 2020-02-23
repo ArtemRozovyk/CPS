@@ -24,7 +24,7 @@ public class PublisherAlaska extends AbstractComponent {
         this.installPlugin(managementPlugin);
 
         this.tracer.setTitle("publisher-alaska") ;
-        this.tracer.setRelativePosition(2, 1) ;
+        this.tracer.setRelativePosition(1, 2) ;
     }
 
     @Override
@@ -32,13 +32,15 @@ public class PublisherAlaska extends AbstractComponent {
 
         String topic = "weather0";
         createTopic(topic);
+        createTopic("weather3");
+
         String msg = "120 degrees in Florida";
         for (int i =0; i <10;i ++) {
             if(i>4){
-                topic="weather1";
+                topic="weather3";
                 msg = "40 degrees in Alaska";
             }
-            logMessage("Publishing message "+i);
+            logMessage("Publishing message "+i+ " for topic : "+ topic);
             publish(new Message(msg), topic);
         }
     }

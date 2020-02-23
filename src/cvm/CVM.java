@@ -1,8 +1,5 @@
 package cvm;
-import components.Broker;
-import components.Publisher;
-import components.PublisherAlaska;
-import components.Subscriber;
+import components.*;
 import connectors.ManagementConnector;
 import connectors.PublicationConnector;
 import connectors.ReceptionConnector;
@@ -13,6 +10,8 @@ import fr.sorbonne_u.components.cvm.AbstractCVM;
  * The class <code>CVM</code> implements the single JVM assembly
  */
 public class CVM extends AbstractCVM{
+
+	private static final String SUBSCRIBER_ALASKA_COMPONENT_URI = "alaska-sub-URI-publisher";;
 
 	public CVM(boolean isDistributed) throws Exception {
 		super(isDistributed);
@@ -40,6 +39,7 @@ public class CVM extends AbstractCVM{
 	protected String publisherAlaksaURI;
 	protected String subscriberURI1;
 	protected String subscriberURI2;
+	private String subscriberAlaska;
 
 	/**
 	 * Creates the components, publishes theirs ports 
@@ -48,30 +48,30 @@ public class CVM extends AbstractCVM{
 	@Override
 	public void deploy() throws Exception{
 		assert	!this.deploymentDone() ;
-		
+
 		//Create the Broker component
 		this.brokerURI = AbstractComponent.createComponent(
 				Broker.class.getCanonicalName(),
 				new Object[] {BROKER_COMPONENT_URI,
 						BROKER_PUBLICATION_INBOUND_PORT,
 						BROKER_MANAGEMENT_INBOUND_PORT});
-		
+
 		assert this.isDeployedComponent(this.brokerURI);
 		this.toggleTracing(this.brokerURI);
 		this.toggleLogging(this.brokerURI);
-		
+
 		// Create the Publisher component
 		this.publisherURI = AbstractComponent.createComponent(
 				Publisher.class.getCanonicalName(),
 				new Object[] {PUBLISHER_COMPONENT_URI,
 						PUBLISHER_PUBLICATION_OUTBOUND_PORT,
 						PUBLISHER_MANAGEMENT_INBOUND_PORT});
-		
+
 		assert this.isDeployedComponent(this.publisherURI);
 		this.toggleTracing(this.publisherURI);
 		this.toggleLogging(this.publisherURI);
-		
-		
+
+
 		//Create the Subscriber1 Component
 		this.subscriberURI1 = AbstractComponent.createComponent(
 				Subscriber.class.getCanonicalName(),
@@ -79,7 +79,7 @@ public class CVM extends AbstractCVM{
 						SUBSCRIBER1_MANAGEMENT_OUTBOUND_PORT,
 						BROKER_MANAGEMENT_INBOUND_PORT
 				});
-		
+
 		assert this.isDeployedComponent(this.subscriberURI1);
 		this.toggleTracing(this.subscriberURI1);
 		this.toggleLogging(this.subscriberURI1);
@@ -126,34 +126,34 @@ public class CVM extends AbstractCVM{
 				BROKER_RECEPTION_OUTBOUND_PORT,
 				SUBSCRIBER_RECEPTION_INBOUND_PORT,
 				ReceptionConnector.class.getCanonicalName());*/
-		
+
 		//Publication
-		
+
 		//Deployment
 
 
 
 		//TODO PLUGIN TESTING
 
-
+		//plugin publisher
 		this.publisherAlaksaURI= AbstractComponent.createComponent(
 				PublisherAlaska.class.getCanonicalName(),
 				new Object[] {PUBLISHER_ALASKA_COMPONENT_URI});
-
-
 
 		assert this.isDeployedComponent(this.publisherAlaksaURI);
 		this.toggleTracing(this.publisherAlaksaURI);
 		this.toggleLogging(this.publisherAlaksaURI);
 
 
+		//plugin subscriber
 
+		this.subscriberAlaska= AbstractComponent.createComponent(
+				SubscriberAlaska.class.getCanonicalName(),
+				new Object[] {SUBSCRIBER_ALASKA_COMPONENT_URI});
 
-
-
-
-
-
+		assert this.isDeployedComponent(this.subscriberAlaska);
+		this.toggleTracing(this.subscriberAlaska);
+		this.toggleLogging(this.subscriberAlaska);
 
 
 		super.deploy();
@@ -175,7 +175,7 @@ public class CVM extends AbstractCVM{
 	{
 		try {
 			CVM c = new CVM() ;
-			c.startStandardLifeCycle(20000L) ;
+			c.startStandardLifeCycle(60000L) ;
 			Thread.sleep(5000L) ;
 			System.exit(0) ;
 		} catch (Exception e) {

@@ -15,8 +15,8 @@ implements  ManagementCI
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public SubscriberManagementOutbondPort(Class<?> implementedInterface, ComponentI owner) throws Exception {
-		super(implementedInterface, owner);
+	public SubscriberManagementOutbondPort( ComponentI owner) throws Exception {
+		super(ManagementCI.class, owner);
 	}
 	
 	public SubscriberManagementOutbondPort(String uri, ComponentI owner) throws Exception {

@@ -1,16 +1,38 @@
 package components;
 
 import fr.sorbonne_u.components.AbstractComponent;
+import fr.sorbonne_u.components.exceptions.PostconditionException;
 import interfaces.MessageI;
-import plugins.SubscriberPlugin;
+import interfaces.ReceptionCI;
+import plugins.SubscriberManagementPlugin;
+import plugins.SubscriberReceptionPlugin;
+import ports.SubscriberManagementOutbondPort;
 
-public class SubscriberAlaska extends AbstractComponent {
-    protected final static String	SUB_ALASKA_PLUGIN_URI = "sub-alaska-uri" ;
+public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
+    protected final static String	SUB_ALASKA_RECEPT_PLUGIN_URI = "sub-alaska-recept-uri" ;
+    protected final static String	SUB_ALASKA_MANAGE_PLUGIN_URI = "sub-alaska-manage-uri" ;
 
+    static int i = 0;
+    static final Object iGuard = new Object();
+    private String subscriberReceptionInboundPortURI= "subscriber-reception-inbound-port-uri-3";
 
 
     protected SubscriberAlaska(String reflectionInboundPortURI) throws Exception {
         super(reflectionInboundPortURI, 0, 1);
+
+        SubscriberManagementPlugin smp = new SubscriberManagementPlugin();
+        smp.setPluginURI(SUB_ALASKA_MANAGE_PLUGIN_URI);
+        this.installPlugin(smp);
+
+        //unstailling the plgin that will create port and publish it
+        SubscriberReceptionPlugin subscriberPlugin
+                = new SubscriberReceptionPlugin(subscriberReceptionInboundPortURI,SUB_ALASKA_RECEPT_PLUGIN_URI);
+        subscriberPlugin.setPluginURI(SUB_ALASKA_RECEPT_PLUGIN_URI);
+        this.installPlugin(subscriberPlugin);
+
+        this.tracer.setTitle("sub-alaska") ;
+        this.tracer.setRelativePosition(0, 2) ;
+
 
     }
 
@@ -19,15 +41,17 @@ public class SubscriberAlaska extends AbstractComponent {
     @Override
     public void			execute() throws Exception {
         super.execute();
-        SubscriberPlugin subscriberPlugin = new SubscriberPlugin();
-        subscriberPlugin.setPluginURI(SUB_ALASKA_PLUGIN_URI);
+
+        /*
+        SubscriberReceptionPlugin subscriberPlugin = new SubscriberReceptionPlugin();
+        subscriberPlugin.setPluginURI(SUB_ALASKA_RECEPT_PLUGIN_URI);
         this.installPlugin(subscriberPlugin);
-        this.tracer.setTitle("sub-alaska") ;
-        this.tracer.setRelativePosition(0, 3) ;
-
-
+        */
 
         //test scenario
+
+        subscribe("weather3");
+
 
     }
 
@@ -36,6 +60,35 @@ public class SubscriberAlaska extends AbstractComponent {
         logMessage("Getting message "+m);
     }
 
+    @Override
+    public void acceptMessage(MessageI[] ms) throws Exception {
+
+    }
+
+    public void subscribe(String topic ) throws Exception {
+
+
+        logMessage("Subscribing to weather3 ");
+
+        //sending the port over the Broker
+        ((SubscriberManagementPlugin)this.getPlugin(
+                SUB_ALASKA_MANAGE_PLUGIN_URI)).subscribe(topic,subscriberReceptionInboundPortURI);
+
+
+
+
+
+        assert	this.subscriberReceptionInboundPortURI.equals("subscriber-reception-inbound-port-uri-3") :
+                new PostconditionException("The URI prefix has not "
+                        + "been initialised!") ;
+        assert	this.isPortExisting(subscriberReceptionInboundPortURI) :
+                new PostconditionException("The component must have a "
+                        + "port with URI " + subscriberReceptionInboundPortURI) ;
+        assert	this.findPortFromURI(subscriberReceptionInboundPortURI).isPublished() :
+                new PostconditionException("The component must have a "
+                        + "port published with URI " + subscriberReceptionInboundPortURI) ;
+
+    }
 
 
 

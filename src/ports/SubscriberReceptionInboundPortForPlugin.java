@@ -6,6 +6,7 @@ import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.forplugins.AbstractInboundPortForPlugin;
 import interfaces.MessageI;
 import interfaces.ReceptionCI;
+import plugins.SubscriberReceptionPlugin;
 
 public class SubscriberReceptionInboundPortForPlugin 
 extends AbstractInboundPortForPlugin 
@@ -30,7 +31,7 @@ implements ReceptionCI{
 				new AbstractComponent.AbstractService<Void>(this.pluginURI) {
 					@Override
 					public Void call() throws Exception {
-						((Subscriber)this.getServiceProviderReference()).acceptMessage(m);
+						((SubscriberReceptionPlugin)this.getServiceProviderReference()).acceptMessage(m);
 						return null;
 					}
 				});
@@ -43,7 +44,7 @@ implements ReceptionCI{
 
 					@Override
 					public Void call() throws Exception {
-						((Subscriber)this.getServiceProviderReference()).acceptMessage(ms);
+						((SubscriberReceptionPlugin)this.getServiceProviderReference()).acceptMessage(ms);
 						return null;
 					}
 				});

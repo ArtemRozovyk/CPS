@@ -3,6 +3,7 @@ package components;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 import fr.sorbonne_u.components.examples.cps.components.ValueConsumer;
+import fr.sorbonne_u.components.examples.ddeployment_cs.components.DynamicURIConsumer;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
 import fr.sorbonne_u.components.exceptions.PreconditionException;
@@ -45,6 +46,7 @@ public class Broker extends AbstractComponent {
 
 	private Map<String, Set<String >> topicSubsUriMap;
 	private Map<String, Set<MessageI>> topicMessageStorageMap;
+	private Integer numberOfMsgStored=0;
 	private Map<String, MessageFilterI> subUriFilterMap;
 	private Map<String,BrokerReceptionOutboundPort> subUriPortObjMap;
 
@@ -63,6 +65,8 @@ public class Broker extends AbstractComponent {
 
 	protected String brokerPublicationInboundPortURI;
 	protected String brokerManagementInboundPortURI;
+	protected String messageAcceptionExecutorURI;
+	public final Object messageQueueGuard = new Object();
 
 
 	protected Broker(int nbThreads, int nbSchedulableThreads) {
@@ -139,70 +143,88 @@ public class Broker extends AbstractComponent {
 	@Override
 	public void execute() throws Exception{
 		int i = 0;
-			this.scheduleTask(
-					new AbstractComponent.AbstractTask() {
-						@Override
-						public void run() {
-							try {
-								//there are messages, find recepients
-								((Broker)this.getTaskOwner()).
-										acceptMessages() ;
-							} catch (Exception e) {
-								throw new RuntimeException(e) ;
-							}
-						}
-					},1000L, TimeUnit.MILLISECONDS) ; ;
+			this.createNewExecutorService(messageAcceptionExecutorURI,2,true);
+
+			handleRequestAsync(messageAcceptionExecutorURI,new AbstractComponent.AbstractService<Void>() {
+				@Override
+				public Void call() throws Exception {
+					((Broker)this.getServiceOwner()).acceptMessages();
+					return null;
+				}
+			});
+
 
 
 	}
 
 	public void acceptMessages() throws Exception {
-		new Thread(() -> {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			for(Map.Entry<String, Set<MessageI>> entry
-					: topicMessageStorageMap.entrySet()){
-				String topic = entry.getKey();
-				for(MessageI msg : entry.getValue()){
-					//all the msgs for this topic
-					//TODO include topic and filter
-					try {
-						for(String uriSub : topicSubsUriMap.get(topic)){
-							//trouver le filte
-							MessageFilterI filter ;
-							if((filter=subUriFilterMap.get(uriSub))!=null){
-								if(filter.filter(msg)){
+		for(int i =0;i<5;i++){
+			Thread.sleep(1000);
+			synchronized (messageQueueGuard){
+
+				while(numberOfMsgStored==0){
+					messageQueueGuard.wait();
+				}
+				Map<String,Set<MessageI>> tpMSGalreadySent= new HashMap<>();
+				String topic;
+				for(Map.Entry<String, Set<MessageI>> entry
+						: topicMessageStorageMap.entrySet()){
+					topic = entry.getKey();
+					if(!tpMSGalreadySent.containsKey(topic))
+						tpMSGalreadySent.put(topic,new HashSet<>());
+					for(MessageI msg : entry.getValue()){
+						Thread.sleep(50);
+						//all the msgs for this topic
+						//TODO include topic and filter
+						try {
+							for(String uriSub : topicSubsUriMap.get(topic)){
+								//trouver le filte
+								MessageFilterI filter ;
+								if((filter=subUriFilterMap.get(uriSub))!=null){
+									if(filter.filter(msg)){
+										subUriPortObjMap.get(uriSub).acceptMessage(msg);
+									}
+								}else{
 									subUriPortObjMap.get(uriSub).acceptMessage(msg);
 								}
-							}else{
-								subUriPortObjMap.get(uriSub).acceptMessage(msg);
+								numberOfMsgStored--;
 							}
+						} catch (Exception e) {
+							e.printStackTrace();
 						}
-					} catch (Exception e) {
-						e.printStackTrace();
 					}
+					topicMessageStorageMap.get(topic).removeAll(entry.getValue());
+
 				}
+
 			}
+
+		}
+
+
+
 
 
 		}
-				 ).start();
-	}
+
+
 
 
 	public void publish(MessageI m, String topic) throws Exception {
-		//voir le stockage et la publication
+		synchronized (messageQueueGuard) {
+
+			//voir le stockage et la publication
 			Set<MessageI> storedMsgs;
-			if((storedMsgs=topicMessageStorageMap.get(topic))!=null){
+			if ((storedMsgs = topicMessageStorageMap.get(topic)) != null) {
 				storedMsgs.add(m);
-			}else {
-				Set<MessageI> s=new HashSet<>();
+			} else {
+				Set<MessageI> s = new HashSet<>();
 				s.add(m);
 				topicMessageStorageMap.put(topic, s);
 			}
+			numberOfMsgStored++;
+			messageQueueGuard.notifyAll();
+		}
 	}
 
 	public void publish(MessageI m, String[] topics) throws Exception {

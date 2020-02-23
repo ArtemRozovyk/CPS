@@ -13,7 +13,7 @@ import ports.BrokerManagementInboundPort;
 import ports.SubscriberManagementOutbondPort;
 import ports.SubscriberReceptionInboundPort;
 
-public class Subscriber extends AbstractComponent{
+public class Subscriber extends AbstractComponent implements ReceptionCI{
 	
 	protected String subscriberReceptionInboundPortURI;
 	protected String myManagementOutbondPortURI;
@@ -28,7 +28,7 @@ public class Subscriber extends AbstractComponent{
 	public Subscriber(int nbThreads, int nbSchedulableThreads) {
 		super(nbThreads, nbSchedulableThreads);
 	}
-	
+	static int pos=0;
 	protected Subscriber(
 			String uri,
 			String managementOutboundPortURI,
@@ -63,13 +63,9 @@ public class Subscriber extends AbstractComponent{
 			} else {
 				this.executionLog.setDirectory(System.getProperty("user.home")) ;
 			}
-			
 			this.tracer.setTitle("subscriber") ;
-			this.tracer.setRelativePosition(0, 1) ;
-
+			this.tracer.setRelativePosition(0, pos++) ;
 			Subscriber.checkInvariant(this) ;
-
-
 			assert	this.isPortExisting(managementOutboundPortURI) :
 						new PostconditionException("The component must have a "
 								+ "port with URI " + managementOutboundPortURI) ;
@@ -85,7 +81,6 @@ public class Subscriber extends AbstractComponent{
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
-
 		try {
 			this.doPortConnection(
 					myManagementOutbondPortURI,
@@ -96,7 +91,6 @@ public class Subscriber extends AbstractComponent{
 		}
 
 	}
-
 		/*
 	@Override
 	public void start() throws ComponentStartException {
@@ -109,12 +103,9 @@ public class Subscriber extends AbstractComponent{
 		}
 	}*/
 
-
 	@Override
 	public void execute() throws Exception {
-
-			subscribe("weather");
-
+		subscribe("weather");
 	}
 	public void acceptMessage(MessageI m) throws Exception {
 		logMessage("Getting message "+m);
@@ -138,13 +129,10 @@ public class Subscriber extends AbstractComponent{
 			i++;
 		}
 
-
 		PortI p = new SubscriberReceptionInboundPort(subscriberReceptionInboundPortURI, this) ;
 		p.publishPort() ;
-
 		smop.subscribe(topic, subscriberReceptionInboundPortURI);
 		//smop.subscribe(topic, m -> m.location == floride, subscriberReceptionInboundPortURI);
-
 		assert	this.subscriberReceptionInboundPortURI.equals("subscriber-reception-inbound-port-uri-"+i) :
 				new PostconditionException("The URI prefix has not "
 						+ "been initialised!") ;

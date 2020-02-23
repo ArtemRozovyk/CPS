@@ -58,7 +58,7 @@ public class Publisher extends AbstractComponent{
 				topic="weather1";
 				msg = "150 degrees in Acapulco";
 			}
-			logMessage("Publishing message "+i);
+			logMessage("Publishing message "+i+ " for topic : "+ topic);
 			publish(new Message(msg), topic);
 		}
 	}
