@@ -28,10 +28,9 @@ implements ReceptionCI{
 	public void acceptMessage(MessageI m) throws Exception {
 		this.owner.handleRequestAsync(
 				new AbstractComponent.AbstractService<Void>(this.pluginURI) {
-
 					@Override
 					public Void call() throws Exception {
-						((Subscriber)this.getServiceOwner()).acceptMessage(m);
+						((Subscriber)this.getServiceProviderReference()).acceptMessage(m);
 						return null;
 					}
 				});
@@ -44,7 +43,7 @@ implements ReceptionCI{
 
 					@Override
 					public Void call() throws Exception {
-						((Subscriber)this.getServiceOwner()).acceptMessage(ms);
+						((Subscriber)this.getServiceProviderReference()).acceptMessage(ms);
 						return null;
 					}
 				});

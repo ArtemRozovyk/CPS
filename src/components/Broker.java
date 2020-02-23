@@ -226,6 +226,7 @@ public class Broker extends AbstractComponent {
 	}
 
 	public void createTopic(String topic) {
+
 		topicSubsUriMap.put(topic,new HashSet<>());
 	}
 

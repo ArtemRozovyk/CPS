@@ -6,7 +6,7 @@ import interfaces.MessageI;
 import interfaces.ReceptionCI;
 import ports.SubscriberReceptionInboundPortForPlugin;
 
-public class SubscriberReceptionPlugin 
+public class SubscriberPlugin
 extends AbstractPlugin
 implements ReceptionCI
 {

@@ -14,14 +14,13 @@ import interfaces.PublicationCI;
 import ports.PublisherManagementOutboundPort;
 import ports.PublisherPublicationOutboundPort;
 
-public class PublisherPlugin
+public class PublisherManagementPlugin
 extends AbstractPlugin
 {
 
 	private static final long serialVersionUID = 1L;
 	
 	/** Outbound port required to connect to the Broker component **/
-	protected PublisherPublicationOutboundPort ppop;
 	protected PublisherManagementOutboundPort pmop;
 
 	
@@ -34,9 +33,6 @@ extends AbstractPlugin
 		super.installOn(owner);
 		
 		// We add the required interface and publish the outbound port
-		this.addRequiredInterface(PublicationCI.class);
-		this.ppop = new PublisherPublicationOutboundPort(this.owner);
-		this.ppop.publishPort();
 		//management
 		this.addRequiredInterface(ManagementCI.class);
 		this.pmop = new PublisherManagementOutboundPort(this.owner);
@@ -69,8 +65,7 @@ extends AbstractPlugin
 				CVM.BROKER_COMPONENT_URI,
 				ReflectionConnector.class.getCanonicalName());
 		
-		String[] urisPub = rop.findPortURIsFromInterface(PublicationCI.class) ;
-		assert	urisPub != null && urisPub.length == 1 ;
+
 
 		String[] urisManage = rop.findPortURIsFromInterface(ManagementCI.class) ;
 		assert	urisManage != null && urisManage.length == 1 ;
@@ -81,10 +76,7 @@ extends AbstractPlugin
 		this.removeRequiredInterface(ReflectionI.class) ;
 		
 		// connect the outbound port.
-		this.owner.doPortConnection(
-				this.ppop.getPortURI(),
-				urisPub[0],
-				PublicationConnector.class.getCanonicalName()) ;
+
 		this.owner.doPortConnection(
 				this.pmop.getPortURI(),
 				urisManage[0],
@@ -99,7 +91,7 @@ extends AbstractPlugin
 	@Override
 	public void finalise() throws Exception
 	{
-		this.owner.doPortDisconnection(this.ppop.getPortURI());
+		this.owner.doPortDisconnection(this.pmop.getPortURI());
 	}
 	
 	/**
@@ -109,25 +101,15 @@ extends AbstractPlugin
 	@Override
 	public void uninstall() throws Exception
 	{
-		this.ppop.unpublishPort();
-		this.ppop.destroyPort();
+		this.pmop.unpublishPort();
+		this.pmop.destroyPort();
 		this.removeRequiredInterface(PublicationCI.class);
 	}
 	
-	public void publish(MessageI m, String topic) throws Exception {
-		this.ppop.publish(m, topic);
+	public void createTopic(String topic) throws Exception {
+		this.pmop.createTopic(topic);
 	}
+	//...TODO Management
 
-	public void publish(MessageI m, String[] topics) throws Exception {
-		this.ppop.publish(m, topics);
-	}
-
-	public void publish(MessageI[] ms, String topic) throws Exception {
-		this.ppop.publish(ms, topic);
-	}
-
-	public void publish(MessageI[] ms, String[] topics) throws Exception {
-		this.ppop.publish(ms, topics);
-	}
 	
 }
