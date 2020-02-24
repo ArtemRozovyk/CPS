@@ -81,27 +81,6 @@ extends AbstractPlugin
 		super.initialise();
 	}
 	
-	/**
-	 * Disconnect the ountbound port
-	 */
-	@Override
-	public void finalise() throws Exception
-	{
-		this.owner.doPortDisconnection(this.ppop.getPortURI());
-	}
-	
-	/**
-	 * Unpublish the outbound port, destroy the port and remove
-	 * the required interface
-	 */
-	@Override
-	public void uninstall() throws Exception
-	{
-		this.ppop.unpublishPort();
-		this.ppop.destroyPort();
-		this.removeRequiredInterface(PublicationCI.class);
-	}
-	
 	public void publish(MessageI m, String topic) throws Exception {
 		this.ppop.publish(m, topic);
 	}

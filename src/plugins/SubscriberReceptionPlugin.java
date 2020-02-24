@@ -42,27 +42,6 @@ implements ReceptionCI
 	}
 	
 	
-	/**
-	 * Disconnect the inbound port
-	 */
-	@Override
-	public void finalise() throws Exception
-	{
-		this.owner.doPortDisconnection(this.sripfp.getPortURI());
-	}
-	
-	/**
-	 * Unpublish the inbound port, destroy the port and remove
-	 * the required interface
-	 */
-	@Override
-	public void uninstall() throws Exception
-	{
-		this.sripfp.unpublishPort();
-		this.sripfp.destroyPort();
-		this.removeOfferedInterface(ReceptionCI.class);
-	}
-	
 	private ReceptionCI getOwner()
 	{
 		return (ReceptionCI)this.owner;
