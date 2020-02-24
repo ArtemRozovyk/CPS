@@ -1,9 +1,8 @@
 package interfaces;
 
 /**
- * The interfaces ManagementImplementationI defines the interface
+ * The interface ManagementImplementationI defines the interface
  * required by a component that needs to manage the topics
- *
  */
 public interface ManagementImplementationI {
 	

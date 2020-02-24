@@ -5,17 +5,14 @@ import interfaces.ManagementCI;
 import message.MessageFilterI;
 
 /**
- * The class ManagementConnector defines the connetor for
+ * The class ManagementConnector defines the connector for
  * the ManagementCI interface
- * 
- * <p><strong>Description</strong></p>
  * 
  * <p><strong>Invariant</strong></p>
  * 
  * <pre>
  * invariant	true
  * </pre>
- *
  */
 public class ManagementConnector 
 extends AbstractConnector 

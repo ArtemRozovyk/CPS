@@ -162,6 +162,15 @@ public class CVM extends AbstractCVM{
 	
 	/**
 	 * Disconnect the components
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	true				// no more preconditions.
+	 * post	true				// no more postconditions.
+	 * </pre>
+	 * 
+	 * @see fr.sorbonne_u.components.cvm.AbstractCVM#shutdown()
 	 */
 	@Override
 	public void shutdown() throws Exception
