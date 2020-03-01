@@ -29,6 +29,7 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 		super(nbThreads, nbSchedulableThreads);
 	}
 	static int pos=0;
+
 	protected Subscriber(
 			String uri,
 			String managementOutboundPortURI,
@@ -91,21 +92,10 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 		}
 
 	}
-		/*
-	@Override
-	public void start() throws ComponentStartException {
-		super.start();
-		logMessage("Subscribing to weather");
-		try {
-			subscribe("weather");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}*/
 
 	@Override
 	public void execute() throws Exception {
-		subscribe("weather");
+		subscribe("weather0");
 	}
 	public void acceptMessage(MessageI m) throws Exception {
 		logMessage("Getting message "+m);
@@ -117,23 +107,14 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 			logMessage("Getting message " + ms[i]);
 		}
 	}
-	static int i = 0;
-	static Object iGuard = new Object();
-	public void subscribe(String topic) throws Exception {
-		
-		//TODO
-		synchronized (iGuard){
-			this.subscriberReceptionInboundPortURI = "subscriber-reception-inbound-port-uri-"+i;
-			logMessage("Subscribing to weather"+i);
-			topic+=i;
-			i++;
-		}
 
+	public void subscribe(String topic) throws Exception {
+	    this.subscriberReceptionInboundPortURI = "subscriber-reception-inbound-port-uri-0";
+	    logMessage("Subscribing to weather0");
 		PortI p = new SubscriberReceptionInboundPort(subscriberReceptionInboundPortURI, this) ;
 		p.publishPort() ;
 		smop.subscribe(topic, subscriberReceptionInboundPortURI);
-		//smop.subscribe(topic, m -> m.location == floride, subscriberReceptionInboundPortURI);
-		assert	this.subscriberReceptionInboundPortURI.equals("subscriber-reception-inbound-port-uri-"+i) :
+		assert	this.subscriberReceptionInboundPortURI.equals("subscriber-reception-inbound-port-uri-0") :
 				new PostconditionException("The URI prefix has not "
 						+ "been initialised!") ;
 		assert	this.isPortExisting(subscriberReceptionInboundPortURI) :
@@ -143,6 +124,4 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 				new PostconditionException("The component must have a "
 						+ "port published with URI " + subscriberReceptionInboundPortURI) ;
 	}
-	
-
 }

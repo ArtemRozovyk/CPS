@@ -35,8 +35,8 @@ public class PublisherAlaska extends AbstractComponent {
         createTopic("weather3");
 
         String msg = "120 degrees in Florida";
-        for (int i =0; i <10;i ++) {
-            if(i>4){
+        for (int i =0; i <30;i ++) {
+            if(i>15){
                 topic="weather3";
                 msg = "40 degrees in Alaska";
             }

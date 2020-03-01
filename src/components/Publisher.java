@@ -52,7 +52,7 @@ public class Publisher extends AbstractComponent{
 	@Override
 	public void execute() throws Exception{
 		String topic = "weather0";
-		String msg = "110 degrees in Denver";
+		String msg = "10 degrees in Denver";
 		for (int i =0; i <10;i ++) {
 			if(i>4){
 				topic="weather1";

@@ -12,14 +12,15 @@ import fr.sorbonne_u.components.cvm.AbstractCVM;
 public class CVM extends AbstractCVM{
 
 	private static final String SUBSCRIBER_ALASKA_COMPONENT_URI = "alaska-sub-URI-publisher";;
+	private static final String SUBSCRIBER_CUBA_COMPONENT_URI = "cuba-sub-URI-publisher";;
+    private String subscriberCuba;
 
-	public CVM(boolean isDistributed) throws Exception {
+    public CVM(boolean isDistributed) throws Exception {
 		super(isDistributed);
 	}
 	public static final String PUBLISHER_COMPONENT_URI="my-URI-publisher";
 	public static final String PUBLISHER_ALASKA_COMPONENT_URI="my-URI-publisher-alaska";
 	public static final String BROKER_COMPONENT_URI="my-URI-broker";
-	public static final String SUBSCRIBER1_COMPONENT_URI="my-URI-subscriber1";
 	public static final String SUBSCRIBER2_COMPONENT_URI="my-URI-subscriber2";
 
 	public static final String BROKER_PUBLICATION_INBOUND_PORT="i-broker-publication";
@@ -73,16 +74,7 @@ public class CVM extends AbstractCVM{
 
 
 		//Create the Subscriber1 Component
-		this.subscriberURI1 = AbstractComponent.createComponent(
-				Subscriber.class.getCanonicalName(),
-				new Object[] {SUBSCRIBER1_COMPONENT_URI,
-						SUBSCRIBER1_MANAGEMENT_OUTBOUND_PORT,
-						BROKER_MANAGEMENT_INBOUND_PORT
-				});
 
-		assert this.isDeployedComponent(this.subscriberURI1);
-		this.toggleTracing(this.subscriberURI1);
-		this.toggleLogging(this.subscriberURI1);
 
 
 		//Create the Subscriber1 Component
@@ -145,8 +137,7 @@ public class CVM extends AbstractCVM{
 		this.toggleLogging(this.publisherAlaksaURI);
 
 
-		//plugin subscriber
-
+		//plugin subscriberAlaksa
 		this.subscriberAlaska= AbstractComponent.createComponent(
 				SubscriberAlaska.class.getCanonicalName(),
 				new Object[] {SUBSCRIBER_ALASKA_COMPONENT_URI});
@@ -154,6 +145,15 @@ public class CVM extends AbstractCVM{
 		assert this.isDeployedComponent(this.subscriberAlaska);
 		this.toggleTracing(this.subscriberAlaska);
 		this.toggleLogging(this.subscriberAlaska);
+
+		//subscriber cuba
+        this.subscriberCuba= AbstractComponent.createComponent(
+                SubscriberCuba.class.getCanonicalName(),
+                new Object[] {SUBSCRIBER_CUBA_COMPONENT_URI});
+
+        assert this.isDeployedComponent(this.subscriberCuba);
+        this.toggleTracing(this.subscriberCuba);
+        this.toggleLogging(this.subscriberCuba);
 
 
 		super.deploy();
