@@ -100,9 +100,13 @@ public class Broker extends AbstractComponent {
 		} else {
 			this.executionLog.setDirectory(System.getProperty("user.home")) ;
 		}
+		this.createNewExecutorService(acceptionExecutorURI,5,false);
+        this.createNewExecutorService(publishingExecutorURI,5,false);
+        this.createNewExecutorService(subscriptionExecutorURI,5,false);
 		this.tracer.setTitle("broker") ;
 		this.tracer.setRelativePosition(1, 1) ;
 		Broker.checkInvariant(this);
+
 		assert	this.brokerPublicationInboundPortURI.equals(uri) :
 					new PostconditionException("The URI prefix has not "
 												+ "been initialised!") ;
@@ -120,9 +124,7 @@ public class Broker extends AbstractComponent {
 
 	@Override
 	public void execute() throws Exception{
-	    this.createNewExecutorService(acceptionExecutorURI,5,false);
-	    this.createNewExecutorService(publishingExecutorURI,5,false);
-	    this.createNewExecutorService(subscriptionExecutorURI,5,false);
+
         handleRequestAsync(acceptionExecutorURI,new AbstractComponent.AbstractService<Void>() {
             @Override
             public Void call() throws Exception {
@@ -157,7 +159,7 @@ public class Broker extends AbstractComponent {
                 queue.add(m);
                 topicMessageStorageMap.put(topic,queue);
             }
-            System.out.println("Stored "+m+" in "+Thread.currentThread()+" map sz: "+sizeMessageMap());
+            //System.out.println("Stored "+m+" in "+Thread.currentThread()+" map sz: "+sizeMessageMap());
             condEmpty.signal();
         }finally {
             lock.unlock();
@@ -205,7 +207,7 @@ public class Broker extends AbstractComponent {
 
     public void deliver(MsgEntry msgEntry) throws Exception {
         deliverycount++;
-        System.out.println("Delivering "+msgEntry.message+" in "+Thread.currentThread()+" map sz: "+sizeMessageMap());
+        //System.out.println("Delivering "+msgEntry.message+" in "+Thread.currentThread()+" map sz: "+sizeMessageMap());
         if(topicSubHandlersMap.containsKey(msgEntry.topic)){
             actualdeliverycount++;
             topicSubHandlersMap.get(msgEntry.topic).get(0).port.acceptMessage(msgEntry.message);
