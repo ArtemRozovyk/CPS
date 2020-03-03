@@ -184,15 +184,18 @@ public class CVM extends AbstractCVM{
 	{
 		try {
 		    //while(true){
-                CVM c = new CVM() ;
-                c.startStandardLifeCycle(14555L) ;
-                Thread.sleep(10000L) ;
+            CVM c = new CVM() ;
+            c.startStandardLifeCycle(14555L) ;
+            Thread.sleep(10000L) ;
                 /*if((Broker.jj)%20!=0 ||(Broker.k)%20!=0){
                     System.out.println("error "+Broker.jj+" "+Broker.k);
                     break;
                 }*/
             //}
-
+            System.out.println(Broker.deliverycount + " del count ");
+            System.out.println(Broker.popcount + " pop count ");
+            System.out.println(Broker.actualdeliverycount + " actual count ");
+            System.out.println(Broker.externCount + " exte count ");
 			System.exit(0) ;
 		} catch (Exception e) {
 			throw new RuntimeException(e);

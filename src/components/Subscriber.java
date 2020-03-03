@@ -97,6 +97,7 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 	public void execute() throws Exception {
 		subscribe("weather0");
 	}
+
 	public void acceptMessage(MessageI m) throws Exception {
 		logMessage("Getting message "+m);
 	}

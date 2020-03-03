@@ -53,8 +53,8 @@ public class Publisher extends AbstractComponent{
 	public void execute() throws Exception{
 		String topic = "weather0";
 		String msg = "10 degrees in Denver";
-		for (int i =0; i <10;i ++) {
-			if(i>4){
+		for (int i =0; i <6;i ++) {
+			if(i>2){
 				topic="weather1";
 				msg = "150 degrees in Acapulco";
 			}

@@ -78,7 +78,7 @@ public class Broker extends AbstractComponent {
 			String publicationInboundPortURI,
 					 String managmentInboundPortURI) throws Exception
 	{
-		super(uri, 0, 1) ;
+		super(uri, 1, 1) ;
 
         topicMessageStorageMap=new HashMap<>();
         topicSubHandlersMap=new HashMap<>();
@@ -120,9 +120,9 @@ public class Broker extends AbstractComponent {
 
 	@Override
 	public void execute() throws Exception{
-	    this.createNewExecutorService(acceptionExecutorURI,5,true);
-	    this.createNewExecutorService(publishingExecutorURI,5,true);
-	    this.createNewExecutorService(subscriptionExecutorURI,5,true);
+	    this.createNewExecutorService(acceptionExecutorURI,5,false);
+	    this.createNewExecutorService(publishingExecutorURI,5,false);
+	    this.createNewExecutorService(subscriptionExecutorURI,5,false);
         handleRequestAsync(acceptionExecutorURI,new AbstractComponent.AbstractService<Void>() {
             @Override
             public Void call() throws Exception {
@@ -132,9 +132,12 @@ public class Broker extends AbstractComponent {
         });
 
 	}
-
+    public static int externCount =0;
     public void publish(MessageI m, String topic) throws Exception {
-        handleRequestAsync(publishingExecutorURI,new AbstractComponent.AbstractService<Void>() {
+        System.out.println("Extern pub "+m+" in "+Thread.currentThread());
+        externCount++;
+        //FIXME 2
+        this.handleRequestSync(publishingExecutorURI,new AbstractComponent.AbstractService<Void>() {
             @Override
             public Void call() throws Exception {
                 ((Broker)this.getServiceOwner()).storePublished(m,topic);
@@ -154,22 +157,16 @@ public class Broker extends AbstractComponent {
                 queue.add(m);
                 topicMessageStorageMap.put(topic,queue);
             }
-            System.out.println("Stored "+m+" in "+Thread.currentThread());
+            System.out.println("Stored "+m+" in "+Thread.currentThread()+" map sz: "+sizeMessageMap());
             condEmpty.signal();
         }finally {
             lock.unlock();
         }
     }
+        public static int deliverycount=0;
+        public static int actualdeliverycount=0;
+        public static int popcount=0;
 
-    public void deliver(MsgEntry msgEntry) throws Exception {
-
-            System.out.println("Delivering "+msgEntry.message+" in "+Thread.currentThread());
-            if(topicSubHandlersMap.containsKey(msgEntry.topic)){
-                topicSubHandlersMap.get(msgEntry.topic).get(0).port.acceptMessage(msgEntry.message);
-                Collections.shuffle(topicSubHandlersMap.get(msgEntry.topic));
-            }
-
-   }
 
     public void subscribe(String topic, String inboundPortURI) throws Exception {
 
@@ -201,21 +198,28 @@ public class Broker extends AbstractComponent {
                 topicSubHandlersMap.put(topic,l);
             }
             logMessage(inboundPortURI+" has subscribed  ");
-            System.out.println("Subed to"+topic+" in "+Thread.currentThread());
+            System.out.println("Subed to"+topic+" in "+Thread.currentThread()+" map sz: "+sizeMessageMap());
 
     }
 
 
+    public void deliver(MsgEntry msgEntry) throws Exception {
+        deliverycount++;
+        System.out.println("Delivering "+msgEntry.message+" in "+Thread.currentThread()+" map sz: "+sizeMessageMap());
+        if(topicSubHandlersMap.containsKey(msgEntry.topic)){
+            actualdeliverycount++;
+            topicSubHandlersMap.get(msgEntry.topic).get(0).port.acceptMessage(msgEntry.message);
+            Collections.shuffle(topicSubHandlersMap.get(msgEntry.topic));
+        }
 
-        public void acceptMessages() throws Exception {
+    }
+    public void acceptMessages() throws Exception {
         MsgEntry msgEntry=null;
         while(true){
             lock.lock();
             try{
                 while(isEmptyMap()){
-                    System.out.println("entering empty msg");
                     condEmpty.await();
-                    System.out.println("ending empty msg");
                 }
                 msgEntry = popMessageMap();
                 assert (msgEntry!=null);
@@ -243,11 +247,25 @@ public class Broker extends AbstractComponent {
         return true;
     }
 
+
+    private int sizeMessageMap(){
+        int sz=0;
+        for (Map.Entry<String, ArrayDeque<MessageI>>
+                entryTopicQueue :topicMessageStorageMap.entrySet()){
+            if(!entryTopicQueue.getValue().isEmpty()){
+                sz+=entryTopicQueue.getValue().size();
+
+            }
+        }
+        return sz;
+    }
     private MsgEntry popMessageMap(){
 	    for (Map.Entry<String, ArrayDeque<MessageI>>
                 entryTopicQueue :topicMessageStorageMap.entrySet()){
             if(!entryTopicQueue.getValue().isEmpty()){
+                popcount++;
                 return new MsgEntry(entryTopicQueue.getValue().pop(),entryTopicQueue.getKey());
+
             }
         }
 	    return null;
