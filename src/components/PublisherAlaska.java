@@ -31,7 +31,7 @@ public class PublisherAlaska extends AbstractComponent {
     public void execute() throws Exception{
 
         String topic = "weather0";
-        createTopic(topic);
+        //createTopic(topic);
         //createTopic("weather3");
 
         String msg = "120 degrees in Florida";

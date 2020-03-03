@@ -101,15 +101,7 @@ extends AbstractPlugin
 
 
 	public void subscribe(String topic, String subscriberReceptionInboundPortURI) throws Exception {
-		//TODO
-
 		smop.subscribe(topic, subscriberReceptionInboundPortURI);
-		//smop.subscribe(topic, m -> m.location == floride, subscriberReceptionInboundPortURI);
-
-
-
-
-
 	}
 
 
