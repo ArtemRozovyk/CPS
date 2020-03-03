@@ -25,14 +25,41 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.*;
 
 import connectors.ReceptionConnector;
 
 public class Broker extends AbstractComponent {
+
+    class SubHanler{
+        String subUri;
+        BrokerReceptionOutboundPort port;
+        String topic;
+        MessageFilterI filter;
+
+        public SubHanler(String subUri, BrokerReceptionOutboundPort port, String topic) {
+            this.subUri = subUri;
+            this.port = port;
+            this.topic = topic;
+        }
+
+        public SubHanler(String subUri, BrokerReceptionOutboundPort port, String topic, MessageFilterI filter) {
+            this.subUri = subUri;
+            this.port = port;
+            this.topic = topic;
+            this.filter = filter;
+        }
+    }
+
+    private class MsgEntry{
+        public MsgEntry(MessageI message, String topic) {
+            this.message = message;
+            this.topic = topic;
+        }
+
+        MessageI message;
+        String topic;
+    }
 	private static int i;
 
 	//protected BrokerPublicationInboundPort bpip;
@@ -56,10 +83,13 @@ public class Broker extends AbstractComponent {
 	private Integer numberOfMsgStored=0;
 	private Map<String, MessageFilterI> subUriFilterMap;
 	private Map<String,BrokerReceptionOutboundPort> subUriPortObjMap;
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final Lock lock = new ReentrantLock();
+
+
 
 	protected String brokerPublicationInboundPortURI;
-	protected String messageAcceptionExecutorURI="handler1";
+	protected String acceptionExecutorURI="handler1";
+	protected String publishingExecutorURI="handler2";
 
 	protected Broker(int nbThreads, int nbSchedulableThreads) {
 		super(nbThreads, nbSchedulableThreads);
@@ -113,9 +143,10 @@ public class Broker extends AbstractComponent {
 
 	@Override
 	public void execute() throws Exception{
-			this.createNewExecutorService(messageAcceptionExecutorURI,2,true);
+			this.createNewExecutorService(acceptionExecutorURI,2,true);
+			this.createNewExecutorService(publishingExecutorURI,5,true);
 
-			handleRequestAsync(messageAcceptionExecutorURI,new AbstractComponent.AbstractService<Void>() {
+			handleRequestAsync(acceptionExecutorURI,new AbstractComponent.AbstractService<Void>() {
 				@Override
 				public Void call() throws Exception {
 					((Broker)this.getServiceOwner()).acceptMessages();
@@ -131,8 +162,20 @@ public class Broker extends AbstractComponent {
 	}
     public static int k=0;
 
+
+
+    public void publish2(MessageI m, String topic) throws Exception {
+        handleRequestAsync(acceptionExecutorURI,new AbstractComponent.AbstractService<Void>() {
+            @Override
+            public Void call() throws Exception {
+                ((Broker)this.getServiceOwner()).publish(m,topic);
+                return null;
+            }
+        });
+    }
+
     public void publish(MessageI m, String topic) throws Exception {
-        lock.writeLock().lock();
+        lock.lock();
         try {
             Set<MessageI> storedMsgs;
             if ((storedMsgs = topicMessageStorageMap1.get(topic)) != null) {
@@ -144,12 +187,13 @@ public class Broker extends AbstractComponent {
             }
             condEmpty.notifyAll();
         }finally {
-            lock.writeLock().unlock();
+            lock.unlock();
         }
     }
 
     public void subscribe(String topic, String inboundPortURI) throws Exception {
-        lock.writeLock().lock();
+        lock.lock();
+        try{
         String outUri="outbound-reception-broker-uri"+i;
         i++;
         this.addRequiredInterface(ReceptionCI.class);
@@ -158,7 +202,7 @@ public class Broker extends AbstractComponent {
         brop.publishPort();
         this.doPortConnection(outUri,inboundPortURI,ReceptionConnector.class.getCanonicalName() );
 
-        try{
+
             subUriPortObjMap.put(inboundPortURI, brop);
             if(topicSubsUriMap.containsKey(topic)){
                 topicSubsUriMap.get(topic).add(inboundPortURI);
@@ -168,20 +212,20 @@ public class Broker extends AbstractComponent {
                 topicSubsUriMap.put(topic,uriSet);
             }
 
-            logMessage(inboundPortURI+" has subscribed");
             System.out.println("Subscription for "+topic);
         }finally {
-            lock.writeLock().unlock();
+            lock.unlock();
         }
+        logMessage(inboundPortURI+" has subscribed");
 
     }
-    Condition condEmpty = lock.writeLock().newCondition();
+    Condition condEmpty = lock.newCondition();
 
 
 	public void acceptMessages() throws Exception {
             HashMap<String,Set<MessageI>> alreadySent;
             while(true){
-                lock.writeLock().lock();
+                lock.lock();
                 try{
                     alreadySent= new HashMap<>();
                     String topic;
@@ -207,12 +251,11 @@ public class Broker extends AbstractComponent {
                                 }
                                 System.out.println("Sending "+k+++" "+msg);
                                 //TODO remove msg even if thereis no one to receive.
+                                alreadySent.get(topic).add(msg);
 
                             }
-                            alreadySent.get(topic).add(msg);
                         }
                     }
-                    System.out.println("ha-ha");
                     if(hasValues(alreadySent)){
                         System.out.println(alreadySent.size()+" topics sent");
                         for(Map.Entry<String, Set<MessageI>> entry : alreadySent.entrySet()){
@@ -225,8 +268,9 @@ public class Broker extends AbstractComponent {
                     }
 
                 } finally {
-                    lock.writeLock().unlock();
+                    lock.unlock();
                 }
+                System.out.println("lol");
             }
 	}
 
