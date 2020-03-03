@@ -112,4 +112,8 @@ public class Message implements MessageI {
 		return this.content;
 	}
 
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
 }

@@ -58,8 +58,8 @@ public class CVM extends AbstractCVM{
 						BROKER_MANAGEMENT_INBOUND_PORT});
 
 		assert this.isDeployedComponent(this.brokerURI);
-		this.toggleTracing(this.brokerURI);
-		this.toggleLogging(this.brokerURI);
+		//this.toggleTracing(this.brokerURI);
+		//this.toggleLogging(this.brokerURI);
 
 		// Create the Publisher component
 		this.publisherURI = AbstractComponent.createComponent(
@@ -69,8 +69,8 @@ public class CVM extends AbstractCVM{
 						PUBLISHER_MANAGEMENT_INBOUND_PORT});
 
 		assert this.isDeployedComponent(this.publisherURI);
-		this.toggleTracing(this.publisherURI);
-		this.toggleLogging(this.publisherURI);
+		//this.toggleTracing(this.publisherURI);
+		//this.toggleLogging(this.publisherURI);
 
 
 		//Create the Subscriber1 Component
@@ -86,8 +86,8 @@ public class CVM extends AbstractCVM{
 				});
 
 		assert this.isDeployedComponent(this.subscriberURI2);
-		this.toggleTracing(this.subscriberURI2);
-		this.toggleLogging(this.subscriberURI2);
+		//this.toggleTracing(this.subscriberURI2);
+		//this.toggleLogging(this.subscriberURI2);
 
 
 /*
@@ -133,8 +133,8 @@ public class CVM extends AbstractCVM{
 				new Object[] {PUBLISHER_ALASKA_COMPONENT_URI});
 
 		assert this.isDeployedComponent(this.publisherAlaksaURI);
-		this.toggleTracing(this.publisherAlaksaURI);
-		this.toggleLogging(this.publisherAlaksaURI);
+		//this.toggleTracing(this.publisherAlaksaURI);
+		//this.toggleLogging(this.publisherAlaksaURI);
 
 
 		//plugin subscriberAlaksa
@@ -143,8 +143,8 @@ public class CVM extends AbstractCVM{
 				new Object[] {SUBSCRIBER_ALASKA_COMPONENT_URI});
 
 		assert this.isDeployedComponent(this.subscriberAlaska);
-		this.toggleTracing(this.subscriberAlaska);
-		this.toggleLogging(this.subscriberAlaska);
+		//this.toggleTracing(this.subscriberAlaska);
+		//this.toggleLogging(this.subscriberAlaska);
 
 		//subscriber cuba
         this.subscriberCuba= AbstractComponent.createComponent(
@@ -152,8 +152,8 @@ public class CVM extends AbstractCVM{
                 new Object[] {SUBSCRIBER_CUBA_COMPONENT_URI});
 
         assert this.isDeployedComponent(this.subscriberCuba);
-        this.toggleTracing(this.subscriberCuba);
-        this.toggleLogging(this.subscriberCuba);
+        //this.toggleTracing(this.subscriberCuba);
+        //this.toggleLogging(this.subscriberCuba);
 
 
 		super.deploy();
@@ -183,10 +183,17 @@ public class CVM extends AbstractCVM{
 	public static void main(String[] args)
 	{
 		try {
-			CVM c = new CVM() ;
-			c.startStandardLifeCycle(60000L) ;
-			Thread.sleep(5000L) ;
-			System.exit(0) ;
+		    while(true){
+                CVM c = new CVM() ;
+                c.startStandardLifeCycle(14555L) ;
+                Thread.sleep(10000L) ;
+                /*if((Broker.jj)%20!=0 ||(Broker.k)%20!=0){
+                    System.out.println("error "+Broker.jj+" "+Broker.k);
+                    break;
+                }*/
+            }
+
+			//System.exit(0) ;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

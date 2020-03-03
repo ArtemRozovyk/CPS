@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -56,24 +57,9 @@ public class Broker extends AbstractComponent {
 	private Map<String, MessageFilterI> subUriFilterMap;
 	private Map<String,BrokerReceptionOutboundPort> subUriPortObjMap;
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
-	public Broker(String reflectionInboundPortURI,
-				  int nbThreads,
-				  int nbSchedulableThreads,
-				  Map<String, Set<String>> topicSubsUri,
-				  Map<String, Set<MessageI>> topicMessageStorage,
-				  Map<String, MessageFilterI> subUriFilter
-				  ) {
-		super(reflectionInboundPortURI, nbThreads, nbSchedulableThreads);
-
-	}
-
-
 
 	protected String brokerPublicationInboundPortURI;
-	protected String brokerManagementInboundPortURI;
 	protected String messageAcceptionExecutorURI="handler1";
-	public final Object messageQueueGuard = new Object();
-
 
 	protected Broker(int nbThreads, int nbSchedulableThreads) {
 		super(nbThreads, nbSchedulableThreads);
@@ -96,26 +82,11 @@ public class Broker extends AbstractComponent {
 			new PreconditionException("inbound port can't be null!") ;
 
 		this.brokerPublicationInboundPortURI = uri;
-
-		//Publish the reception port (an outbound port is always local)
-		/*this.brop = new BrokerReceptionOutboundPort(receptionOutboundPortURI, this);
-		this.brop.localPublishPort();
-		*/
-		//Publish the publication inbound port
 		PortI p = new BrokerPublicationInboundPort(publicationInboundPortURI, this);
 		p.publishPort();
 
 		PortI m = new BrokerManagementInboundPort(managmentInboundPortURI, this);
 		m.publishPort();
-		
-		// Install the plugins
-		/*BrokerReceptionClientPlugin pluginReception = new BrokerReceptionClientPlugin();
-		pluginReception.setPluginURI(BROKER_CLIENT_RECEPTION_PLUGIN);
-		this.installPlugin(pluginReception);
-		
-		BrokerPublicationPlugin pluginPublication = new BrokerPublicationPlugin();
-		pluginPublication.setPluginURI(BROKER_PUBLICATION_PLUGIN);
-		this.installPlugin(pluginPublication);*/
 
 		if (AbstractCVM.isDistributed) {
 			this.executionLog.setDirectory(System.getProperty("user.dir")) ;
@@ -141,12 +112,7 @@ public class Broker extends AbstractComponent {
 	}
 
 	@Override
-	public void	start() throws ComponentStartException{
-
-	}
-	@Override
 	public void execute() throws Exception{
-		int i = 0;
 			this.createNewExecutorService(messageAcceptionExecutorURI,2,true);
 
 			handleRequestAsync(messageAcceptionExecutorURI,new AbstractComponent.AbstractService<Void>() {
@@ -157,21 +123,17 @@ public class Broker extends AbstractComponent {
 				}
 			});
 	}
-	/*
-	public Message popMessage(){
-		topicMessageStorageMap.entrySet().removeIf(entry -> entry.getValue().isEmpty());
-		for(String topic : topicMessageStorageMap.keySet()){
-			topicMessageStorageMap.get(topic).removeIf(messageI -> )
-		}
-	}*/
 
 
-	ReentrantLock lock1 =new ReentrantLock();
-	ReentrantLock lock2 =new ReentrantLock();
 
-	public void publish(MessageI m, String topic) throws Exception {
-	    lock.writeLock().lock();
-	    try {
+	public void acceptMessagesConcurrent() throws Exception{
+
+	}
+    public static int k=0;
+
+    public void publish(MessageI m, String topic) throws Exception {
+        lock.writeLock().lock();
+        try {
             Set<MessageI> storedMsgs;
             if ((storedMsgs = topicMessageStorageMap1.get(topic)) != null) {
                 storedMsgs.add(m);
@@ -180,36 +142,60 @@ public class Broker extends AbstractComponent {
                 s.add(m);
                 topicMessageStorageMap1.put(topic, s);
             }
+            condEmpty.notifyAll();
         }finally {
-	        lock.writeLock().unlock();
+            lock.writeLock().unlock();
         }
-	}
+    }
 
-	public void acceptMessagesConcurrent() throws Exception{
+    public void subscribe(String topic, String inboundPortURI) throws Exception {
+        lock.writeLock().lock();
+        String outUri="outbound-reception-broker-uri"+i;
+        i++;
+        this.addRequiredInterface(ReceptionCI.class);
+        BrokerReceptionOutboundPort brop =
+                new BrokerReceptionOutboundPort(outUri, this);
+        brop.publishPort();
+        this.doPortConnection(outUri,inboundPortURI,ReceptionConnector.class.getCanonicalName() );
 
-	}
+        try{
+            subUriPortObjMap.put(inboundPortURI, brop);
+            if(topicSubsUriMap.containsKey(topic)){
+                topicSubsUriMap.get(topic).add(inboundPortURI);
+            }else{
+                Set <String> uriSet = new HashSet<>();
+                uriSet.add(inboundPortURI);
+                topicSubsUriMap.put(topic,uriSet);
+            }
+
+            logMessage(inboundPortURI+" has subscribed");
+            System.out.println("Subscription for "+topic);
+        }finally {
+            lock.writeLock().unlock();
+        }
+
+    }
+    Condition condEmpty = lock.writeLock().newCondition();
+
 
 	public void acceptMessages() throws Exception {
             HashMap<String,Set<MessageI>> alreadySent;
-            boolean foundReceptors=false;
             while(true){
-                lock.readLock().lock();
+                lock.writeLock().lock();
                 try{
                     alreadySent= new HashMap<>();
                     String topic;
+
+                    while(!hasValues(topicMessageStorageMap1)){
+                        condEmpty.wait();
+                    }
+
                     for(Map.Entry<String, Set<MessageI>> entry : topicMessageStorageMap1.entrySet()){
                         topic = entry.getKey();
                         //no one for this topic yet:
-                        if(!topicSubsUriMap.containsKey(topic)){
-                            foundReceptors=false;
-                            break;
-                        }else {
-                            foundReceptors=true;
-                        }
                         if(!alreadySent.containsKey(topic)) alreadySent.put(topic,new HashSet<>());
                         for(MessageI msg : entry.getValue()){
-                            Thread.sleep(50);
-
+                            //Thread.sleep(50);
                             for(String uriSub : topicSubsUriMap.get(topic)){
                                 MessageFilterI filter ;
                                 if((filter=subUriFilterMap.get(uriSub))!=null){
@@ -219,31 +205,32 @@ public class Broker extends AbstractComponent {
                                 }else{
                                     subUriPortObjMap.get(uriSub).acceptMessage(msg);
                                 }
-                                alreadySent.get(topic).add(msg);
+                                System.out.println("Sending "+k+++" "+msg);
+                                //TODO remove msg even if thereis no one to receive.
+
+                            }
+                            alreadySent.get(topic).add(msg);
+                        }
+                    }
+                    System.out.println("ha-ha");
+                    if(hasValues(alreadySent)){
+                        System.out.println(alreadySent.size()+" topics sent");
+                        for(Map.Entry<String, Set<MessageI>> entry : alreadySent.entrySet()){
+                            System.out.println(entry.getValue().size()+" messages sent for "+entry.getKey());
+                            for(MessageI m : entry.getValue()){
+                                topicMessageStorageMap1.get(entry.getKey()).remove(m);
+                                System.out.println("removing "+jj+++m);
                             }
                         }
                     }
-                }finally {
-                    lock.readLock().unlock();
-                }
-                if(!foundReceptors)continue;
-                lock.writeLock().lock();
-                try{
-                    for(Map.Entry<String, Set<MessageI>> entry : alreadySent.entrySet()){
-                        topicMessageStorageMap1.get(entry.getKey()).removeAll(entry.getValue());
-                    }
+
                 } finally {
                     lock.writeLock().unlock();
                 }
             }
 	}
 
-	public void pubAux (Map<String,Set<MessageI>> topicMessageStorageMap,String topic, MessageI m){
-
-	}
-	public void publish2(MessageI m, String topic) throws Exception {
-
-	}
+    public static int jj=0;
 
 	public void publish(MessageI m, String[] topics) throws Exception {
 		for(String topic : topics ){
@@ -266,8 +253,8 @@ public class Broker extends AbstractComponent {
 	}
 
 	public void createTopic(String topic) {
-
-		topicSubsUriMap.put(topic,new HashSet<>());
+        //FIXME
+		//topicSubsUriMap.put(topic,new HashSet<>());
 	}
 
 	public void createTopics(String[] topics) {
@@ -289,33 +276,14 @@ public class Broker extends AbstractComponent {
 		String [] topics = new String [tset.size()];
 		return tset.toArray(topics);
 	}
-
-	public void subscribe(String topic, String inboundPortURI) throws Exception {
-		String outUri="outbound-reception-broker-uri"+i;
-		i++;
-		this.addRequiredInterface(ReceptionCI.class);
-		BrokerReceptionOutboundPort brop =
-				new BrokerReceptionOutboundPort(outUri, this);
-		brop.publishPort();
-		this.doPortConnection(outUri,inboundPortURI,ReceptionConnector.class.getCanonicalName() );
-		subUriPortObjMap.put(inboundPortURI, brop);
-        if(topicSubsUriMap.containsKey(topic)){
-            topicSubsUriMap.get(topic).add(inboundPortURI);
-        }else{
-            Set <String> uriSet = new HashSet<>();
-            uriSet.add(inboundPortURI);
-            topicSubsUriMap.put(topic,uriSet);
+    private boolean hasValues(Map <String,Set<MessageI>> map){
+        for(Map.Entry<String, Set<MessageI>> entry : map.entrySet()){
+            if(!entry.getValue().isEmpty()){
+                return true;
+            }
         }
-		//create outbound port for each subscriber
-		//topicSubsUriMap.get(topic).add(inboundPortURI);
-		logMessage(inboundPortURI+" has subscribed");
-		//brop.acceptMessage(new Message("you have been connected to "+outUri));
-		try{
-			brop.acceptMessage(new Message("You have been connected to "+outUri));
-		}catch (Exception e){
-			e.printStackTrace();
-		}
-	}
+        return false;
+    }
 
 	public void subscribe(String[] topics, String inboutPortURI) throws Exception {
 		for(String topic : topics ){

@@ -26,21 +26,22 @@ public class PublisherAlaska extends AbstractComponent {
         this.tracer.setTitle("publisher-alaska") ;
         this.tracer.setRelativePosition(1, 2) ;
     }
-
+    static int k =0;
     @Override
     public void execute() throws Exception{
 
         String topic = "weather0";
         createTopic(topic);
-        createTopic("weather3");
+        //createTopic("weather3");
 
         String msg = "120 degrees in Florida";
-        for (int i =0; i <30;i ++) {
-            if(i>15){
+        for (int i =0; i <10;i ++) {
+            if(i>4){
                 topic="weather3";
                 msg = "40 degrees in Alaska";
             }
             logMessage("Publishing message "+i+ " for topic : "+ topic);
+            System.out.println("publishing "+k+++" "+ msg);
             publish(new Message(msg), topic);
         }
     }

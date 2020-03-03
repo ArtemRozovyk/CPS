@@ -48,7 +48,7 @@ public class Publisher extends AbstractComponent{
 		this.tracer.setRelativePosition(1, 0) ;
 	}
 	
-	
+	static int k=0;
 	@Override
 	public void execute() throws Exception{
 		String topic = "weather0";
@@ -59,7 +59,8 @@ public class Publisher extends AbstractComponent{
 				msg = "150 degrees in Acapulco";
 			}
 			logMessage("Publishing message "+i+ " for topic : "+ topic);
-			publish(new Message(msg), topic);
+            System.out.println("publishing "+k+++" "+ msg);
+            publish(new Message(msg), topic);
 		}
 	}
 	
