@@ -78,7 +78,7 @@ public class Broker extends AbstractComponent {
 			String publicationInboundPortURI,
 					 String managmentInboundPortURI) throws Exception
 	{
-		super(uri, 0, 2) ;
+		super(uri, 0, 1) ;
 
         topicMessageStorageMap=new HashMap<>();
         topicSubHandlersMap=new HashMap<>();
@@ -134,7 +134,14 @@ public class Broker extends AbstractComponent {
 	}
 
     public void publish(MessageI m, String topic) throws Exception {
-               storePublished(m,topic);
+        handleRequestAsync(publishingExecutorURI,new AbstractComponent.AbstractService<Void>() {
+            @Override
+            public Void call() throws Exception {
+                ((Broker)this.getServiceOwner()).storePublished(m,topic);
+                return null;
+            }
+        });
+
     }
 
     public void storePublished(MessageI m, String topic){
@@ -147,7 +154,7 @@ public class Broker extends AbstractComponent {
                 queue.add(m);
                 topicMessageStorageMap.put(topic,queue);
             }
-            System.out.println("Stored "+m);
+            System.out.println("Stored "+m+" in "+Thread.currentThread());
             condEmpty.signal();
         }finally {
             lock.unlock();
@@ -156,7 +163,7 @@ public class Broker extends AbstractComponent {
 
     public void deliver(MsgEntry msgEntry) throws Exception {
 
-            System.out.println("Sending"+msgEntry.message);
+            System.out.println("Delivering "+msgEntry.message+" in "+Thread.currentThread());
             if(topicSubHandlersMap.containsKey(msgEntry.topic)){
                 topicSubHandlersMap.get(msgEntry.topic).get(0).port.acceptMessage(msgEntry.message);
                 Collections.shuffle(topicSubHandlersMap.get(msgEntry.topic));
@@ -165,18 +172,20 @@ public class Broker extends AbstractComponent {
    }
 
     public void subscribe(String topic, String inboundPortURI) throws Exception {
-        handleRequestAsync(subscriptionExecutorURI,new AbstractComponent.AbstractService<Void>() {
+
+        //System.out.println("someone's subbing");
+       /* handleRequestSync(subscriptionExecutorURI,new AbstractComponent.AbstractService<Void>() {
             @Override
             public Void call() throws Exception {
                 ((Broker)this.getServiceOwner()).subscribeAux(topic,inboundPortURI);
                 return null;
             }
-        });
+        });*/
+        subscribeAux(topic,inboundPortURI);
     }
 
     public void subscribeAux(String topic, String inboundPortURI) throws Exception {
-        lockSubscribers.writeLock().lock();
-        try{
+
             String outUri="outbound-reception-broker-uri"+i;
             i++;
             this.addRequiredInterface(ReceptionCI.class);
@@ -191,11 +200,9 @@ public class Broker extends AbstractComponent {
                 l.add(new SubHandler(outUri,brop,topic));
                 topicSubHandlersMap.put(topic,l);
             }
-            logMessage(inboundPortURI+" has subscribed");
-            System.out.println("Subed to"+topic);
-        }finally {
-            lockSubscribers.writeLock().unlock();
-        }
+            logMessage(inboundPortURI+" has subscribed  ");
+            System.out.println("Subed to"+topic+" in "+Thread.currentThread());
+
     }
 
 
