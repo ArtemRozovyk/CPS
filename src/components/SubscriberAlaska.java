@@ -50,9 +50,10 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
 
         //test scenario
 
-        subscribe("weather3");
-
-
+        subscribe("USA"); // 35 msg
+        subscribe("Alaska"); // 40 msg
+        subscribe("Anchorage"); // 15 msg
+        subscribe("Cambridge"); // 35 msg
     }
 
 

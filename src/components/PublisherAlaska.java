@@ -30,18 +30,28 @@ public class PublisherAlaska extends AbstractComponent {
     @Override
     public void execute() throws Exception{
 
-        String topic = "weather0";
-        //createTopic(topic);
-        //createTopic("weather3");
-
-        String msg = "120 degrees in Florida";
-        for (int i =0; i <6;i ++) {
-            if(i>2){
-                topic="weather3";
-                msg = "40 degrees in Alaska";
+    	String topic;
+        String msg;
+        
+        /*createTopic("USA");
+        createTopic("Alaska");
+        createTopic("Anchorage");*/
+        
+        // 35 msg USA, 40 msg Alaska, 15 msg Anchorage
+        for (int i = 0; i < 90;i ++) {
+        	if (i < 35){
+        		topic = "USA";
+        		msg = "10 degrees in average in the US";
+        	}
+        	else if(i >= 35 && i < 75){
+            	topic = "Alaska";
+        		msg = "-10 degrees in average in Alaska";
+            }
+            else {
+            	topic = "Anchorage";
+        		msg = "-20 degrees in Anchorage";
             }
             logMessage("Publishing message "+i+ " for topic : "+ topic);
-            System.out.println("publishing "+k+++" "+ msg);
             publish(new Message(msg), topic);
         }
     }

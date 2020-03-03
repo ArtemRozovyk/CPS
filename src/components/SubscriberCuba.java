@@ -49,7 +49,9 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
 
         //test scenario
 
-        subscribe("weather1");
+        subscribe("Colorado");
+        subscribe("USA");
+        subscribe("IDF");
 
 
     }

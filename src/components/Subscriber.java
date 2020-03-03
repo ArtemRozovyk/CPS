@@ -95,7 +95,9 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 
 	@Override
 	public void execute() throws Exception {
-		subscribe("weather0");
+		subscribe("France"); // 15 msg
+		subscribe("London"); // 20 msg
+		subscribe("Denver"); // 45 msg
 	}
 
 	public void acceptMessage(MessageI m) throws Exception {

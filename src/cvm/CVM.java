@@ -13,6 +13,7 @@ public class CVM extends AbstractCVM{
 
 	private static final String SUBSCRIBER_ALASKA_COMPONENT_URI = "alaska-sub-URI-publisher";;
 	private static final String SUBSCRIBER_CUBA_COMPONENT_URI = "cuba-sub-URI-publisher";;
+
     private String subscriberCuba;
 
     public CVM(boolean isDistributed) throws Exception {
@@ -20,6 +21,9 @@ public class CVM extends AbstractCVM{
 	}
 	public static final String PUBLISHER_COMPONENT_URI="my-URI-publisher";
 	public static final String PUBLISHER_ALASKA_COMPONENT_URI="my-URI-publisher-alaska";
+	public static final String PUBLISHER_FRANCE_COMPONENT_URI="my-URI-publisher-france";
+	public static final String PUBLISHER_UK_COMPONENT_URI="my-URI-publisher-uk";
+	
 	public static final String BROKER_COMPONENT_URI="my-URI-broker";
 	public static final String SUBSCRIBER2_COMPONENT_URI="my-URI-subscriber2";
 
@@ -38,6 +42,8 @@ public class CVM extends AbstractCVM{
 	protected String brokerURI;
 	protected String publisherURI;
 	protected String publisherAlaksaURI;
+	protected String publisherFranceURI;
+	protected String publisherUKURI;
 	protected String subscriberURI1;
 	protected String subscriberURI2;
 	private String subscriberAlaska;
@@ -155,6 +161,23 @@ public class CVM extends AbstractCVM{
         this.toggleTracing(this.subscriberCuba);
         this.toggleLogging(this.subscriberCuba);
 
+        // Publisher France
+        this.publisherFranceURI= AbstractComponent.createComponent(
+				PublisherFrance.class.getCanonicalName(),
+				new Object[] {PUBLISHER_FRANCE_COMPONENT_URI});
+
+		assert this.isDeployedComponent(this.publisherFranceURI);
+		this.toggleTracing(this.publisherFranceURI);
+		this.toggleLogging(this.publisherFranceURI);
+		
+		// Publisher UK
+        this.publisherUKURI= AbstractComponent.createComponent(
+				PublisherUK.class.getCanonicalName(),
+				new Object[] {PUBLISHER_UK_COMPONENT_URI});
+
+		assert this.isDeployedComponent(this.publisherUKURI);
+		this.toggleTracing(this.publisherUKURI);
+		this.toggleLogging(this.publisherUKURI);
 
 		super.deploy();
 		assert this.deploymentDone();

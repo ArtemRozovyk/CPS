@@ -48,20 +48,33 @@ public class Publisher extends AbstractComponent{
 		this.tracer.setRelativePosition(1, 0) ;
 	}
 	
-	static int k=0;
 	@Override
 	public void execute() throws Exception{
-		String topic = "weather0";
-		String msg = "10 degrees in Denver";
-		for (int i =0; i <6;i ++) {
-			if(i>2){
-				topic="weather1";
-				msg = "150 degrees in Acapulco";
-			}
-			logMessage("Publishing message "+i+ " for topic : "+ topic);
-            System.out.println("publishing "+k+++" "+ msg);
+		
+		String topic;
+        String msg;
+        
+        /*createTopic("Colorado");
+        createTopic("Denver");
+        createTopic("South Park City");*/
+        
+        // 40 msg Colorado, 45 msg Denver, 35 msg South Park City
+        for (int i = 0; i < 120;i ++) {
+        	if (i < 40){
+        		topic = "Colorado";
+        		msg = "0 degree in average in the Colorado";
+        	}
+        	else if(i >= 40 && i < 85){
+            	topic = "Denver";
+        		msg = "-4 degrees in Denver";
+            }
+            else {
+            	topic = "South Park";
+        		msg = "-7 degrees in South Park City";
+            }
+            logMessage("Publishing message "+i+ " for topic : "+ topic);
             publish(new Message(msg), topic);
-		}
+        }
 	}
 	
 	public void publish(MessageI m, String topic) throws Exception {
