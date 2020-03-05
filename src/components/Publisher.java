@@ -59,7 +59,7 @@ public class Publisher extends AbstractComponent{
         createTopic("South Park City");*/
         
         // 40 msg Colorado, 45 msg Denver, 35 msg South Park City
-        for (int i = 0; i < 120;i ++) {
+        for (int i = 0; i < 120; i++) {
         	if (i < 40){
         		topic = "Colorado";
         		msg = "0 degree in average in the Colorado";
@@ -69,7 +69,7 @@ public class Publisher extends AbstractComponent{
         		msg = "-4 degrees in Denver";
             }
             else {
-            	topic = "South Park";
+            	topic = "South Park City";
         		msg = "-7 degrees in South Park City";
             }
             logMessage("Publishing message "+i+ " for topic : "+ topic);

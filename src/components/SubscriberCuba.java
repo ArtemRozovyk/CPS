@@ -49,9 +49,10 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
 
         //test scenario
 
-        subscribe("Colorado");
-        subscribe("USA");
-        subscribe("IDF");
+        subscribe("Colorado"); // 40 msg
+        subscribe("USA"); // 35 msg
+        //Thread.sleep(20);
+        subscribe("IDF"); // 15 msg
 
 
     }
@@ -69,7 +70,7 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
     public void subscribe(String topic ) throws Exception {
 
 
-        logMessage("Subscribing to weather1 ");
+    	logMessage("Subscribing to " + topic);
 
         //sending the port over the Broker
         ((SubscriberManagementPlugin)this.getPlugin(

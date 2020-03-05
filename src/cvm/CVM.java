@@ -209,7 +209,7 @@ public class CVM extends AbstractCVM{
 		    //while(true){
             CVM c = new CVM() ;
             c.startStandardLifeCycle(14555L) ;
-            Thread.sleep(10000L) ;
+            Thread.sleep(20000L) ;
                 /*if((Broker.jj)%20!=0 ||(Broker.k)%20!=0){
                     System.out.println("error "+Broker.jj+" "+Broker.k);
                     break;

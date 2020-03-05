@@ -4,6 +4,7 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 import fr.sorbonne_u.components.examples.cps.components.ValueConsumer;
 import fr.sorbonne_u.components.examples.ddeployment_cs.components.DynamicURIConsumer;
+import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
 import fr.sorbonne_u.components.exceptions.PreconditionException;
@@ -57,6 +58,8 @@ public class Broker extends AbstractComponent {
     }
 	private static int i;
 
+	private Map<String,Integer> topicDeliveryNumberMap = new HashMap<>();
+	
 	private Map<String, ArrayDeque<MessageI>> topicMessageStorageMap;
     private Map<String, ArrayList<SubHandler>>topicSubHandlersMap;
 
@@ -136,7 +139,7 @@ public class Broker extends AbstractComponent {
 	}
     public static int externCount =0;
     public void publish(MessageI m, String topic) throws Exception {
-        System.out.println("Extern pub "+m+" in "+Thread.currentThread());
+        //System.out.println("Extern pub "+m+" in "+Thread.currentThread());
         externCount++;
         //FIXME 2
         this.handleRequestSync(publishingExecutorURI,new AbstractComponent.AbstractService<Void>() {
@@ -192,6 +195,10 @@ public class Broker extends AbstractComponent {
                     new BrokerReceptionOutboundPort(outUri, this);
             brop.publishPort();
             this.doPortConnection(outUri,inboundPortURI,ReceptionConnector.class.getCanonicalName() );
+            
+            logMessage(inboundPortURI+" has subscribed  ");
+            System.out.println("Subed to "+topic+" in "+Thread.currentThread()+" map sz: "+sizeMessageMap());
+            
             if(topicSubHandlersMap.containsKey(topic)){
                 topicSubHandlersMap.get(topic).add(new SubHandler(outUri,brop,topic));
             }else {
@@ -199,18 +206,33 @@ public class Broker extends AbstractComponent {
                 l.add(new SubHandler(outUri,brop,topic));
                 topicSubHandlersMap.put(topic,l);
             }
-            logMessage(inboundPortURI+" has subscribed  ");
-            System.out.println("Subed to"+topic+" in "+Thread.currentThread()+" map sz: "+sizeMessageMap());
+            
 
     }
 
 
     public void deliver(MsgEntry msgEntry) throws Exception {
+    	Integer nbDelivered; 
+    	
         deliverycount++;
         //System.out.println("Delivering "+msgEntry.message+" in "+Thread.currentThread()+" map sz: "+sizeMessageMap());
         if(topicSubHandlersMap.containsKey(msgEntry.topic)){
             actualdeliverycount++;
-            topicSubHandlersMap.get(msgEntry.topic).get(0).port.acceptMessage(msgEntry.message);
+            for (SubHandler sh : topicSubHandlersMap.get(msgEntry.topic)) {
+				sh.port.acceptMessage(msgEntry.message);
+				
+				synchronized (topicDeliveryNumberMap) {
+					nbDelivered = topicDeliveryNumberMap.get(msgEntry.topic);
+					if(nbDelivered != null) {
+			    		topicDeliveryNumberMap.replace(msgEntry.topic, nbDelivered + 1);
+			    	} else { topicDeliveryNumberMap.put(msgEntry.topic, 1); }
+					System.out.println("delivered " + msgEntry.topic + " " + topicDeliveryNumberMap.get(msgEntry.topic));
+				}
+					
+					
+				
+			}
+            //topicSubHandlersMap.get(msgEntry.topic).get(0).port.acceptMessage(msgEntry.message);
             Collections.shuffle(topicSubHandlersMap.get(msgEntry.topic));
         }
 
@@ -354,6 +376,17 @@ public class Broker extends AbstractComponent {
 		//subUriFilterMap.remove(inboundPort);
 		//subUriFilterMap.put(inboundPort,newFilter);
 
+	}
+	
+	@Override
+	public void	shutdown() throws ComponentShutdownException 
+	{
+		super.shutdown();
+		for (Map.Entry<String, Integer> entry : topicDeliveryNumberMap.entrySet()) {
+			System.out.println("topic : " + entry.getKey() + " - delivered : " + entry.getValue());
+		}
+		System.out.println("Expecting : USA 105, France 15, London 20, Denver 45,\n"
+				+ "Alaska 40, Anchorage 15, Cambridge 35, Colorado 40, IDF 15");
 	}
 
 }

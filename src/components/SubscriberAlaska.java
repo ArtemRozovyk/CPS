@@ -69,7 +69,7 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
     public void subscribe(String topic ) throws Exception {
 
 
-        logMessage("Subscribing to weather3 ");
+        logMessage("Subscribing to " + topic);
 
         //sending the port over the Broker
         ((SubscriberManagementPlugin)this.getPlugin(

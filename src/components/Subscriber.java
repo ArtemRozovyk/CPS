@@ -98,6 +98,7 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 		subscribe("France"); // 15 msg
 		subscribe("London"); // 20 msg
 		subscribe("Denver"); // 45 msg
+		subscribe("USA");
 	}
 
 	public void acceptMessage(MessageI m) throws Exception {
@@ -113,7 +114,7 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 
 	public void subscribe(String topic) throws Exception {
 	    this.subscriberReceptionInboundPortURI = "subscriber-reception-inbound-port-uri-0";
-	    logMessage("Subscribing to weather0");
+	    logMessage("Subscribing to " + topic);
 		PortI p = new SubscriberReceptionInboundPort(subscriberReceptionInboundPortURI, this) ;
 		p.publishPort() ;
 		smop.subscribe(topic, subscriberReceptionInboundPortURI);
