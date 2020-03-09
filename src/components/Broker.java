@@ -174,7 +174,14 @@ public class Broker extends AbstractComponent {
             synchronized (topicSubHandlersMap.get(msgEntry.topic)) {
                 for (SubHandler sh : topicSubHandlersMap.get(msgEntry.topic)) {
                     actualdeliverycount++;
-                    sh.port.acceptMessage(msgEntry.message);
+                    if(sh.filter!=null){
+                        if(sh.filter.filter(msgEntry.message)){
+                            sh.port.acceptMessage(msgEntry.message);
+                        }
+                    }else {
+                        sh.port.acceptMessage(msgEntry.message);
+                    }
+
                     System.out.println("delivered " + msgEntry.topic);
                 }
             }
