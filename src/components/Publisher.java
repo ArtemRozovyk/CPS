@@ -74,6 +74,8 @@ public class Publisher extends AbstractComponent {
         }
     }
 
+
+
     public void publish(MessageI m, String topic) throws Exception {
         this.scheduleTask(new AbstractComponent.AbstractTask() {
             @Override

@@ -21,6 +21,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * @author hEII
+ */
 public class Broker extends AbstractComponent {
 
     public static int externCount = 0;
@@ -180,11 +183,11 @@ public class Broker extends AbstractComponent {
             synchronized (topicSubHandlersMap.get(msgEntry.topic)) {
                 for (SubHandler sh : topicSubHandlersMap.get(msgEntry.topic)) {
                     actualdeliverycount++;
-                    if(sh.filter!=null){
-                        if(sh.filter.filter(msgEntry.message)){
+                    if (sh.filter != null) {
+                        if (sh.filter.filter(msgEntry.message)) {
                             sh.port.acceptMessage(msgEntry.message);
                         }
-                    }else {
+                    } else {
                         sh.port.acceptMessage(msgEntry.message);
                     }
 
@@ -305,8 +308,23 @@ public class Broker extends AbstractComponent {
         }
     }
 
-    public void destroyTopic(String topic) {
-        //topicSubsUriMap.remove(topic);
+    public void destroyTopic(String topic) throws Exception {
+        lock.lock();
+        try
+        {
+            for(MessageI m : topicMessageStorageMap.get(topic)){
+                handleRequestAsync(acceptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
+                    @Override
+                    public Void call() throws Exception {
+                        ((Broker) this.getServiceOwner()).deliver(new MsgEntry(m,topic));
+                        return null;
+                    }
+                });
+            }
+            topicMessageStorageMap.get(topic).clear();
+        }finally {
+            lock.unlock();
+        }
     }
 
     public boolean isTopic(String topic) {
