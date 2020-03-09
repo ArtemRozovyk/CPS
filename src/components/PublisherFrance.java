@@ -57,6 +57,18 @@ public class PublisherFrance extends AbstractComponent {
     private void publish(Message message, String topic) throws Exception {
         ((PublisherPublicationPlugin) this.getPlugin(FRANCE_PUB_PLUGIN_URI)).publish(message, topic);
     }
+    
+    private void publish(Message[] message, String topic) throws Exception {
+        ((PublisherPublicationPlugin) this.getPlugin(FRANCE_PUB_PLUGIN_URI)).publish(message, topic);
+    }
+    
+    private void publish(Message message, String[] topic) throws Exception {
+        ((PublisherPublicationPlugin) this.getPlugin(FRANCE_PUB_PLUGIN_URI)).publish(message, topic);
+    }
+    
+    private void publish(Message[] message, String[] topic) throws Exception {
+        ((PublisherPublicationPlugin) this.getPlugin(FRANCE_PUB_PLUGIN_URI)).publish(message, topic);
+    }
 
     public void createTopic(String topic) throws Exception {
         ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).createTopic(topic);

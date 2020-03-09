@@ -130,6 +130,12 @@ public class Broker extends AbstractComponent {
             }
         });
     }
+    
+    public void subscribe(String[] topics, String inboutPortURI) throws Exception {
+        for (String topic : topics) {
+            subscribe(topic, inboutPortURI);
+        }
+    }
 
     public void unsubscribe(String topic, String inboundPortURI) throws Exception {
         handleRequestAsync(subscriptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
@@ -304,8 +310,7 @@ public class Broker extends AbstractComponent {
     }
 
     public boolean isTopic(String topic) {
-        //return topicSubsUriMap.containsKey(topic);
-        return true;
+        return topicMessageStorageMap.containsKey(topic) || topicSubHandlersMap.containsKey(topic);
     }
 
     public String[] getTopics() {
@@ -315,12 +320,6 @@ public class Broker extends AbstractComponent {
         return null;
     }
 
-
-    public void subscribe(String[] topics, String inboutPortURI) throws Exception {
-        for (String topic : topics) {
-            subscribe(topic, inboutPortURI);
-        }
-    }
 
     public void subscribe(String topic, MessageFilterI filter, String inboutPortURI) throws Exception {
         //topicSubsUriMap.get(topic).add(inboutPortURI);
