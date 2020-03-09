@@ -14,7 +14,7 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
 
     static int i = 0;
     static final Object iGuard = new Object();
-    private String subscriberReceptionInboundPortURI= "subscriber-reception-inbound-port-uri-3";
+    private String subscriberReceptionInboundPortURI= "subscriber-alaska-reception-inbound-port-uri-3";
 
 
     protected SubscriberAlaska(String reflectionInboundPortURI) throws Exception {
@@ -76,7 +76,7 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
                 SUB_ALASKA_MANAGE_PLUGIN_URI)).subscribe(topic,subscriberReceptionInboundPortURI);
 
 
-        assert	this.subscriberReceptionInboundPortURI.equals("subscriber-reception-inbound-port-uri-3") :
+        assert	this.subscriberReceptionInboundPortURI.equals("subscriber-alaska-reception-inbound-port-uri-3") :
                 new PostconditionException("The URI prefix has not "
                         + "been initialised!") ;
         assert	this.isPortExisting(subscriberReceptionInboundPortURI) :

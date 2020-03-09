@@ -6,8 +6,8 @@ import plugins.PublisherManagementPlugin;
 import plugins.PublisherPublicationPlugin;
 
 public class PublisherFrance extends AbstractComponent {
-    protected final static String	FRANCE_PUB_PLUGIN_URI = "publisher-france-pub-plugin-uri" ;
-    protected final static String	FRANCE_MAN_PLUGIN_URI = "publisher-france-man-plugin-uri" ;
+    protected final static String FRANCE_PUB_PLUGIN_URI = "publisher-france-pub-plugin-uri";
+    protected final static String FRANCE_MAN_PLUGIN_URI = "publisher-france-man-plugin-uri";
 
     protected PublisherFrance(int nbThreads, int nbSchedulableThreads) {
         super(nbThreads, nbSchedulableThreads);
@@ -23,12 +23,12 @@ public class PublisherFrance extends AbstractComponent {
         managementPlugin.setPluginURI(FRANCE_MAN_PLUGIN_URI);
         this.installPlugin(managementPlugin);
 
-        this.tracer.setTitle("publisher-france") ;
-        this.tracer.setRelativePosition(2, 1) ;
+        this.tracer.setTitle("publisher-france");
+        this.tracer.setRelativePosition(1, 1);
     }
 
     @Override
-    public void execute() throws Exception{
+    public void execute() throws Exception {
 
         String topic;
         String msg;
@@ -36,33 +36,30 @@ public class PublisherFrance extends AbstractComponent {
         /*createTopic("France");
         createTopic("IDF");
         createTopic("Paris");*/
-        
         // 15 msg France, 15 msg IDF, 20 msg Paris
-        for (int i = 0; i < 50;i ++) {
-        	if (i < 15){
-        		topic = "France";
-        		msg = "13 degrees in average in France";
-        	}
-        	else if(i >= 15 && i < 30){
-            	topic = "IDF";
-        		msg = "10 degrees in average in IDF";
+        for (int i = 0; i < 10; i++) {
+            if (i < 4) {
+                topic = "France";
+                msg = "13 degrees in average in France";
+            } else if (i < 7) {
+                topic = "IDF";
+                msg = "10 degrees in average in IDF";
+            } else {
+                topic = "Paris";
+                msg = "6 degrees in Paris";
             }
-            else {
-            	topic = "Paris";
-        		msg = "6 degrees in Paris";
-            }
-            logMessage("Publishing message "+i+ " for topic : "+ topic);
+            logMessage("Publishing message " + i + " for topic : " + topic);
             publish(new Message(msg), topic);
         }
     }
 
 
-
     private void publish(Message message, String topic) throws Exception {
-        ((PublisherPublicationPlugin)this.getPlugin(FRANCE_PUB_PLUGIN_URI)).publish(message,topic);
+        ((PublisherPublicationPlugin) this.getPlugin(FRANCE_PUB_PLUGIN_URI)).publish(message, topic);
     }
+
     public void createTopic(String topic) throws Exception {
-        ((PublisherManagementPlugin)this.getPlugin(FRANCE_MAN_PLUGIN_URI)).createTopic(topic);
+        ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).createTopic(topic);
     }
 
 }

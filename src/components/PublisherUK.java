@@ -6,8 +6,8 @@ import plugins.PublisherManagementPlugin;
 import plugins.PublisherPublicationPlugin;
 
 public class PublisherUK extends AbstractComponent {
-    protected final static String	UK_PUB_PLUGIN_URI = "publisher-uk-pub-plugin-uri" ;
-    protected final static String	UK_MAN_PLUGIN_URI = "publisher-uk-man-plugin-uri" ;
+    protected final static String UK_PUB_PLUGIN_URI = "publisher-uk-pub-plugin-uri";
+    protected final static String UK_MAN_PLUGIN_URI = "publisher-uk-man-plugin-uri";
 
     protected PublisherUK(int nbThreads, int nbSchedulableThreads) {
         super(nbThreads, nbSchedulableThreads);
@@ -23,12 +23,12 @@ public class PublisherUK extends AbstractComponent {
         managementPlugin.setPluginURI(UK_MAN_PLUGIN_URI);
         this.installPlugin(managementPlugin);
 
-        this.tracer.setTitle("publisher-uk") ;
-        this.tracer.setRelativePosition(2, 0) ;
+        this.tracer.setTitle("publisher-uk");
+        this.tracer.setRelativePosition(1, 3);
     }
 
     @Override
-    public void execute() throws Exception{
+    public void execute() throws Exception {
 
         String topic;
         String msg;
@@ -36,33 +36,31 @@ public class PublisherUK extends AbstractComponent {
         /*createTopic("UK");
         createTopic("London");
         createTopic("Cambridge");*/
-        
+
         // 15 msg UK, 20 msg London, 35 msg Cambridge
-        for (int i = 0; i < 70;i ++) {
-        	if (i < 15){
-        		topic = "UK";
-        		msg = "6 degrees in average in the UK";
-        	}
-        	else if(i >= 15 && i < 35){
-            	topic = "London";
-        		msg = "10 degrees in London";
+        for (int i = 0; i < 10; i++) {
+            if (i < 4) {
+                topic = "UK";
+                msg = "6 degrees in average in the UK";
+            } else if (i < 7) {
+                topic = "London";
+                msg = "10 degrees in London";
+            } else {
+                topic = "Cambridge";
+                msg = "5 degrees in Cambridge";
             }
-            else {
-            	topic = "Cambridge";
-        		msg = "5 degrees in Cambridge";
-            }
-            logMessage("Publishing message "+i+ " for topic : "+ topic);
+            logMessage("Publishing message " + i + " for topic : " + topic);
             publish(new Message(msg), topic);
         }
     }
 
 
-
     private void publish(Message message, String topic) throws Exception {
-        ((PublisherPublicationPlugin)this.getPlugin(UK_PUB_PLUGIN_URI)).publish(message,topic);
+        ((PublisherPublicationPlugin) this.getPlugin(UK_PUB_PLUGIN_URI)).publish(message, topic);
     }
+
     public void createTopic(String topic) throws Exception {
-        ((PublisherManagementPlugin)this.getPlugin(UK_MAN_PLUGIN_URI)).createTopic(topic);
+        ((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).createTopic(topic);
     }
 
 }

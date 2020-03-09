@@ -105,5 +105,7 @@ extends AbstractPlugin
 	}
 
 
-
+    public void unsubscribe(String topic, String subscriberReceptionInboundPortURI) throws Exception {
+	    smop.unsubscribe(topic,subscriberReceptionInboundPortURI);
+    }
 }

@@ -13,7 +13,7 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
 
     static int i = 0;
     static final Object iGuard = new Object();
-    private String subscriberReceptionInboundPortURI= "subscriber-reception-inbound-port-uri-1";
+    private String subscriberReceptionInboundPortURI= "subscriber-cuba-reception-inbound-port-uri-1";
 
 
     protected SubscriberCuba(String reflectionInboundPortURI) throws Exception {
@@ -51,7 +51,8 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
 
         subscribe("Colorado"); // 40 msg
         subscribe("USA"); // 35 msg
-        //Thread.sleep(20);
+        Thread.sleep(400);
+        unsubscribe("USA");
         subscribe("IDF"); // 15 msg
 
 
@@ -67,6 +68,15 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
 
     }
 
+    public void unsubscribe(String topic ) throws Exception {
+
+
+        logMessage("Unsubscribing from " + topic);
+        System.out.println(  ((SubscriberManagementPlugin)this.getPlugin(
+                SUB_CUBA_MANAGE_PLUGIN_URI)));
+        ((SubscriberManagementPlugin)this.getPlugin(
+                SUB_CUBA_MANAGE_PLUGIN_URI)).unsubscribe(topic,subscriberReceptionInboundPortURI);
+    }
     public void subscribe(String topic ) throws Exception {
 
 
@@ -80,7 +90,7 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
 
 
 
-        assert	this.subscriberReceptionInboundPortURI.equals("subscriber-reception-inbound-port-uri-1") :
+        assert	this.subscriberReceptionInboundPortURI.equals("subscriber-cuba-reception-inbound-port-uri-1") :
                 new PostconditionException("The URI prefix has not "
                         + "been initialised!") ;
         assert	this.isPortExisting(subscriberReceptionInboundPortURI) :
