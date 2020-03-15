@@ -5,6 +5,11 @@ public class TimeStamp {
 	protected long time=0;
 
 	protected String timestamper;
+	
+	public TimeStamp(long t, String author) {
+		this.time = t;
+		this.timestamper = author;
+	}
 
 	public boolean isInitialised() {
 		return time!= 0 && timestamper != null;
