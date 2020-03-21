@@ -136,6 +136,17 @@ public class Broker extends AbstractComponent {
             }
         });
     }
+    
+    public void subscribe(String topic, MessageFilterI filter, String inboutPortURI) throws Exception {
+    	handleRequestAsync(subscriptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
+            @Override
+            public Void call() throws Exception {
+                ((Broker) this.getServiceOwner()).subscribeAux(topic, filter, inboutPortURI);
+                return null;
+            }
+        });
+
+    }
 
     public void subscribe(String[] topics, String inboutPortURI) throws Exception {
         for (String topic : topics) {
@@ -237,6 +248,27 @@ public class Broker extends AbstractComponent {
             topicSubHandlersMap.put(topic, l);
         }
     }
+    
+    private void subscribeAux(String topic, MessageFilterI filter, String inboundPortURI) throws Exception {
+        String outUri = "outbound-reception-broker-uri" + i;
+        i++;
+
+        BrokerReceptionOutboundPort brop =
+                new BrokerReceptionOutboundPort(outUri, this);
+        brop.publishPort();
+        this.doPortConnection(outUri, inboundPortURI, ReceptionConnector.class.getCanonicalName());
+        logMessage(inboundPortURI + " has subscribed  to " + topic);
+        System.out.println("Subed to " + topic + " in " + Thread.currentThread() + " map sz: " + sizeMessageMap());
+        if (topicSubHandlersMap.containsKey(topic)) {
+            synchronized (topicSubHandlersMap.get(topic)) {
+                topicSubHandlersMap.get(topic).add(new SubHandler(inboundPortURI, brop, topic, filter));
+            }
+        } else {
+            Set<SubHandler> l = Collections.synchronizedSet(new HashSet<>());
+            l.add(new SubHandler(inboundPortURI, brop, topic, filter));
+            topicSubHandlersMap.put(topic, l);
+        }
+    }
 
 
     private boolean isEmptyMap() {
@@ -301,7 +333,14 @@ public class Broker extends AbstractComponent {
     }
 
     public void createTopic(String topic) {
-        //FIXME
+        lock.lock();
+        try {
+        	if(topicMessageStorageMap.containsKey(topic)) return;
+        	
+        	topicMessageStorageMap.put(topic, new HashSet<>());
+        } finally {
+        	lock.unlock();
+        }
 
     }
 
@@ -340,13 +379,6 @@ public class Broker extends AbstractComponent {
     }
 
 
-    public void subscribe(String topic, MessageFilterI filter, String inboutPortURI) throws Exception {
-        //topicSubsUriMap.get(topic).add(inboutPortURI);
-        //subUriFilterMap.put(inboutPortURI,filter);
-        subscribe(topic, inboutPortURI);
-
-    }
-
     private void removeSubscriber(String topic, String inboundPortURI) throws Exception {
         logMessage(inboundPortURI + " WANTS TO UNSUB FROM " + topic);
 
@@ -372,9 +404,11 @@ public class Broker extends AbstractComponent {
     public void modifyFilter(String topic,
                              MessageFilterI newFilter,
                              String inboundPort) {
-        //subUriFilterMap.remove(inboundPort);
-        //subUriFilterMap.put(inboundPort,newFilter);
-
+        synchronized (topicSubHandlersMap.get(topic)) {
+        	topicSubHandlersMap.get(topic).forEach((SubHandler sh) -> {
+        		if(sh.subUri.equals(inboundPort)) sh.filter = newFilter;
+        	});
+		}
     }
 
     @Override
