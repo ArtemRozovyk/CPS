@@ -12,6 +12,7 @@ import fr.sorbonne_u.components.reflection.ports.ReflectionOutboundPort;
 import interfaces.ManagementCI;
 import interfaces.MessageI;
 import interfaces.ReceptionCI;
+import message.MessageFilterI;
 import ports.SubscriberManagementOutbondPort;
 import ports.SubscriberReceptionInboundPort;
 import ports.SubscriberReceptionInboundPortForPlugin;
@@ -103,9 +104,44 @@ extends AbstractPlugin
 	public void subscribe(String topic, String subscriberReceptionInboundPortURI) throws Exception {
 		smop.subscribe(topic, subscriberReceptionInboundPortURI);
 	}
-
+	
+	public void subscribe(String[] topic, String subscriberReceptionInboundPortURI) throws Exception {
+		for (String t : topic) {
+			smop.subscribe(t, subscriberReceptionInboundPortURI);
+		}
+	}
+	
+	public void subscribe(String topic, MessageFilterI filter, String subscriberReceptionInboundPortURI) throws Exception {
+		smop.subscribe(topic, filter, subscriberReceptionInboundPortURI);
+	}
+	
+	public void modifyFilter(String topic, MessageFilterI newFilter, String inboundPortUri) throws Exception {
+		smop.modifyFilter(topic, newFilter, inboundPortUri);
+	}
 
     public void unsubscribe(String topic, String subscriberReceptionInboundPortURI) throws Exception {
 	    smop.unsubscribe(topic,subscriberReceptionInboundPortURI);
+    }
+    
+    public void createTopic(String topic) throws Exception {
+    	smop.createTopic(topic);
+    }
+    
+    public void createTopic(String[] topic) throws Exception {
+    	for (String t : topic) {
+    		smop.createTopic(t);
+		}
+    }
+    
+    public void destroyTopic(String topic) throws Exception {
+    	smop.destroyTopic(topic);
+    }
+    
+    public boolean isTopic(String topic) throws Exception {
+    	return smop.isTopic(topic);
+    }
+    
+    public String[] getTopics() throws Exception {
+    	return smop.getTopics();
     }
 }

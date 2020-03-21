@@ -4,8 +4,10 @@ import fr.sorbonne_u.components.AbstractComponent;
 import interfaces.ManagementCI;
 import interfaces.PublicationCI;
 import message.Message;
+import message.MessageFilterI;
 import plugins.PublisherManagementPlugin;
 import plugins.PublisherPublicationPlugin;
+import plugins.SubscriberManagementPlugin;
 
 public class PublisherFrance extends AbstractComponent {
     protected final static String FRANCE_PUB_PLUGIN_URI = "publisher-france-pub-plugin-uri";
@@ -71,9 +73,25 @@ public class PublisherFrance extends AbstractComponent {
     private void publish(Message[] message, String[] topic) throws Exception {
         ((PublisherPublicationPlugin) this.getPlugin(FRANCE_PUB_PLUGIN_URI)).publish(message, topic);
     }
-
+    
     public void createTopic(String topic) throws Exception {
-        ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).createTopic(topic);
+    	((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).createTopic(topic);
+    }
+    
+    public void createTopic(String[] topics) throws Exception {
+    	((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).createTopic(topics);
+    }
+    
+    public void destroy(String topic) throws Exception {
+    	((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).destroyTopic(topic);
+    }
+    
+    public boolean isTopic(String topic) throws Exception {
+    	return ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).isTopic(topic);
+    }
+    
+    public String[] getTopics() throws Exception {
+    	return ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).getTopics();
     }
 
 }

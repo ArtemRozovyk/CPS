@@ -5,6 +5,7 @@ import fr.sorbonne_u.components.exceptions.PostconditionException;
 import interfaces.ManagementCI;
 import interfaces.MessageI;
 import interfaces.ReceptionCI;
+import message.MessageFilterI;
 import plugins.SubscriberManagementPlugin;
 import plugins.SubscriberReceptionPlugin;
 
@@ -62,7 +63,9 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
 
     @Override
     public void acceptMessage(MessageI[] ms) throws Exception {
-
+    	for (MessageI m : ms) {
+			acceptMessage(m);
+		}
     }
 
     public void unsubscribe(String topic) throws Exception {
@@ -95,6 +98,38 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
                 new PostconditionException("The component must have a "
                         + "port published with URI " + subscriberReceptionInboundPortURI);
 
+    }
+    
+    public void subscribe(String[] topics) throws Exception {
+    	((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).subscribe(topics, subscriberReceptionInboundPortURI);
+    }
+    
+    public void subscribe(String topic, MessageFilterI filter) throws Exception {
+    	((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).subscribe(topic, filter, subscriberReceptionInboundPortURI);
+    }
+
+    public void modifyFilter(String topic, MessageFilterI newFilter) throws Exception {
+    	((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).modifyFilter(topic, newFilter, subscriberReceptionInboundPortURI);
+    }
+    
+    public void createTopic(String topic) throws Exception {
+    	((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).createTopic(topic);
+    }
+    
+    public void createTopic(String[] topics) throws Exception {
+    	((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).createTopic(topics);
+    }
+    
+    public void destroy(String topic) throws Exception {
+    	((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).destroyTopic(topic);
+    }
+    
+    public boolean isTopic(String topic) throws Exception {
+    	return ((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).isTopic(topic);
+    }
+    
+    public String[] getTopics() throws Exception {
+    	return ((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).getTopics();
     }
 
 

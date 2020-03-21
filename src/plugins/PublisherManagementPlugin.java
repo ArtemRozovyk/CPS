@@ -11,6 +11,7 @@ import fr.sorbonne_u.components.reflection.ports.ReflectionOutboundPort;
 import interfaces.ManagementCI;
 import interfaces.MessageI;
 import interfaces.PublicationCI;
+import message.MessageFilterI;
 import ports.PublisherManagementOutboundPort;
 import ports.PublisherPublicationOutboundPort;
 
@@ -106,10 +107,49 @@ extends AbstractPlugin
 		this.removeRequiredInterface(ManagementCI.class);
 	}
 	
-	public void createTopic(String topic) throws Exception {
-		this.pmop.createTopic(topic);
+	public void subscribe(String topic, String subscriberReceptionInboundPortURI) throws Exception {
+		pmop.subscribe(topic, subscriberReceptionInboundPortURI);
 	}
-	//...TODO Management
+	
+	public void subscribe(String[] topic, String subscriberReceptionInboundPortURI) throws Exception {
+		for (String t : topic) {
+			pmop.subscribe(t, subscriberReceptionInboundPortURI);
+		}
+	}
+	
+	public void subscribe(String topic, MessageFilterI filter, String subscriberReceptionInboundPortURI) throws Exception {
+		pmop.subscribe(topic, filter, subscriberReceptionInboundPortURI);
+	}
+	
+	public void modifyFilter(String topic, MessageFilterI newFilter, String inboundPortUri) throws Exception {
+		pmop.modifyFilter(topic, newFilter, inboundPortUri);
+	}
+
+    public void unsubscribe(String topic, String subscriberReceptionInboundPortURI) throws Exception {
+	    pmop.unsubscribe(topic,subscriberReceptionInboundPortURI);
+    }
+    
+    public void createTopic(String topic) throws Exception {
+    	pmop.createTopic(topic);
+    }
+    
+    public void createTopic(String[] topic) throws Exception {
+    	for (String t : topic) {
+    		pmop.createTopic(t);
+		}
+    }
+    
+    public void destroyTopic(String topic) throws Exception {
+    	pmop.destroyTopic(topic);
+    }
+    
+    public boolean isTopic(String topic) throws Exception {
+    	return pmop.isTopic(topic);
+    }
+    
+    public String[] getTopics() throws Exception {
+    	return pmop.getTopics();
+    }
 
 	
 }

@@ -116,8 +116,8 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 	
 	public void acceptMessage(MessageI[] ms) throws Exception 
 	{
-		for (int i = 0; i < ms.length; i++) {
-			logMessage("Getting message " + ms[i]);
+		for (MessageI m : ms) {
+			acceptMessage(m);
 		}
 	}
 

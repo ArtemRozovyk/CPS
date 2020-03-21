@@ -73,7 +73,23 @@ public class PublisherUK extends AbstractComponent {
     }
 
     public void createTopic(String topic) throws Exception {
-        ((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).createTopic(topic);
+    	((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).createTopic(topic);
+    }
+    
+    public void createTopic(String[] topics) throws Exception {
+    	((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).createTopic(topics);
+    }
+    
+    public void destroy(String topic) throws Exception {
+    	((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).destroyTopic(topic);
+    }
+    
+    public boolean isTopic(String topic) throws Exception {
+    	return ((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).isTopic(topic);
+    }
+    
+    public String[] getTopics() throws Exception {
+    	return ((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).getTopics();
     }
 
 }
