@@ -35,7 +35,7 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
 
         //unstailling the plgin that will create port and publish it
         SubscriberReceptionPlugin subscriberPlugin
-                = new SubscriberReceptionPlugin();
+                = new SubscriberReceptionPlugin(subscriberReceptionInboundPortURI);
         subscriberPlugin.setPluginURI(SUB_CUBA_RECEPT_PLUGIN_URI);
         this.installPlugin(subscriberPlugin);
         super.execute();

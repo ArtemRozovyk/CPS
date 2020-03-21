@@ -15,8 +15,20 @@ implements ReceptionCI
 	
 	/** Inbound port to connect to the plugin **/
 	protected SubscriberReceptionInboundPortForPlugin sripfp;
+    protected String sripURI ;
 
-	/**
+    public SubscriberReceptionPlugin(String subscriberReceptionInboundPortURI) {
+        this.sripURI=subscriberReceptionInboundPortURI;
+    }
+
+    @Override
+    public void initialise() throws Exception {
+        this.sripfp = new SubscriberReceptionInboundPortForPlugin(
+                sripURI,this.getPluginURI(), this.owner);
+        this.sripfp.publishPort();
+    }
+
+    /**
 	 * Used in components to install the plugin
 	 */
 	@Override
@@ -26,9 +38,7 @@ implements ReceptionCI
 		
 		// We add the required interface and publish the inbound port
 		this.addOfferedInterface(ReceptionCI.class);
-		this.sripfp = new SubscriberReceptionInboundPortForPlugin(
-				this.getPluginURI(), this.owner);
-		this.sripfp.publishPort();
+
 	}
 	
 	
@@ -47,9 +57,6 @@ implements ReceptionCI
 	public void acceptMessage(MessageI[] ms) throws Exception {
 		this.getOwner().acceptMessage(ms);
 	}
-
-
-
 
 
 }
