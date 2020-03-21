@@ -17,6 +17,7 @@ implements PublicationCI{
 	private static final long serialVersionUID = 1L;
 
 	public BrokerPublicationInboundPort(ComponentI owner) throws Exception {
+
 		super(PublicationCI.class, owner);
 	}
 	

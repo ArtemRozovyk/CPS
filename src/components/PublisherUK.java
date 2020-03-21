@@ -15,13 +15,7 @@ public class PublisherUK extends AbstractComponent {
 
     protected PublisherUK(String reflectionInboundPortURI) throws Exception {
         super(reflectionInboundPortURI, 0, 1);
-        PublisherPublicationPlugin pluginPublication = new PublisherPublicationPlugin();
-        pluginPublication.setPluginURI(UK_PUB_PLUGIN_URI);
-        this.installPlugin(pluginPublication);
 
-        PublisherManagementPlugin managementPlugin = new PublisherManagementPlugin();
-        managementPlugin.setPluginURI(UK_MAN_PLUGIN_URI);
-        this.installPlugin(managementPlugin);
 
         this.tracer.setTitle("publisher-uk");
         this.tracer.setRelativePosition(1, 3);
@@ -29,7 +23,13 @@ public class PublisherUK extends AbstractComponent {
 
     @Override
     public void execute() throws Exception {
+        PublisherPublicationPlugin pluginPublication = new PublisherPublicationPlugin();
+        pluginPublication.setPluginURI(UK_PUB_PLUGIN_URI);
+        this.installPlugin(pluginPublication);
 
+        PublisherManagementPlugin managementPlugin = new PublisherManagementPlugin();
+        managementPlugin.setPluginURI(UK_MAN_PLUGIN_URI);
+        this.installPlugin(managementPlugin);
         String topic;
         String msg;
         

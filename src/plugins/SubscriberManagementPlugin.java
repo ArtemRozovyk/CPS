@@ -36,7 +36,7 @@ extends AbstractPlugin
 		super.installOn(owner);
 		
 		// We add the required interface and publish the inbound port
-		this.addOfferedInterface(ReceptionCI.class);
+		this.addRequiredInterface(ManagementCI.class);
 		this.smop = new SubscriberManagementOutbondPort(
 											this.getPluginURI(), this.owner);
 		this.smop.publishPort();

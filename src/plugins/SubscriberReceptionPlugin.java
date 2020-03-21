@@ -14,17 +14,7 @@ implements ReceptionCI
 	private static final long serialVersionUID = 1L;
 	
 	/** Inbound port to connect to the plugin **/
-	protected String sripURI ;
-	protected String pluginURI ;
 	protected SubscriberReceptionInboundPortForPlugin sripfp;
-
-	public SubscriberReceptionPlugin(String subscriberReceptionInboundPortURI,
-									 String subAlaskaReceptPluginUri) {
-
-		this.sripURI=subscriberReceptionInboundPortURI;
-		this.pluginURI=subAlaskaReceptPluginUri;
-	}
-
 
 	/**
 	 * Used in components to install the plugin
@@ -37,7 +27,7 @@ implements ReceptionCI
 		// We add the required interface and publish the inbound port
 		this.addOfferedInterface(ReceptionCI.class);
 		this.sripfp = new SubscriberReceptionInboundPortForPlugin(
-				sripURI,pluginURI, this.owner);
+				this.getPluginURI(), this.owner);
 		this.sripfp.publishPort();
 	}
 	

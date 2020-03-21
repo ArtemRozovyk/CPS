@@ -1,7 +1,9 @@
 package interfaces;
 
-public interface ManagementCI 
-extends ManagementImplementationI, SubscriptionImplementationI
-{
+import fr.sorbonne_u.components.interfaces.OfferedI;
+import fr.sorbonne_u.components.interfaces.RequiredI;
+
+public interface ManagementCI
+        extends ManagementImplementationI, SubscriptionImplementationI, RequiredI, OfferedI {
 
 }

@@ -7,6 +7,7 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
 import fr.sorbonne_u.components.exceptions.PreconditionException;
 import fr.sorbonne_u.components.ports.PortI;
+import interfaces.ManagementCI;
 import interfaces.MessageI;
 import interfaces.ReceptionCI;
 import ports.BrokerManagementInboundPort;
@@ -25,7 +26,7 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 	public final static String	SUBSCRIBER_RECEPTION_PLUGIN =
 			"subscriber-reception-plugin-uri" ;
 
-	public Subscriber(int nbThreads, int nbSchedulableThreads) {
+    protected Subscriber(int nbThreads, int nbSchedulableThreads) {
 		super(nbThreads, nbSchedulableThreads);
 	}
 	static int pos=0;
@@ -42,6 +43,8 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 			//assert	receptionInboundPortURI != null :
 			//			new PreconditionException("receptionInboundPortURI can't be null!") ;
 
+            addOfferedInterface(ReceptionCI.class);
+            addRequiredInterface(ManagementCI.class);
 
 			//Publish the management outbound port
 			myManagementOutbondPortURI=managementOutboundPortURI;
@@ -49,6 +52,10 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 
 			this.smop = new SubscriberManagementOutbondPort(managementOutboundPortURI, this);
 			this.smop.localPublishPort();
+
+            this.subscriberReceptionInboundPortURI = "subscriber-reception-inbound-port-uri-0";
+            PortI p = new SubscriberReceptionInboundPort(subscriberReceptionInboundPortURI, this) ;
+            p.publishPort() ;
 			
 			// Install the plugin
 			/*SubscriberReceptionPlugin receptionPlugin = new SubscriberReceptionPlugin();
@@ -71,7 +78,7 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 						new PostconditionException("The component must have a "
 								+ "port with URI " + managementOutboundPortURI) ;
 			assert	this.findPortFromURI(managementOutboundPortURI).
-						getImplementedInterface().equals(ReceptionCI.class) :
+						getImplementedInterface().equals(ManagementCI.class) :
 						new PostconditionException("The component must have a "
 								+ "port with implemented interface URIProviderI") ;
 			assert	this.findPortFromURI(managementOutboundPortURI).isPublished() :
@@ -90,6 +97,7 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 
 	}
 
@@ -113,10 +121,8 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 	}
 
 	public void subscribe(String topic) throws Exception {
-	    this.subscriberReceptionInboundPortURI = "subscriber-reception-inbound-port-uri-0";
 	    logMessage("Subscribing to " + topic);
-		PortI p = new SubscriberReceptionInboundPort(subscriberReceptionInboundPortURI, this) ;
-		p.publishPort() ;
+
 		smop.subscribe(topic, subscriberReceptionInboundPortURI);
 		assert	this.subscriberReceptionInboundPortURI.equals("subscriber-reception-inbound-port-uri-0") :
 				new PostconditionException("The URI prefix has not "

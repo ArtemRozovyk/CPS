@@ -11,7 +11,6 @@ import message.Message;
 import message.MessageFilterI;
 import message.Properties;
 import message.TimeStamp;
-
 class MessageTest {
 	
 	private MessageI msg1;

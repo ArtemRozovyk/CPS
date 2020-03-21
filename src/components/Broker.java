@@ -7,6 +7,7 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
 import fr.sorbonne_u.components.exceptions.PreconditionException;
 import fr.sorbonne_u.components.ports.PortI;
+import interfaces.ManagementCI;
 import interfaces.MessageI;
 import interfaces.PublicationCI;
 import interfaces.ReceptionCI;
@@ -56,7 +57,9 @@ public class Broker extends AbstractComponent {
 
         topicMessageStorageMap = new HashMap<>();
         topicSubHandlersMap = new HashMap<>();
-
+        addOfferedInterface(ManagementCI.class);
+        addOfferedInterface(PublicationCI.class);
+        addRequiredInterface(ReceptionCI.class);
         assert uri != null :
                 new PreconditionException("uri can't be null!");
         assert publicationInboundPortURI != null :
@@ -65,7 +68,6 @@ public class Broker extends AbstractComponent {
         this.brokerPublicationInboundPortURI = uri;
         PortI p = new BrokerPublicationInboundPort(publicationInboundPortURI, this);
         p.publishPort();
-
         PortI m = new BrokerManagementInboundPort(managmentInboundPortURI, this);
         m.publishPort();
 
@@ -133,7 +135,7 @@ public class Broker extends AbstractComponent {
             }
         });
     }
-    
+
     public void subscribe(String[] topics, String inboutPortURI) throws Exception {
         for (String topic : topics) {
             subscribe(topic, inboutPortURI);
@@ -191,7 +193,7 @@ public class Broker extends AbstractComponent {
                         sh.port.acceptMessage(msgEntry.message);
                     }
 
-                    System.out.println("delivered " + msgEntry.topic);
+                   // System.out.println("delivered " + msgEntry.topic);
                 }
             }
         }
@@ -214,10 +216,10 @@ public class Broker extends AbstractComponent {
     }
 
 
-    public void subscribeAux(String topic, String inboundPortURI) throws Exception {
+    private void subscribeAux(String topic, String inboundPortURI) throws Exception {
         String outUri = "outbound-reception-broker-uri" + i;
         i++;
-        this.addRequiredInterface(ReceptionCI.class);
+
         BrokerReceptionOutboundPort brop =
                 new BrokerReceptionOutboundPort(outUri, this);
         brop.publishPort();
@@ -299,7 +301,7 @@ public class Broker extends AbstractComponent {
 
     public void createTopic(String topic) {
         //FIXME
-        //topicSubsUriMap.put(topic,new HashSet<>());
+
     }
 
     public void createTopics(String[] topics) {
@@ -310,19 +312,18 @@ public class Broker extends AbstractComponent {
 
     public void destroyTopic(String topic) throws Exception {
         lock.lock();
-        try
-        {
-            for(MessageI m : topicMessageStorageMap.get(topic)){
+        try {
+            for (MessageI m : topicMessageStorageMap.get(topic)) {
                 handleRequestAsync(acceptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
                     @Override
                     public Void call() throws Exception {
-                        ((Broker) this.getServiceOwner()).deliver(new MsgEntry(m,topic));
+                        ((Broker) this.getServiceOwner()).deliver(new MsgEntry(m, topic));
                         return null;
                     }
                 });
             }
             topicMessageStorageMap.get(topic).clear();
-        }finally {
+        } finally {
             lock.unlock();
         }
     }
@@ -332,10 +333,9 @@ public class Broker extends AbstractComponent {
     }
 
     public String[] getTopics() {
-        //	Set<String > tset= topicSubsUriMap.keySet();
-        //String [] topics = new String [tset.size()];
-        //return tset.toArray(topics);
-        return null;
+        Set<String> tset = topicMessageStorageMap.keySet();
+        String[] topics = new String[tset.size()];
+        return tset.toArray(topics);
     }
 
 
@@ -346,7 +346,7 @@ public class Broker extends AbstractComponent {
 
     }
 
-    public void removeSubscriber(String topic, String inboundPortURI) {
+    private void removeSubscriber(String topic, String inboundPortURI) {
         logMessage(inboundPortURI + " WANTS TO UNSUB FROM " + topic);
 
         if (topicSubHandlersMap.containsKey(topic)) {

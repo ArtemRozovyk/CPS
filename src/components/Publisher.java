@@ -4,7 +4,10 @@ import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
+import interfaces.ManagementCI;
 import interfaces.MessageI;
+import interfaces.PublicationCI;
+import interfaces.ReceptionCI;
 import message.Message;
 import ports.PublisherManagementOutboundPort;
 import ports.PublisherPublicationOutboundPort;
@@ -25,6 +28,8 @@ public class Publisher extends AbstractComponent {
                         String publicationOutboundPortURI,
                         String managementOutboundPort) throws Exception {
         super(uri, 0, 1);
+        addRequiredInterface(PublicationCI.class);
+        addRequiredInterface(ManagementCI.class);
 
         //Publish the reception port (an outbound port is always local)
         this.ppop = new PublisherPublicationOutboundPort(publicationOutboundPortURI, this);
