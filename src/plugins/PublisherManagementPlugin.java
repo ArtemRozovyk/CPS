@@ -103,7 +103,7 @@ extends AbstractPlugin
 	{
 		this.pmop.unpublishPort();
 		this.pmop.destroyPort();
-		this.removeRequiredInterface(PublicationCI.class);
+		this.removeRequiredInterface(ManagementCI.class);
 	}
 	
 	public void createTopic(String topic) throws Exception {

@@ -3,6 +3,7 @@ package components;
 import connectors.ManagementConnector;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
+import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
 import fr.sorbonne_u.components.exceptions.PreconditionException;
@@ -21,8 +22,8 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 	protected String brokerManagementInboundPortURI;
 
 	protected SubscriberManagementOutbondPort smop;
-	protected BrokerManagementInboundPort bmip;
-	
+	protected SubscriberReceptionInboundPort srip;
+
 	public final static String	SUBSCRIBER_RECEPTION_PLUGIN =
 			"subscriber-reception-plugin-uri" ;
 
@@ -54,9 +55,9 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 			this.smop.localPublishPort();
 
             this.subscriberReceptionInboundPortURI = "subscriber-reception-inbound-port-uri-0";
-            PortI p = new SubscriberReceptionInboundPort(subscriberReceptionInboundPortURI, this) ;
-            p.publishPort() ;
-			
+            srip = new SubscriberReceptionInboundPort(subscriberReceptionInboundPortURI, this) ;
+            srip.publishPort() ;
+
 			// Install the plugin
 			/*SubscriberReceptionPlugin receptionPlugin = new SubscriberReceptionPlugin();
 			receptionPlugin.setPluginURI(SUBSCRIBER_RECEPTION_PLUGIN);
@@ -134,4 +135,19 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 				new PostconditionException("The component must have a "
 						+ "port published with URI " + subscriberReceptionInboundPortURI) ;
 	}
+    @Override
+    public void	shutdown() throws ComponentShutdownException
+    {
+        try {
+            this.srip.unpublishPort() ;
+            this.srip.destroyPort() ;
+            this.smop.unpublishPort() ;
+            this.smop.destroyPort() ;
+
+        } catch (Exception e) {
+            throw new ComponentShutdownException(e) ;
+        }
+
+        super.shutdown() ;
+    }
 }

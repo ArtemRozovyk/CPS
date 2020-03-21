@@ -2,6 +2,7 @@ package plugins;
 
 import fr.sorbonne_u.components.AbstractPlugin;
 import fr.sorbonne_u.components.ComponentI;
+import interfaces.ManagementCI;
 import interfaces.MessageI;
 import interfaces.ReceptionCI;
 import ports.SubscriberReceptionInboundPortForPlugin;
@@ -35,7 +36,6 @@ implements ReceptionCI
 	public void installOn(ComponentI owner) throws Exception
 	{
 		super.installOn(owner);
-		
 		// We add the required interface and publish the inbound port
 		this.addOfferedInterface(ReceptionCI.class);
 
@@ -58,5 +58,11 @@ implements ReceptionCI
 		this.getOwner().acceptMessage(ms);
 	}
 
-
+    @Override
+    public void uninstall() throws Exception
+    {
+        this.sripfp.unpublishPort();
+        this.sripfp.destroyPort();
+        this.removeOfferedInterface(ReceptionCI.class);
+    }
 }

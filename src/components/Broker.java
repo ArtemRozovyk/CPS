@@ -45,7 +45,8 @@ public class Broker extends AbstractComponent {
     //that makes no guarantees as to the iteration order of the set.
     private Map<String, Set<MessageI>> topicMessageStorageMap;
     private Map<String, Set<SubHandler>> topicSubHandlersMap;
-
+    protected BrokerPublicationInboundPort bpip;
+    protected BrokerManagementInboundPort bmip;
     protected Broker(int nbThreads, int nbSchedulableThreads) {
         super(nbThreads, nbSchedulableThreads);
     }
@@ -66,10 +67,10 @@ public class Broker extends AbstractComponent {
                 new PreconditionException("inbound port can't be null!");
 
         this.brokerPublicationInboundPortURI = uri;
-        PortI p = new BrokerPublicationInboundPort(publicationInboundPortURI, this);
-        p.publishPort();
-        PortI m = new BrokerManagementInboundPort(managmentInboundPortURI, this);
-        m.publishPort();
+        bpip = new BrokerPublicationInboundPort(publicationInboundPortURI, this);
+        bpip.publishPort();
+        bmip = new BrokerManagementInboundPort(managmentInboundPortURI, this);
+        bmip.publishPort();
 
         if (AbstractCVM.isDistributed) {
             this.executionLog.setDirectory(System.getProperty("user.dir"));
@@ -346,7 +347,7 @@ public class Broker extends AbstractComponent {
 
     }
 
-    private void removeSubscriber(String topic, String inboundPortURI) {
+    private void removeSubscriber(String topic, String inboundPortURI) throws Exception {
         logMessage(inboundPortURI + " WANTS TO UNSUB FROM " + topic);
 
         if (topicSubHandlersMap.containsKey(topic)) {
@@ -356,6 +357,9 @@ public class Broker extends AbstractComponent {
                     SubHandler sh = it.next();
                     if (sh.subUri.equals(inboundPortURI)) {
                         logMessage(sh.subUri + " has unsubed from " + topic);
+                        sh.port.unpublishPort();
+                        sh.port.destroyPort();
+
                         it.remove();
                         return;
                     }
@@ -374,9 +378,24 @@ public class Broker extends AbstractComponent {
     }
 
     @Override
-    public void shutdown() throws ComponentShutdownException {
-        super.shutdown();
-
+    public void	shutdown() throws ComponentShutdownException
+    {
+        try {
+            for (Set<SubHandler> shs : topicSubHandlersMap.values()){
+                for(SubHandler sh:shs){
+                    System.out.println("Destroying "+sh.port.getPortURI());
+                    sh.port.unpublishPort();
+                    sh.port.destroyPort();
+                }
+            }
+            bpip.unpublishPort();
+            bpip.destroyPort();
+            bmip.unpublishPort();
+            bmip.destroyPort();
+        } catch (Exception e) {
+            throw new ComponentShutdownException(e) ;
+        }
+        super.shutdown() ;
     }
 
     private static class SubHandler {

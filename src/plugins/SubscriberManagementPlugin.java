@@ -91,7 +91,7 @@ extends AbstractPlugin
 	{
 		this.smop.unpublishPort();
 		this.smop.destroyPort();
-		this.removeOfferedInterface(ReceptionCI.class);
+		this.removeRequiredInterface(ManagementCI.class);
 	}
 	
 	private ReceptionCI getOwner()

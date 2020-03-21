@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
+import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import interfaces.ManagementCI;
 import interfaces.MessageI;
 import interfaces.PublicationCI;
@@ -140,5 +141,19 @@ public class Publisher extends AbstractComponent {
         }, 1000, TimeUnit.MILLISECONDS);
     }
 
+    @Override
+    public void	shutdown() throws ComponentShutdownException
+    {
+        try {
+            this.ppop.unpublishPort() ;
+            this.ppop.destroyPort() ;
+            this.pmop.unpublishPort() ;
+            this.pmop.destroyPort() ;
 
+        } catch (Exception e) {
+            throw new ComponentShutdownException(e) ;
+        }
+
+        super.shutdown() ;
+    }
 }

@@ -2,6 +2,7 @@ package components;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
+import interfaces.ManagementCI;
 import interfaces.MessageI;
 import interfaces.ReceptionCI;
 import plugins.SubscriberManagementPlugin;
@@ -18,8 +19,6 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
 
     protected SubscriberCuba(String reflectionInboundPortURI) throws Exception {
         super(reflectionInboundPortURI, 0, 1);
-
-
         this.tracer.setTitle("sub-cuba");
         this.tracer.setRelativePosition(0, 1);
 

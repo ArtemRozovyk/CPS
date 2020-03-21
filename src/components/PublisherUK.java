@@ -1,6 +1,8 @@
 package components;
 
 import fr.sorbonne_u.components.AbstractComponent;
+import interfaces.ManagementCI;
+import interfaces.PublicationCI;
 import message.Message;
 import plugins.PublisherManagementPlugin;
 import plugins.PublisherPublicationPlugin;
@@ -15,7 +17,6 @@ public class PublisherUK extends AbstractComponent {
 
     protected PublisherUK(String reflectionInboundPortURI) throws Exception {
         super(reflectionInboundPortURI, 0, 1);
-
 
         this.tracer.setTitle("publisher-uk");
         this.tracer.setRelativePosition(1, 3);
