@@ -29,6 +29,7 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
 
     @Override
     public void execute() throws Exception {
+        super.execute();
         SubscriberManagementPlugin smp = new SubscriberManagementPlugin();
         smp.setPluginURI(SUB_CUBA_MANAGE_PLUGIN_URI);
         this.installPlugin(smp);
@@ -38,7 +39,7 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
                 = new SubscriberReceptionPlugin(subscriberReceptionInboundPortURI);
         subscriberPlugin.setPluginURI(SUB_CUBA_RECEPT_PLUGIN_URI);
         this.installPlugin(subscriberPlugin);
-        super.execute();
+
 
         /*
         SubscriberReceptionPlugin subscriberPlugin = new SubscriberReceptionPlugin();

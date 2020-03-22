@@ -2,8 +2,12 @@ package components;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import interfaces.ManagementCI;
+import interfaces.MessageI;
 import interfaces.PublicationCI;
 import message.Message;
+import message.MessageFilterI;
+import message.Properties;
+import message.TimeStamp;
 import plugins.PublisherManagementPlugin;
 import plugins.PublisherPublicationPlugin;
 
@@ -24,6 +28,7 @@ public class PublisherUK extends AbstractComponent {
 
     @Override
     public void execute() throws Exception {
+        super.execute();
         PublisherPublicationPlugin pluginPublication = new PublisherPublicationPlugin();
         pluginPublication.setPluginURI(UK_PUB_PLUGIN_URI);
         this.installPlugin(pluginPublication);
@@ -32,26 +37,38 @@ public class PublisherUK extends AbstractComponent {
         managementPlugin.setPluginURI(UK_MAN_PLUGIN_URI);
         this.installPlugin(managementPlugin);
         String topic;
-        String msg;
-        
         /*createTopic("UK");
         createTopic("London");
         createTopic("Cambridge");*/
-
+        Message msg;
         // 15 msg UK, 20 msg London, 35 msg Cambridge
         for (int i = 0; i < 10; i++) {
             if (i < 4) {
                 topic = "UK";
-                msg = "6 degrees in average in the UK";
+                msg = new Message("6 degrees in average in the UK");
             } else if (i < 7) {
                 topic = "London";
-                msg = "10 degrees in London";
+                msg = new Message("10 degrees in London");
             } else {
                 topic = "Cambridge";
-                msg = "5 degrees in Cambridge";
+                TimeStamp ts = new TimeStamp(System.currentTimeMillis(), "PbUK");
+
+                msg = new Message("PayloadUK", ts, "5 degrees in Cambridge", new Properties());
+                msg.getProperties().putProp("Integer", 3);
+                msg.getProperties().putProp("Long", 3L);
+                msg.getProperties().putProp("Character", '3');
+                msg.getProperties().putProp("Short", (short) 3);
+                msg.getProperties().putProp("Byte", (byte) 3);
+                msg.getProperties().putProp("Float", 3f);
+                msg.getProperties().putProp("String", "3");
+                msg.getProperties().putProp("Boolean", true);
+                msg.getProperties().putProp("Double", 3.0);
+                msg.getTimeStamp().setTime(System.currentTimeMillis());
+                msg.getTimeStamp().setTimestamper("PbUK");
             }
+
             logMessage("Publishing message " + i + " for topic : " + topic);
-            publish(new Message(msg), topic);
+            publish(msg, topic);
         }
     }
 
@@ -59,37 +76,37 @@ public class PublisherUK extends AbstractComponent {
     private void publish(Message message, String topic) throws Exception {
         ((PublisherPublicationPlugin) this.getPlugin(UK_PUB_PLUGIN_URI)).publish(message, topic);
     }
-    
+
     private void publish(Message[] message, String topic) throws Exception {
         ((PublisherPublicationPlugin) this.getPlugin(UK_PUB_PLUGIN_URI)).publish(message, topic);
     }
-    
+
     private void publish(Message message, String[] topic) throws Exception {
         ((PublisherPublicationPlugin) this.getPlugin(UK_PUB_PLUGIN_URI)).publish(message, topic);
     }
-    
+
     private void publish(Message[] message, String[] topic) throws Exception {
         ((PublisherPublicationPlugin) this.getPlugin(UK_PUB_PLUGIN_URI)).publish(message, topic);
     }
 
     public void createTopic(String topic) throws Exception {
-    	((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).createTopic(topic);
+        ((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).createTopic(topic);
     }
-    
+
     public void createTopic(String[] topics) throws Exception {
-    	((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).createTopic(topics);
+        ((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).createTopic(topics);
     }
-    
+
     public void destroy(String topic) throws Exception {
-    	((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).destroyTopic(topic);
+        ((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).destroyTopic(topic);
     }
-    
+
     public boolean isTopic(String topic) throws Exception {
-    	return ((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).isTopic(topic);
+        return ((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).isTopic(topic);
     }
-    
+
     public String[] getTopics() throws Exception {
-    	return ((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).getTopics();
+        return ((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).getTopics();
     }
 
 }

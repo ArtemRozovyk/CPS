@@ -191,6 +191,9 @@ public class Broker extends AbstractComponent {
     }
 
     public void deliver(MsgEntry msgEntry) throws Exception {
+        if(msgEntry.topic.equals("Anchorage")){
+            System.out.println("Ancho");
+        }
         deliverycount++;
         if (topicSubHandlersMap.containsKey(msgEntry.topic)) {
             //people trying to sub will be effectively added only

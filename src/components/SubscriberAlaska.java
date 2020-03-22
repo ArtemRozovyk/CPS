@@ -31,6 +31,7 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
 
     @Override
     public void execute() throws Exception {
+        super.execute();
         SubscriberManagementPlugin smp = new SubscriberManagementPlugin();
         smp.setPluginURI(SUB_ALASKA_MANAGE_PLUGIN_URI);
         this.installPlugin(smp);
@@ -40,32 +41,59 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
                 = new SubscriberReceptionPlugin(subscriberReceptionInboundPortURI);
         subscriberPlugin.setPluginURI(SUB_ALASKA_RECEPT_PLUGIN_URI);
         this.installPlugin(subscriberPlugin);
-        super.execute();
+
 
         /*
         SubscriberReceptionPlugin subscriberPlugin = new SubscriberReceptionPlugin();
         subscriberPlugin.setPluginURI(SUB_ALASKA_RECEPT_PLUGIN_URI);
         this.installPlugin(subscriberPlugin);
-        */
-
+*/
         //test scenario
+        MessageFilterI filter = m -> {
+            Long lng = m.getProperties().getLongProp("Long");
+            Integer in = m.getProperties().getIntProp("Integer");
+            Character cr = m.getProperties().getCharProp("Character");
+            Byte by = m.getProperties().getByteProp("Byte");
+            Boolean bo = m.getProperties().getBooleanProp("Boolean");
+            String str = m.getProperties().getStringProp("String");
+            Short shrt = m.getProperties().getShortProp("Short");
+            Double dbl = m.getProperties().getDoubleProp("Double");
+            Float flt = m.getProperties().getFloatProp("Float");
+            return (lng != null && in != null && cr != null &&
+                    by != null && bo != null && str != null &&
+                    shrt != null && dbl != null && flt != null &&
+                    lng == 3L && in == 3 && cr == '3' && by == 3
+                    && bo && str.equals("3") && shrt == 3
+                    && dbl == 3.0 && flt == 3.0f)
+                    && m.getPayload()!=null;
+        };
+
 
         subscribe("USA"); // 35 msg
         subscribe("Alaska"); // 40 msg
         subscribe("Anchorage"); // 15 msg
-        subscribe("Cambridge"); // 35 msg
+        subscribe("Cambridge",filter); // 35 msg
+
+
     }
 
 
     public void acceptMessage(MessageI m) throws Exception {
         logMessage("Getting message " + m);
+        if(m.getPayload()!=null){
+            logMessage(" Pl : "+ m.getPayload());
+        }
+        if(m.getTimeStamp()!=null){
+            logMessage(" Ts : "+ m.getTimeStamp().getTime()+":"+m.getTimeStamp().getTimestamper());
+        }
+
     }
 
     @Override
     public void acceptMessage(MessageI[] ms) throws Exception {
-    	for (MessageI m : ms) {
-			acceptMessage(m);
-		}
+        for (MessageI m : ms) {
+            acceptMessage(m);
+        }
     }
 
     public void subscribe(String topic) throws Exception {
@@ -89,41 +117,41 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
                         + "port published with URI " + subscriberReceptionInboundPortURI);
 
     }
-    
+
     public void subscribe(String[] topics) throws Exception {
-    	((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).subscribe(topics, subscriberReceptionInboundPortURI);
+        ((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).subscribe(topics, subscriberReceptionInboundPortURI);
     }
-    
+
     public void subscribe(String topic, MessageFilterI filter) throws Exception {
-    	((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).subscribe(topic, filter, subscriberReceptionInboundPortURI);
+        ((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).subscribe(topic, filter, subscriberReceptionInboundPortURI);
     }
 
     public void modifyFilter(String topic, MessageFilterI newFilter) throws Exception {
-    	((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).modifyFilter(topic, newFilter, subscriberReceptionInboundPortURI);
+        ((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).modifyFilter(topic, newFilter, subscriberReceptionInboundPortURI);
     }
-    
+
     public void unsubscribe(String topic) throws Exception {
-    	((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).unsubscribe(topic, subscriberReceptionInboundPortURI);
+        ((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).unsubscribe(topic, subscriberReceptionInboundPortURI);
     }
-    
+
     public void createTopic(String topic) throws Exception {
-    	((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).createTopic(topic);
+        ((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).createTopic(topic);
     }
-    
+
     public void createTopic(String[] topics) throws Exception {
-    	((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).createTopic(topics);
+        ((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).createTopic(topics);
     }
-    
+
     public void destroy(String topic) throws Exception {
-    	((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).destroyTopic(topic);
+        ((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).destroyTopic(topic);
     }
-    
+
     public boolean isTopic(String topic) throws Exception {
-    	return ((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).isTopic(topic);
+        return ((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).isTopic(topic);
     }
-    
+
     public String[] getTopics() throws Exception {
-    	return ((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).getTopics();
+        return ((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).getTopics();
     }
 
 }

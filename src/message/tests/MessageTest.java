@@ -63,7 +63,8 @@ class MessageTest {
             Float f = m.getProperties().getFloatProp("Distribution");
             Short s = m.getProperties().getShortProp("Building");
             return bl != null && b != null && d != null && f != null && s != null
-                    && bl && (b == 127) && (d < 1.4) && (f < 1.5f) & (s == 32767);
+                    && bl && (b == 127) && (d < 1.4) && (f < 1.5f) & (s == 32767) &&
+                    m.getPayload()!=null;
         };
 
 
@@ -75,8 +76,6 @@ class MessageTest {
 
         assertTrue(mf3.filter(msg2));
         assertFalse(mf3.filter(msg1));
-
-
     }
 
     @Test

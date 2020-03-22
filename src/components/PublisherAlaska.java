@@ -4,6 +4,7 @@ import fr.sorbonne_u.components.AbstractComponent;
 import interfaces.ManagementCI;
 import interfaces.PublicationCI;
 import message.Message;
+import message.MessageFilterI;
 import plugins.PublisherManagementPlugin;
 import plugins.PublisherPublicationPlugin;
 
@@ -26,6 +27,7 @@ public class PublisherAlaska extends AbstractComponent {
 
     @Override
     public void execute() throws Exception {
+        super.execute();
         PublisherPublicationPlugin pluginPublication = new PublisherPublicationPlugin();
         pluginPublication.setPluginURI(ALASKA_PUB_PLUGIN_URI);
         this.installPlugin(pluginPublication);
@@ -41,6 +43,8 @@ public class PublisherAlaska extends AbstractComponent {
         createTopic("Anchorage");*/
         Thread.sleep(3000);
         // 35 msg USA, 40 msg Alaska, 15 msg Anchorage
+
+
         for (int i = 0; i < 10; i++) {
             if (i < 4) {
                 topic = "USA";
@@ -75,23 +79,23 @@ public class PublisherAlaska extends AbstractComponent {
     }
 
     public void createTopic(String topic) throws Exception {
-    	((PublisherManagementPlugin) this.getPlugin(ALASKA_MAN_PLUGIN_URI)).createTopic(topic);
+        ((PublisherManagementPlugin) this.getPlugin(ALASKA_MAN_PLUGIN_URI)).createTopic(topic);
     }
-    
+
     public void createTopic(String[] topics) throws Exception {
-    	((PublisherManagementPlugin) this.getPlugin(ALASKA_MAN_PLUGIN_URI)).createTopic(topics);
+        ((PublisherManagementPlugin) this.getPlugin(ALASKA_MAN_PLUGIN_URI)).createTopic(topics);
     }
-    
+
     public void destroy(String topic) throws Exception {
-    	((PublisherManagementPlugin) this.getPlugin(ALASKA_MAN_PLUGIN_URI)).destroyTopic(topic);
+        ((PublisherManagementPlugin) this.getPlugin(ALASKA_MAN_PLUGIN_URI)).destroyTopic(topic);
     }
-    
+
     public boolean isTopic(String topic) throws Exception {
-    	return ((PublisherManagementPlugin) this.getPlugin(ALASKA_MAN_PLUGIN_URI)).isTopic(topic);
+        return ((PublisherManagementPlugin) this.getPlugin(ALASKA_MAN_PLUGIN_URI)).isTopic(topic);
     }
-    
+
     public String[] getTopics() throws Exception {
-    	return ((PublisherManagementPlugin) this.getPlugin(ALASKA_MAN_PLUGIN_URI)).getTopics();
+        return ((PublisherManagementPlugin) this.getPlugin(ALASKA_MAN_PLUGIN_URI)).getTopics();
     }
 
 

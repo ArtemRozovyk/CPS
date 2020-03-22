@@ -26,6 +26,7 @@ public class PublisherFrance extends AbstractComponent {
 
     @Override
     public void execute() throws Exception {
+        super.execute();
         PublisherPublicationPlugin pluginPublication = new PublisherPublicationPlugin();
         pluginPublication.setPluginURI(FRANCE_PUB_PLUGIN_URI);
         this.installPlugin(pluginPublication);
