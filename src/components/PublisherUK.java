@@ -53,7 +53,7 @@ public class PublisherUK extends AbstractComponent {
                 topic = "Cambridge";
                 TimeStamp ts = new TimeStamp(System.currentTimeMillis(), "PbUK");
 
-                msg = new Message("PayloadUK", ts, "5 degrees in Cambridge", new Properties());
+                msg = new Message("PayloadUK", ts, "5 degrees in Cambridge1:"+i, new Properties());
                 msg.getProperties().putProp("Integer", 3);
                 msg.getProperties().putProp("Long", 3L);
                 msg.getProperties().putProp("Character", '3');
@@ -70,6 +70,36 @@ public class PublisherUK extends AbstractComponent {
             logMessage("Publishing message " + i + " for topic : " + topic);
             publish(msg, topic);
         }
+
+        Thread.sleep(3000);
+        for (int i = 0; i < 3; i++){
+            topic = "Cambridge";
+            TimeStamp ts = new TimeStamp(System.currentTimeMillis(), "PbUK");
+
+            msg = new Message("PayloadUK", ts, "5 degrees in Cambridge 2:"+i, new Properties());
+            //Now set different properies every odd send so that the filter fail sometimes
+            if(i%2==0){
+                msg.getProperties().putProp("Integer", 3);
+                msg.getProperties().putProp("Long", 3L);
+                msg.getProperties().putProp("Character", '3');
+            }else{
+                msg.getProperties().putProp("Integer", 5);
+                msg.getProperties().putProp("Long", 5L);
+                msg.getProperties().putProp("Character", '5');
+            }
+
+            msg.getProperties().putProp("Short", (short) 3);
+            msg.getProperties().putProp("Byte", (byte) 3);
+            msg.getProperties().putProp("Float", 3f);
+            msg.getProperties().putProp("String", "3");
+            msg.getProperties().putProp("Boolean", true);
+            msg.getProperties().putProp("Double", 3.0);
+            msg.getTimeStamp().setTime(System.currentTimeMillis());
+            msg.getTimeStamp().setTimestamper("PbUK");
+            publish(msg, topic);
+        }
+
+
     }
 
 

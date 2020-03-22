@@ -41,7 +41,7 @@ public class PublisherAlaska extends AbstractComponent {
         /*createTopic("USA");
         createTopic("Alaska");
         createTopic("Anchorage");*/
-        Thread.sleep(3000);
+        Thread.sleep(1900);
         // 35 msg USA, 40 msg Alaska, 15 msg Anchorage
 
 
