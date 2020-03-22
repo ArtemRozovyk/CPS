@@ -13,7 +13,7 @@ import interfaces.MessageI;
  * invariant		true
  * </pre>
  */
-public class Message implements MessageI {
+public class Message implements MessageI,Serializable {
 
 	private static final long serialVersionUID = -2687757832261453813L;
 
@@ -25,7 +25,6 @@ public class Message implements MessageI {
 	
 	private Properties prop;
 	
-	private String msg;
 
 	/**
 	 * Creation of a message
@@ -54,18 +53,18 @@ public class Message implements MessageI {
 
 	/**
 	 * Creation of a message
-	 * 
+	 *
 	 * <p><strong>Contract</strong></p>
-	 * 
+	 *
 	 * <pre>
 	 * pre	msg != null
 	 * post	true			// no postcondition.
 	 * </pre>
-	 * 
+	 *
 	 * @param msg		the content of the message
 	 */
 	public Message(String msg) {
-		this.msg=msg;
+		this.URI=msg;
 	}
 
 	/**
@@ -73,7 +72,7 @@ public class Message implements MessageI {
 	 */
 	@Override
 	public String toString() {
-		return "Message: "+msg+"  ";
+		return "Message: "+URI+"  ";
 	}
 
 	

@@ -158,15 +158,12 @@ public class CVM extends AbstractCVM {
      * @see fr.sorbonne_u.components.cvm.AbstractCVM#shutdown()
      */
 
-
     public static void main(String[] args) {
         try {
             //while(true){
             CVM c = new CVM();
             c.startStandardLifeCycle(14555L);
             Thread.sleep(20000L);
-
-
             System.out.println(Broker.deliverycount + " del count ");
             System.out.println(Broker.popcount + " pop count ");
             System.out.println(Broker.actualdeliverycount + " actual count ");

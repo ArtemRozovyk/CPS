@@ -47,6 +47,7 @@ public class Broker extends AbstractComponent {
     private Map<String, Set<SubHandler>> topicSubHandlersMap;
     protected BrokerPublicationInboundPort bpip;
     protected BrokerManagementInboundPort bmip;
+
     protected Broker(int nbThreads, int nbSchedulableThreads) {
         super(nbThreads, nbSchedulableThreads);
     }
@@ -131,14 +132,14 @@ public class Broker extends AbstractComponent {
         handleRequestAsync(subscriptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
             @Override
             public Void call() throws Exception {
-                ((Broker) this.getServiceOwner()).subscribeAux(topic, inboundPortURI);
+                ((Broker) this.getServiceOwner()).subscribeAux(topic, null, inboundPortURI);
                 return null;
             }
         });
     }
-    
+
     public void subscribe(String topic, MessageFilterI filter, String inboutPortURI) throws Exception {
-    	handleRequestAsync(subscriptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
+        handleRequestAsync(subscriptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
             @Override
             public Void call() throws Exception {
                 ((Broker) this.getServiceOwner()).subscribeAux(topic, filter, inboutPortURI);
@@ -205,7 +206,7 @@ public class Broker extends AbstractComponent {
                         sh.port.acceptMessage(msgEntry.message);
                     }
 
-                   // System.out.println("delivered " + msgEntry.topic);
+                    // System.out.println("delivered " + msgEntry.topic);
                 }
             }
         }
@@ -228,27 +229,6 @@ public class Broker extends AbstractComponent {
     }
 
 
-    private void subscribeAux(String topic, String inboundPortURI) throws Exception {
-        String outUri = "outbound-reception-broker-uri" + i;
-        i++;
-
-        BrokerReceptionOutboundPort brop =
-                new BrokerReceptionOutboundPort(outUri, this);
-        brop.publishPort();
-        this.doPortConnection(outUri, inboundPortURI, ReceptionConnector.class.getCanonicalName());
-        logMessage(inboundPortURI + " has subscribed  to " + topic);
-        System.out.println("Subed to " + topic + " in " + Thread.currentThread() + " map sz: " + sizeMessageMap());
-        if (topicSubHandlersMap.containsKey(topic)) {
-            synchronized (topicSubHandlersMap.get(topic)) {
-                topicSubHandlersMap.get(topic).add(new SubHandler(inboundPortURI, brop, topic));
-            }
-        } else {
-            Set<SubHandler> l = Collections.synchronizedSet(new HashSet<>());
-            l.add(new SubHandler(inboundPortURI, brop, topic));
-            topicSubHandlersMap.put(topic, l);
-        }
-    }
-    
     private void subscribeAux(String topic, MessageFilterI filter, String inboundPortURI) throws Exception {
         String outUri = "outbound-reception-broker-uri" + i;
         i++;
@@ -261,11 +241,19 @@ public class Broker extends AbstractComponent {
         System.out.println("Subed to " + topic + " in " + Thread.currentThread() + " map sz: " + sizeMessageMap());
         if (topicSubHandlersMap.containsKey(topic)) {
             synchronized (topicSubHandlersMap.get(topic)) {
-                topicSubHandlersMap.get(topic).add(new SubHandler(inboundPortURI, brop, topic, filter));
+                if (filter != null) {
+                    topicSubHandlersMap.get(topic).add(new SubHandler(inboundPortURI, brop, topic, filter));
+                } else {
+                    topicSubHandlersMap.get(topic).add(new SubHandler(inboundPortURI, brop, topic));
+                }
             }
         } else {
             Set<SubHandler> l = Collections.synchronizedSet(new HashSet<>());
-            l.add(new SubHandler(inboundPortURI, brop, topic, filter));
+            if (filter != null) {
+                l.add(new SubHandler(inboundPortURI, brop, topic, filter));
+            } else {
+                l.add(new SubHandler(inboundPortURI, brop, topic));
+            }
             topicSubHandlersMap.put(topic, l);
         }
     }
@@ -335,11 +323,11 @@ public class Broker extends AbstractComponent {
     public void createTopic(String topic) {
         lock.lock();
         try {
-        	if(topicMessageStorageMap.containsKey(topic)) return;
-        	
-        	topicMessageStorageMap.put(topic, new HashSet<>());
+            if (topicMessageStorageMap.containsKey(topic)) return;
+
+            topicMessageStorageMap.put(topic, new HashSet<>());
         } finally {
-        	lock.unlock();
+            lock.unlock();
         }
 
     }
@@ -405,19 +393,18 @@ public class Broker extends AbstractComponent {
                              MessageFilterI newFilter,
                              String inboundPort) {
         synchronized (topicSubHandlersMap.get(topic)) {
-        	topicSubHandlersMap.get(topic).forEach((SubHandler sh) -> {
-        		if(sh.subUri.equals(inboundPort)) sh.filter = newFilter;
-        	});
-		}
+            topicSubHandlersMap.get(topic).forEach((SubHandler sh) -> {
+                if (sh.subUri.equals(inboundPort)) sh.filter = newFilter;
+            });
+        }
     }
 
     @Override
-    public void	shutdown() throws ComponentShutdownException
-    {
+    public void shutdown() throws ComponentShutdownException {
         try {
-            for (Set<SubHandler> shs : topicSubHandlersMap.values()){
-                for(SubHandler sh:shs){
-                    System.out.println("Destroying "+sh.port.getPortURI());
+            for (Set<SubHandler> shs : topicSubHandlersMap.values()) {
+                for (SubHandler sh : shs) {
+                    System.out.println("Destroying " + sh.port.getPortURI());
                     sh.port.unpublishPort();
                     sh.port.destroyPort();
                 }
@@ -427,9 +414,9 @@ public class Broker extends AbstractComponent {
             bmip.unpublishPort();
             bmip.destroyPort();
         } catch (Exception e) {
-            throw new ComponentShutdownException(e) ;
+            throw new ComponentShutdownException(e);
         }
-        super.shutdown() ;
+        super.shutdown();
     }
 
     private static class SubHandler {
