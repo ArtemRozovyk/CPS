@@ -143,9 +143,21 @@ implements ManagementCI {
 			});
 	}
 
+	/**
+	 * @see interfaces.ManagementCI#getPublicatinPortURI()
+	 */
     @Override
     public String getPublicatinPortURI() throws Exception {
-        return null;
+        return this.owner.handleRequestSync(
+				new AbstractComponent.AbstractService<String>(){
+
+					@Override
+					public String call() throws Exception {
+						((Broker)this.getServiceOwner()).getPublicationPortURI();
+						return null;
+					}
+				
+			});
     }
 
     /**

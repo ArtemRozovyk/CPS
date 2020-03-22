@@ -368,6 +368,10 @@ public class Broker extends AbstractComponent {
         String[] topics = new String[tset.size()];
         return tset.toArray(topics);
     }
+    
+    public String getPublicationPortURI() {
+    	return null;
+    }
 
 
     private void removeSubscriber(String topic, String inboundPortURI) throws Exception {

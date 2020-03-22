@@ -102,10 +102,13 @@ implements  ManagementCI
 		return ((ManagementCI)this.connector).getTopics();
 	}
 
-    @Override
-    public String getPublicatinPortURI() throws Exception {
-        return null;
-    }
+	/**
+	 * @see interfaces.ManagementCI#getPublicatinPortURI()
+	 */
+	@Override
+	public String getPublicatinPortURI() throws Exception {
+		return ((ManagementCI)this.connector).getPublicatinPortURI();
+	}
 
 
     /**
@@ -151,11 +154,4 @@ implements  ManagementCI
 	public void modifyFilter(String topic, MessageFilterI newFilter, String inboundPortUri) throws Exception {
 		((ManagementCI)this.connector).modifyFilter(topic, newFilter, inboundPortUri);
 	}
-
-
-	@Override
-	public String getPublicatinPortURI() throws Exception {
-		return ((ManagementCI)this.connector).getPublicatinPortURI();
-	}
-
 }

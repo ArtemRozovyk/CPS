@@ -61,10 +61,10 @@ implements ManagementCI  {
 		return ((ManagementCI)this.offering).getTopics();
 	}
 
-    @Override
-    public String getPublicatinPortURI() throws Exception {
-        return null;
-    }
+	@Override
+	public String getPublicatinPortURI() throws Exception {
+		return ((ManagementCI)this.offering).getPublicatinPortURI();
+	}
 
     /**
 	 * @see interfaces.SubscriptionImplementationI#subscribe(String, String)
@@ -107,11 +107,4 @@ implements ManagementCI  {
 		((ManagementCI)this.offering).modifyFilter(topic, newFilter, inboundPortUri);
 		
 	}
-
-
-	@Override
-	public String getPublicatinPortURI() throws Exception {
-		return ((ManagementCI)this.offering).getPublicatinPortURI();
-	}
-	
 }
