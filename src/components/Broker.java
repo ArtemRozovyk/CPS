@@ -23,7 +23,16 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * @author hEII
+ * Broker component. It is used to broadcast messages.
+ * It can receive messages and publish them.
+ * 
+ * <p><strong>Description</strong></p>
+ * 
+ * <p><strong>Invariant</strong></p>
+ * 
+ * <pre>
+ * invariant		true
+ * </pre>
  */
 public class Broker extends AbstractComponent {
 
@@ -48,10 +57,38 @@ public class Broker extends AbstractComponent {
     protected BrokerPublicationInboundPort bpip;
     protected BrokerManagementInboundPort bmip;
 
+    /**
+	 * Broker creation
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	nbThreads > 0
+	 * post	true			// no postcondition.
+	 * </pre>
+	 * 
+	 * @param nbThreads					number of threads used by the component
+	 * @param nbSchedulableThreads		number of schedulable threads
+	 */
     protected Broker(int nbThreads, int nbSchedulableThreads) {
         super(nbThreads, nbSchedulableThreads);
     }
 
+    /**
+     * Broker creation
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	uri != null && publicationInboundPortURI != null && managmentInboundPortURI != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 * 
+     * @param uri							uri of the component
+     * @param publicationInboundPortURI		uri of publication inbound port
+     * @param managmentInboundPortURI		uri of the management inbound port
+     * @throws Exception
+     */
     protected Broker(String uri,
                      String publicationInboundPortURI,
                      String managmentInboundPortURI) throws Exception {
@@ -100,6 +137,9 @@ public class Broker extends AbstractComponent {
                         + "port published with URI " + publicationInboundPortURI);
     }
 
+    /**
+     * Action executed by the component
+     */
     @Override
     public void execute() throws Exception {
 
@@ -113,6 +153,9 @@ public class Broker extends AbstractComponent {
 
     }
 
+    /**
+     * @see interfaces.PublicationCI#publish(MessageI, String)
+     */
     public void publish(MessageI m, String topic) throws Exception {
         //System.out.println("Extern pub "+m+" in "+Thread.currentThread());
         externCount++;
@@ -128,6 +171,9 @@ public class Broker extends AbstractComponent {
 
     }
 
+    /**
+     * @see interfaces.ManagementCI#subscribe(String, String)
+     */
     public void subscribe(String topic, String inboundPortURI) throws Exception {
 
         handleRequestAsync(subscriptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
@@ -139,6 +185,9 @@ public class Broker extends AbstractComponent {
         });
     }
 
+    /**
+     * @see interfaces.ManagementCI#subscribe(String, MessageFilterI, String)
+     */
     public void subscribe(String topic, MessageFilterI filter, String inboutPortURI) throws Exception {
         handleRequestAsync(subscriptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
             @Override
@@ -150,12 +199,18 @@ public class Broker extends AbstractComponent {
 
     }
 
+    /**
+     * @see interfaces.ManagementCI#subscribe(String[], String)
+     */
     public void subscribe(String[] topics, String inboutPortURI) throws Exception {
         for (String topic : topics) {
             subscribe(topic, inboutPortURI);
         }
     }
 
+    /**
+     * @see interfaces.ManagementCI#unsubscribe(String, String)
+     */
     public void unsubscribe(String topic, String inboundPortURI) throws Exception {
         handleRequestAsync(subscriptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
             @Override
@@ -166,6 +221,9 @@ public class Broker extends AbstractComponent {
         });
     }
 
+    /**
+     * TODO
+     */
     public void acceptMessages() throws Exception {
         MsgEntry msgEntry;
         while (true) {
@@ -191,6 +249,20 @@ public class Broker extends AbstractComponent {
         }
     }
 
+    /**
+     * Delivers a message to the subscribers of the
+     * message's topic
+     * 
+     * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	msgEntry != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 * 
+     * @param msgEntry		the message to send
+     * @throws Exception
+     */
     public void deliver(MsgEntry msgEntry) throws Exception {
         deliverycount++;
         if (topicSubHandlersMap.containsKey(msgEntry.topic)) {
@@ -214,6 +286,19 @@ public class Broker extends AbstractComponent {
         }
     }
 
+    /**
+     * Store the publishe messages in the topic-message Map
+     * 
+     * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	m != null && topic != null
+	 * post	topicMessageStorageMap.isEmpty() != false
+	 * </pre>
+	 * 
+     * @param m			the message to be stored
+     * @param topic		the topic of the message
+     */
     public void storePublished(MessageI m, String topic) {
         lock.lock();
         try {
@@ -233,6 +318,20 @@ public class Broker extends AbstractComponent {
     }
 
 
+    /**
+     * Auxiliary method used to manage subscription
+     * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	topic != null && inboundPortURI != null
+	 * post
+	 * </pre>
+	 * 
+     * @param topic				the topic the subscriber wants to subscribe to
+     * @param filter			the filter used in the subscription
+     * @param inboundPortURI	the inbound port of the subscriber
+     * @throws Exception
+     */
     private void subscribeAux(String topic, MessageFilterI filter, String inboundPortURI) throws Exception {
         String outUri = "outbound-reception-broker-uri" + i;
         i++;
@@ -263,6 +362,18 @@ public class Broker extends AbstractComponent {
     }
 
 
+    /**
+     * Check if the topic-message map is empty
+     * 
+     * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	topicMessageStorageMap != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 * 
+     * @return		true if the map if empty, false otherwise
+     */
     private boolean isEmptyMap() {
         for (Map.Entry<String, Set<MessageI>>
                 entryTopicQueue : topicMessageStorageMap.entrySet()) {
@@ -273,6 +384,18 @@ public class Broker extends AbstractComponent {
         return true;
     }
 
+    /**
+     * Get the size of the topic-message Map
+     * 
+     * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	topicMessageStorageMap != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 * 
+     * @return		the number of messages in the map
+     */
     private int sizeMessageMap() {
         int sz = 0;
         for (Map.Entry<String, Set<MessageI>>
@@ -284,6 +407,9 @@ public class Broker extends AbstractComponent {
         return sz;
     }
 
+    /**
+     * TODO
+     */
     private MsgEntry popMessageMap() {
         MessageI toRet;
         for (Map.Entry<String, Set<MessageI>>
@@ -304,6 +430,9 @@ public class Broker extends AbstractComponent {
         return null;
     }
 
+    /**
+     * @see interfaces.PublicationCI#publish(MessageI, String[])
+     */
     public void publish(MessageI m, String[] topics) throws Exception {
         this.handleRequestAsync(publishingExecutorURI, new AbstractComponent.AbstractService<Void>() {
             @Override
@@ -317,6 +446,9 @@ public class Broker extends AbstractComponent {
 
     }
 
+    /**
+     * @see interfaces.PublicationCI#publish(MessageI[], String)
+     */
     public void publish(MessageI[] ms, String topic) throws Exception {
         this.handleRequestAsync(publishingExecutorURI, new AbstractComponent.AbstractService<Void>() {
             @Override
@@ -330,6 +462,9 @@ public class Broker extends AbstractComponent {
 
     }
 
+    /**
+     * @see interfaces.PublicationCI#publish(MessageI[], String[])
+     */
     public void publish(MessageI[] ms, String[] topics) throws Exception {
         this.handleRequestAsync(publishingExecutorURI, new AbstractComponent.AbstractService<Void>() {
             @Override
@@ -345,6 +480,9 @@ public class Broker extends AbstractComponent {
 
     }
 
+    /**
+     * @see interfaces.ManagementCI#createTopic(String)
+     */
     public void createTopic(String topic) {
         lock.lock();
         try {
@@ -354,15 +492,20 @@ public class Broker extends AbstractComponent {
         } finally {
             lock.unlock();
         }
-
     }
 
+    /**
+     * @see interfaces.ManagementCI#createTopics(String[])
+     */
     public void createTopics(String[] topics) {
         for (String t : topics) {
             createTopic(t);
         }
     }
 
+    /**
+     * @see interfaces.ManagementCI#destroyTopic(String)
+     */
     public void destroyTopic(String topic) throws Exception {
         lock.lock();
         try {
@@ -384,10 +527,16 @@ public class Broker extends AbstractComponent {
         }
     }
 
+    /**
+     * @see interfaces.ManagementCI#isTopic(String)
+     */
     public boolean isTopic(String topic) {
         return topicMessageStorageMap.containsKey(topic) || topicSubHandlersMap.containsKey(topic);
     }
 
+    /**
+     * @see interfaces.ManagementCI#getTopics()
+     */
     public String[] getTopics() {
         Set<String> tset = topicMessageStorageMap.keySet();
         String[] topics = new String[tset.size()];
@@ -395,11 +544,26 @@ public class Broker extends AbstractComponent {
         return topics;
     }
 
+    /**
+     * @see interfaces.ManagementCI#getPublicatinPortURI()
+     */
     public String getPublicationPortURI() {
         return brokerPublicationInboundPortURI;
     }
 
-
+    /**
+     * Remove a subscriber during an unsubscription
+     * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	topic != null && inboundPortURI != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 * 
+     * @param topic				the topic you want to unsubscribe fro
+     * @param inboundPortURI	the inbound port of the ubscriber
+     * @throws Exception
+     */
     private void removeSubscriber(String topic, String inboundPortURI) throws Exception {
         logMessage(inboundPortURI + " WANTS TO UNSUB FROM " + topic);
 
@@ -422,6 +586,9 @@ public class Broker extends AbstractComponent {
     }
 
 
+    /**
+     * @see interfaces.ManagementCI#modifyFilter(String, MessageFilterI, String)
+     */
     public void modifyFilter(String topic,
                              MessageFilterI newFilter,
                              String inboundPort) {
@@ -432,6 +599,9 @@ public class Broker extends AbstractComponent {
         }
     }
 
+    /**
+     * Shutdown of the component, unpublish and destroy the ports
+     */
     @Override
     public void shutdown() throws ComponentShutdownException {
         try {
@@ -452,6 +622,9 @@ public class Broker extends AbstractComponent {
         super.shutdown();
     }
 
+    /**
+     * Subclass SubHandler used to store subscribers
+     */
     private static class SubHandler {
         String subUri;
         BrokerReceptionOutboundPort port;
@@ -472,6 +645,9 @@ public class Broker extends AbstractComponent {
         }
     }
 
+    /**
+     * Subclass MsgEntry used to store messages
+     */
     private static class MsgEntry {
         MessageI message;
         String topic;

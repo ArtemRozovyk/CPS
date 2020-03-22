@@ -79,8 +79,18 @@ public interface ManagementImplementationI {
 	String[] getTopics() throws Exception;
 
 
-
-
+	/**
+	 * Returns the uri of the publication port
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	publicationPort != null						
+	 * post	true 					// no post conditions
+	 * </pre>
+	 * @return 		the uri of the publication port
+	 * @throws Exception
+	 */
 	String getPublicatinPortURI() throws Exception;
 
 }

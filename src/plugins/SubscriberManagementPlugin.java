@@ -17,6 +17,18 @@ import ports.SubscriberManagementOutbondPort;
 import ports.SubscriberReceptionInboundPort;
 import ports.SubscriberReceptionInboundPortForPlugin;
 
+/**
+ * The plugin SubscriberManagementPlugin is used to implement the
+ * management services for a subscriber
+ * 
+ * <p><strong>Description</strong></p>
+ * 
+ * <p><strong>Invariant</strong></p>
+ * 
+ * <pre>
+ * invariant		true
+ * </pre>
+ */
 public class SubscriberManagementPlugin
 extends AbstractPlugin
 {
@@ -43,6 +55,18 @@ extends AbstractPlugin
 		this.smop.publishPort();
 	}
 
+	/**
+	 * We assume that the plug-in on the server component has already been
+	 * installed and initialised.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	true				// no more preconditions.
+	 * post	true				// no more postconditions.
+	 * </pre>
+	 * 
+	 */
 	@Override
 	public void initialise() throws Exception {
 		this.addRequiredInterface(ReflectionI.class);
@@ -95,56 +119,93 @@ extends AbstractPlugin
 		this.removeRequiredInterface(ManagementCI.class);
 	}
 	
+	/**
+	 * Returns the owner of the plugin
+	 */
 	private ReceptionCI getOwner()
 	{
 		return (ReceptionCI)this.getOwner();
 	}
 
 
+	/**
+	 * @see interfaces.ManagementCI#subscribe(String, String)
+	 */
 	public void subscribe(String topic, String subscriberReceptionInboundPortURI) throws Exception {
 		smop.subscribe(topic, subscriberReceptionInboundPortURI);
 	}
 	
+	/**
+	 * @see interfaces.ManagementCI#subscribe(String[], String)
+	 */
 	public void subscribe(String[] topic, String subscriberReceptionInboundPortURI) throws Exception {
 		for (String t : topic) {
 			smop.subscribe(t, subscriberReceptionInboundPortURI);
 		}
 	}
 	
+	/**
+	 * @see interfaces.ManagementCI#subscribe(String, MessageFilterI, String)
+	 */
 	public void subscribe(String topic, MessageFilterI filter, String subscriberReceptionInboundPortURI) throws Exception {
 		smop.subscribe(topic, filter, subscriberReceptionInboundPortURI);
 	}
 	
+	/**
+	 * @see interfaces.ManagementCI#modifyFilter(String, MessageFilterI, String)
+	 */
 	public void modifyFilter(String topic, MessageFilterI newFilter, String inboundPortUri) throws Exception {
 		smop.modifyFilter(topic, newFilter, inboundPortUri);
 	}
 
+	/**
+	 * @see interfaces.ManagementCI#unsubscribe(String, String)
+	 */
     public void unsubscribe(String topic, String subscriberReceptionInboundPortURI) throws Exception {
 	    smop.unsubscribe(topic,subscriberReceptionInboundPortURI);
     }
     
+    /**
+	 * @see interfaces.ManagementCI#createTopic(String)
+	 */
     public void createTopic(String topic) throws Exception {
     	smop.createTopic(topic);
     }
     
+    
+    /**
+	 * @see interfaces.ManagementCI#createTopics(String[])
+	 */
     public void createTopic(String[] topic) throws Exception {
     	for (String t : topic) {
     		smop.createTopic(t);
 		}
     }
     
+    /**
+	 * @see interfaces.ManagementCI#destroyTopic(String)
+	 */
     public void destroyTopic(String topic) throws Exception {
     	smop.destroyTopic(topic);
     }
     
+    /**
+	 * @see interfaces.ManagementCI#isTopic(String)
+	 */
     public boolean isTopic(String topic) throws Exception {
     	return smop.isTopic(topic);
     }
     
+    /**
+	 * @see interfaces.ManagementCI#getTopics()
+	 */
     public String[] getTopics() throws Exception {
     	return smop.getTopics();
     }
     
+    /**
+	 * @see interfaces.ManagementCI#getPublicatinPortURI()
+	 */
     public String getPublicatinPortURI() throws Exception {
     	return smop.getPublicatinPortURI();
     }

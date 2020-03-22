@@ -13,6 +13,17 @@ import message.Message;
 import ports.PublisherManagementOutboundPort;
 import ports.PublisherPublicationOutboundPort;
 
+/**
+ * Publisher component. It is used to publish messages.
+ * 
+ * <p><strong>Description</strong></p>
+ * 
+ * <p><strong>Invariant</strong></p>
+ * 
+ * <pre>
+ * invariant		true
+ * </pre>
+ */
 public class Publisher extends AbstractComponent {
 
     protected PublisherPublicationOutboundPort ppop;
@@ -21,10 +32,38 @@ public class Publisher extends AbstractComponent {
     public final static String PUBLISHER_CLIENT_PUBLICATION_PLUGIN =
             "publisher-publication-plugin-uri";
 
+    /**
+   	 * Publisher creation
+   	 * 
+   	 * <p><strong>Contract</strong></p>
+   	 * 
+   	 * <pre>
+   	 * pre	nbThreads > 0
+   	 * post	true			// no postcondition.
+   	 * </pre>
+   	 * 
+   	 * @param nbThreads					number of threads used by the component
+   	 * @param nbSchedulableThreads		number of schedulable threads
+   	 */
     protected Publisher(int nbThreads, int nbSchedulableThreads) {
         super(nbThreads, nbSchedulableThreads);
     }
 
+    /**
+     * Publisher creation
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	uri != null && publicationOutboundPortURI != null && managementOutboundPort != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 * 
+     * @param uri							uri of the component
+     * @param publicationOutboundPortURI	uri of publication outbound port
+     * @param managementOutboundPort		uri of the management outbound port
+     * @throws Exception
+     */
     protected Publisher(String uri,
                         String publicationOutboundPortURI,
                         String managementOutboundPort) throws Exception {
@@ -53,6 +92,9 @@ public class Publisher extends AbstractComponent {
         this.tracer.setRelativePosition(1, 0);
     }
 
+    /**
+     * Action executed by the component
+     */
     @Override
     public void execute() throws Exception {
 
@@ -81,7 +123,9 @@ public class Publisher extends AbstractComponent {
     }
 
 
-
+    /**
+     * @see interfaces.PublicationCI#publish(MessageI, String)
+     */
     public void publish(MessageI m, String topic) throws Exception {
         this.scheduleTask(new AbstractComponent.AbstractTask() {
             @Override
@@ -96,6 +140,9 @@ public class Publisher extends AbstractComponent {
         }, 1000, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * @see interfaces.PublicationCI#publish(MessageI[], String)
+     */
     public void publish(MessageI[] ms, String topic) throws Exception {
         this.scheduleTask(new AbstractComponent.AbstractTask() {
             @Override
@@ -111,6 +158,9 @@ public class Publisher extends AbstractComponent {
         }, 1000, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * @see interfaces.PublicationCI#publish(MessageI, String[])
+     */
     public void publish(MessageI m, String[] topics) throws Exception {
         this.scheduleTask(new AbstractComponent.AbstractTask() {
             @Override
@@ -125,6 +175,9 @@ public class Publisher extends AbstractComponent {
         }, 1000, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * @see interfaces.PublicationCI#publish(MessageI[], String[])
+     */
     public void publish(MessageI[] ms, String[] topics) throws Exception {
 
         this.scheduleTask(new AbstractComponent.AbstractTask() {
@@ -141,6 +194,9 @@ public class Publisher extends AbstractComponent {
         }, 1000, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Shutdown of the component, unpublish and destroy the ports
+     */
     @Override
     public void	shutdown() throws ComponentShutdownException
     {

@@ -11,6 +11,18 @@ import interfaces.MessageI;
 import interfaces.PublicationCI;
 import ports.PublisherPublicationOutboundPort;
 
+/**
+ * The plugin PublisherPublicationPlugin is used to implement the
+ * publication services for a publisher
+ * 
+ * <p><strong>Description</strong></p>
+ * 
+ * <p><strong>Invariant</strong></p>
+ * 
+ * <pre>
+ * invariant		true
+ * </pre>
+ */
 public class PublisherPublicationPlugin
 extends AbstractPlugin
 {
@@ -81,17 +93,27 @@ extends AbstractPlugin
 		super.initialise();
 	}
 	
+	/**
+	 * @see interfaces.PublicationCI#publish(MessageI, String)
+	 */
 	public void publish(MessageI m, String topic) throws Exception {
 		this.ppop.publish(m, topic);
 	}
 
+	/**
+	 * @see interfaces.PublicationCI#publish(MessageI, String[])
+	 */
 	public void publish(MessageI m, String[] topics) throws Exception {
 		this.ppop.publish(m, topics);
 	}
 
+	/**
+	 * @see interfaces.PublicationCI#publish(MessageI[], String)
+	 */
 	public void publish(MessageI[] ms, String topic) throws Exception {
 		this.ppop.publish(ms, topic);
 	}
+	
 	/**
 	 * Disconnect the ountbound port
 	 */
@@ -112,6 +134,10 @@ extends AbstractPlugin
 		this.ppop.destroyPort();
 		this.removeRequiredInterface(PublicationCI.class);
 	}
+	
+	/**
+	 * @see interfaces.PublicationCI#publish(MessageI[], String[])
+	 */
 	public void publish(MessageI[] ms, String[] topics) throws Exception {
 		this.ppop.publish(ms, topics);
 	}

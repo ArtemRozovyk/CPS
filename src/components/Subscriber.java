@@ -15,6 +15,17 @@ import ports.BrokerManagementInboundPort;
 import ports.SubscriberManagementOutbondPort;
 import ports.SubscriberReceptionInboundPort;
 
+/**
+ * Subscriber component. It is used to publish messages.
+ * 
+ * <p><strong>Description</strong></p>
+ * 
+ * <p><strong>Invariant</strong></p>
+ * 
+ * <pre>
+ * invariant		true
+ * </pre>
+ */
 public class Subscriber extends AbstractComponent implements ReceptionCI{
 	
 	protected String subscriberReceptionInboundPortURI;
@@ -27,11 +38,39 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 	public final static String	SUBSCRIBER_RECEPTION_PLUGIN =
 			"subscriber-reception-plugin-uri" ;
 
+	/**
+   	 * Subscriber creation
+   	 * 
+   	 * <p><strong>Contract</strong></p>
+   	 * 
+   	 * <pre>
+   	 * pre	nbThreads > 0
+   	 * post	true			// no postcondition.
+   	 * </pre>
+   	 * 
+   	 * @param nbThreads					number of threads used by the component
+   	 * @param nbSchedulableThreads		number of schedulable threads
+   	 */
     protected Subscriber(int nbThreads, int nbSchedulableThreads) {
 		super(nbThreads, nbSchedulableThreads);
 	}
 	static int pos=0;
 
+	/**
+     * Subscriber creation
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	uri != null && brokerManagementInboundPortURi != null && managementOutboundPort != null
+	 * post	true			// no postcondition.
+	 * </pre>
+	 * 
+     * @param uri									uri of the component
+     * @param brokerManagementInboundPortURi		uri of management inbound port
+     * @param managementOutboundPortURI				uri of the management outbound port
+     * @throws Exception
+     */
 	protected Subscriber(
 			String uri,
 			String managementOutboundPortURI,
@@ -87,6 +126,9 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 								+ "port published with URI " + managementOutboundPortURI) ;
 		}
 
+	/**
+	 * Starts the components, connect the ports together.
+	 */
 	@Override
 	public void start() throws ComponentStartException {
 		super.start();
@@ -102,6 +144,9 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 
 	}
 
+	/**
+     * Action executed by the component
+     */
 	@Override
 	public void execute() throws Exception {
 		subscribe("France"); // 15 msg
@@ -110,10 +155,16 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 		subscribe("USA");
 	}
 
+	/**
+	 * @see interfaces.ReceptionCI#acceptMessage(MessageI)
+	 */
 	public void acceptMessage(MessageI m) throws Exception {
 		logMessage("Getting message "+m);
 	}
 	
+	/**
+	 * @see interfaces.ReceptionCI#acceptMessage(MessageI[])
+	 */
 	public void acceptMessage(MessageI[] ms) throws Exception 
 	{
 		for (MessageI m : ms) {
@@ -121,6 +172,9 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 		}
 	}
 
+	/**
+	 * @see interfaces.ManagementCI#subscribe(String, String)
+	 */
 	public void subscribe(String topic) throws Exception {
 	    logMessage("Subscribing to " + topic);
 
@@ -135,6 +189,10 @@ public class Subscriber extends AbstractComponent implements ReceptionCI{
 				new PostconditionException("The component must have a "
 						+ "port published with URI " + subscriberReceptionInboundPortURI) ;
 	}
+	
+	/**
+     * Shutdown of the component, unpublish and destroy the ports
+     */
     @Override
     public void	shutdown() throws ComponentShutdownException
     {

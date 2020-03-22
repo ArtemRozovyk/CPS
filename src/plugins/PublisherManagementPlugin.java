@@ -15,6 +15,18 @@ import message.MessageFilterI;
 import ports.PublisherManagementOutboundPort;
 import ports.PublisherPublicationOutboundPort;
 
+/**
+ * The plugin PublisherManagementPlugin is used to implement the
+ * management services for a publisher
+ * 
+ * <p><strong>Description</strong></p>
+ * 
+ * <p><strong>Invariant</strong></p>
+ * 
+ * <pre>
+ * invariant		true
+ * </pre>
+ */
 public class PublisherManagementPlugin
 extends AbstractPlugin
 {
@@ -107,50 +119,83 @@ extends AbstractPlugin
 		this.removeRequiredInterface(ManagementCI.class);
 	}
 	
+	/**
+	 * @see interfaces.ManagementCI#subscribe(String, String)
+	 */
 	public void subscribe(String topic, String subscriberReceptionInboundPortURI) throws Exception {
 		pmop.subscribe(topic, subscriberReceptionInboundPortURI);
 	}
 	
+	/**
+	 * @see interfaces.ManagementCI#subscribe(String[], String)
+	 */
 	public void subscribe(String[] topic, String subscriberReceptionInboundPortURI) throws Exception {
 		for (String t : topic) {
 			pmop.subscribe(t, subscriberReceptionInboundPortURI);
 		}
 	}
 	
+	/**
+	 * @see interfaces.ManagementCI#subscribe(String, MessageFilterI, String)
+	 */
 	public void subscribe(String topic, MessageFilterI filter, String subscriberReceptionInboundPortURI) throws Exception {
 		pmop.subscribe(topic, filter, subscriberReceptionInboundPortURI);
 	}
 	
+	/**
+	 * @see interfaces.ManagementCI#subscribe(String, MessageFilterI, String)
+	 */
 	public void modifyFilter(String topic, MessageFilterI newFilter, String inboundPortUri) throws Exception {
 		pmop.modifyFilter(topic, newFilter, inboundPortUri);
 	}
 
+	/**
+	 * @see interfaces.ManagementCI#unsubscribe(String, String)
+	 */
     public void unsubscribe(String topic, String subscriberReceptionInboundPortURI) throws Exception {
 	    pmop.unsubscribe(topic,subscriberReceptionInboundPortURI);
     }
     
+    /**
+	 * @see interfaces.ManagementCI#createTopic(String)
+	 */
     public void createTopic(String topic) throws Exception {
     	pmop.createTopic(topic);
     }
     
+    /**
+	 * @see interfaces.ManagementCI#createTopics(String[])
+	 */
     public void createTopic(String[] topic) throws Exception {
     	for (String t : topic) {
     		pmop.createTopic(t);
 		}
     }
     
+    /**
+	 * @see interfaces.ManagementCI#destroyTopic(String)
+	 */
     public void destroyTopic(String topic) throws Exception {
     	pmop.destroyTopic(topic);
     }
     
+    /**
+	 * @see interfaces.ManagementCI#isTopic(String)
+	 */
     public boolean isTopic(String topic) throws Exception {
     	return pmop.isTopic(topic);
     }
     
+    /**
+	 * @see interfaces.ManagementCI#getTopics()
+	 */
     public String[] getTopics() throws Exception {
     	return pmop.getTopics();
     }
     
+    /**
+	 * @see interfaces.ManagementCI#getPublicatinPortURI()
+	 */
     public String getPublicatinPortURI() throws Exception {
     	return pmop.getPublicatinPortURI();
     }
