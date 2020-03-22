@@ -162,8 +162,8 @@ public class CVM extends AbstractCVM {
         try {
             //while(true){
             CVM c = new CVM();
-            c.startStandardLifeCycle(14555L);
-            Thread.sleep(20000L);
+            c.startStandardLifeCycle(300000L);
+            Thread.sleep(300000L);
             System.out.println(Broker.deliverycount + " del count ");
             System.out.println(Broker.popcount + " pop count ");
             System.out.println(Broker.actualdeliverycount + " actual count ");

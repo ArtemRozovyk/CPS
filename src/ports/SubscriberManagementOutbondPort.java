@@ -102,8 +102,13 @@ implements  ManagementCI
 		return ((ManagementCI)this.connector).getTopics();
 	}
 
-	
-	/**
+    @Override
+    public String getPublicatinPortURI() throws Exception {
+        return null;
+    }
+
+
+    /**
 	 * @see interfaces.ManagementCI#subscribe(String, String)
 	 */
 	@Override

@@ -71,12 +71,17 @@ public class PublisherUK extends AbstractComponent {
             publish(msg, topic);
         }
 
+
+
         Thread.sleep(3000);
+        for (int k=0;k<3;k++){
+
+
         for (int i = 0; i < 3; i++){
             topic = "Cambridge";
             TimeStamp ts = new TimeStamp(System.currentTimeMillis(), "PbUK");
 
-            msg = new Message("PayloadUK", ts, "5 degrees in Cambridge 2:"+i, new Properties());
+            msg = new Message("PayloadUK"+k, ts, "5 degrees in Cambridge 2:"+i, new Properties());
             //Now set different properies every odd send so that the filter fail sometimes
             if(i%2==0){
                 msg.getProperties().putProp("Integer", 3);
@@ -98,7 +103,8 @@ public class PublisherUK extends AbstractComponent {
             msg.getTimeStamp().setTimestamper("PbUK");
             publish(msg, topic);
         }
-
+        Thread.sleep(3000);
+        }
 
     }
 

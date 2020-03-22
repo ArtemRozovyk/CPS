@@ -61,7 +61,12 @@ implements ManagementCI  {
 		return ((ManagementCI)this.offering).getTopics();
 	}
 
-	/**
+    @Override
+    public String getPublicatinPortURI() throws Exception {
+        return null;
+    }
+
+    /**
 	 * @see interfaces.SubscriptionImplementationI#subscribe(String, String)
 	 */
 	@Override

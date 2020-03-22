@@ -70,10 +70,33 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
         };
 
 
-        subscribe("USA"); // 35 msg
-        subscribe("Alaska"); // 40 msg
-        subscribe("Anchorage"); // 15 msg
+
+        String [] topics ={"USA","Alaska","Anchorage"};
+        subscribe(topics); // 35 msg
         subscribe("Cambridge",filter); // 35 msg
+
+        MessageFilterI filterModified = m -> {
+            Long lng = m.getProperties().getLongProp("Long");
+            Integer in = m.getProperties().getIntProp("Integer");
+            Character cr = m.getProperties().getCharProp("Character");
+            Byte by = m.getProperties().getByteProp("Byte");
+            Boolean bo = m.getProperties().getBooleanProp("Boolean");
+            String str = m.getProperties().getStringProp("String");
+            Short shrt = m.getProperties().getShortProp("Short");
+            Double dbl = m.getProperties().getDoubleProp("Double");
+            Float flt = m.getProperties().getFloatProp("Float");
+            return (lng != null && in != null && cr != null &&
+                    by != null && bo != null && str != null &&
+                    shrt != null && dbl != null && flt != null &&
+                    lng == 5L && in == 5 && cr == '5' && by == 3
+                    && bo && str.equals("3") && shrt == 3
+                    && dbl == 3.0 && flt == 3.0f)
+                    && m.getPayload()!=null;
+        };
+        Thread.sleep(5000);
+        modifyFilter("Cambridge",filterModified);
+
+
 
 
     }
