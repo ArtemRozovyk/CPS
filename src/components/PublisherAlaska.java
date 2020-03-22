@@ -97,6 +97,10 @@ public class PublisherAlaska extends AbstractComponent {
     public String[] getTopics() throws Exception {
         return ((PublisherManagementPlugin) this.getPlugin(ALASKA_MAN_PLUGIN_URI)).getTopics();
     }
+    
+    public String getPublicatinPortURI() throws Exception {
+        return ((PublisherManagementPlugin) this.getPlugin(ALASKA_MAN_PLUGIN_URI)).getPublicatinPortURI();
+    }
 
 
 }

@@ -102,5 +102,11 @@ implements ManagementCI  {
 		((ManagementCI)this.offering).modifyFilter(topic, newFilter, inboundPortUri);
 		
 	}
+
+
+	@Override
+	public String getPublicatinPortURI() throws Exception {
+		return ((ManagementCI)this.offering).getPublicatinPortURI();
+	}
 	
 }

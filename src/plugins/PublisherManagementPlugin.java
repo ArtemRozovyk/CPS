@@ -150,6 +150,10 @@ extends AbstractPlugin
     public String[] getTopics() throws Exception {
     	return pmop.getTopics();
     }
+    
+    public String getPublicatinPortURI() throws Exception {
+    	return pmop.getPublicatinPortURI();
+    }
 
 	
 }

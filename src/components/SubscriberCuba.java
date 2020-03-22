@@ -6,6 +6,7 @@ import interfaces.ManagementCI;
 import interfaces.MessageI;
 import interfaces.ReceptionCI;
 import message.MessageFilterI;
+import plugins.PublisherManagementPlugin;
 import plugins.SubscriberManagementPlugin;
 import plugins.SubscriberReceptionPlugin;
 
@@ -131,6 +132,10 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
     
     public String[] getTopics() throws Exception {
     	return ((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).getTopics();
+    }
+    
+    public String getPublicatinPortURI() throws Exception {
+        return ((PublisherManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).getPublicatinPortURI();
     }
 
 

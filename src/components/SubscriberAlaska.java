@@ -7,6 +7,7 @@ import interfaces.MessageI;
 import interfaces.PublicationCI;
 import interfaces.ReceptionCI;
 import message.MessageFilterI;
+import plugins.PublisherManagementPlugin;
 import plugins.SubscriberManagementPlugin;
 import plugins.SubscriberReceptionPlugin;
 import ports.SubscriberManagementOutbondPort;
@@ -152,6 +153,10 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
 
     public String[] getTopics() throws Exception {
         return ((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).getTopics();
+    }
+    
+    public String getPublicatinPortURI() throws Exception {
+        return ((PublisherManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).getPublicatinPortURI();
     }
 
 }

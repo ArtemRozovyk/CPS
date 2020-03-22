@@ -144,4 +144,8 @@ extends AbstractPlugin
     public String[] getTopics() throws Exception {
     	return smop.getTopics();
     }
+    
+    public String getPublicatinPortURI() throws Exception {
+    	return smop.getPublicatinPortURI();
+    }
 }

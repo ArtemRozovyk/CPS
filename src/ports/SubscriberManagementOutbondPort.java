@@ -147,4 +147,10 @@ implements  ManagementCI
 		((ManagementCI)this.connector).modifyFilter(topic, newFilter, inboundPortUri);
 	}
 
+
+	@Override
+	public String getPublicatinPortURI() throws Exception {
+		return ((ManagementCI)this.connector).getPublicatinPortURI();
+	}
+
 }
