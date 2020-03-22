@@ -78,4 +78,9 @@ public interface ManagementImplementationI {
 	 */
 	String[] getTopics() throws Exception;
 
+
+
+
+	String getPublicatinPortURI() throws Exception;
+
 }
