@@ -83,13 +83,14 @@ public class PublisherUK extends AbstractComponent {
                 topic = "Cambridge";
                 TimeStamp ts = new TimeStamp(System.currentTimeMillis(), "PbUK");
 
-                msg = new Message("PayloadUK" + k, ts, "5 degrees in Cambridge 2:" + i, new Properties());
                 //Now set different properies every odd send so that the filter fail sometimes
                 if (i % 2 == 0) {
+                    msg = new Message("PayloadUK" + k, ts, "Even message :" + i, new Properties());
                     msg.getProperties().putProp("Integer", 3);
                     msg.getProperties().putProp("Long", 3L);
                     msg.getProperties().putProp("Character", '3');
                 } else {
+                    msg = new Message("PayloadUK" + k, ts, "Odd message :" + i, new Properties());
                     msg.getProperties().putProp("Integer", 5);
                     msg.getProperties().putProp("Long", 5L);
                     msg.getProperties().putProp("Character", '5');
@@ -116,10 +117,10 @@ public class PublisherUK extends AbstractComponent {
                 //Now set different properies every odd send so that the filter fail sometimes
                 if (k > 1) {
                     topic = "UK";
-                    msg = new Message("PayloadUKX" + k, ts, "56 degrees in average in the UK" + i, new Properties());
+                    msg = new Message("PayloadUK" + k, ts, "MultipleMSG, mate " + i, new Properties());
                 } else {
                     topic = "London";
-                    msg = new Message("PayloadCambridgeX" + k, ts, "5 degrees in London 2:" + i, new Properties());
+                    msg = new Message("PayloadLondon" + k, ts, "oi ! MultipleMSG: " + i, new Properties());
                 }
 
                 if (map.containsKey(topic)) {
@@ -134,6 +135,7 @@ public class PublisherUK extends AbstractComponent {
         }
 
         for (Map.Entry<String, Set<Message>> e : map.entrySet()) {
+            //2 sets of messages for 2 different topics (keys of map).
             Message[] msgArray = new Message[e.getValue().size()];
             publish(e.getValue().toArray(msgArray), e.getKey());
         }
