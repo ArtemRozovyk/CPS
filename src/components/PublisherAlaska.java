@@ -59,6 +59,31 @@ public class PublisherAlaska extends AbstractComponent {
             logMessage("Publishing message " + i + " for topic : " + topic);
             publish(new Message(msg), topic);
         }
+
+
+
+        Thread.sleep(12000);
+        logMessage("Publishing for multiple topics ");
+        Message mmsg = new Message("A message for multiple topics");
+        publish(mmsg, new String[]{"IDF", "Denver"});
+
+        Thread.sleep(2000);
+
+        logMessage("Publishing mulpiple messages for multiple topics ");
+        Message mmsg1 = new Message("Message sent in Array 1");
+        Message mmsg2 = new Message("Message sent in Array 2");
+        publish(new Message[]{mmsg1, mmsg2}, new String[]{"IDF", "Denver"});
+
+
+
+
+
+
+
+
+
+
+
     }
 
 

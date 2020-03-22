@@ -61,7 +61,7 @@ extends AbstractPlugin
 				rop.getPortURI(), 
 				CVM.BROKER_COMPONENT_URI,
 				ReflectionConnector.class.getCanonicalName());
-		
+		//We could have also used getPublicaionPortURI() method call instead
 		String[] urisPub = rop.findPortURIsFromInterface(PublicationCI.class) ;
 		assert	urisPub != null && urisPub.length == 1 ;
 

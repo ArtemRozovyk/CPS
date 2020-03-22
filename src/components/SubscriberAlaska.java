@@ -71,7 +71,7 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
 
 
 
-        String [] topics ={"USA","Alaska","Anchorage"};
+        String [] topics ={"USA","Alaska","Anchorage","UK"};
         subscribe(topics); // 35 msg
         subscribe("Cambridge",filter); // 35 msg
 

@@ -120,6 +120,7 @@ public class Broker extends AbstractComponent {
         this.handleRequestAsync(publishingExecutorURI, new AbstractComponent.AbstractService<Void>() {
             @Override
             public Void call() {
+                System.out.println("Bout to pub"+m+topic);
                 ((Broker) this.getServiceOwner()).storePublished(m, topic);
                 return null;
             }
@@ -191,15 +192,13 @@ public class Broker extends AbstractComponent {
     }
 
     public void deliver(MsgEntry msgEntry) throws Exception {
-        if(msgEntry.topic.equals("Anchorage")){
-            System.out.println("Ancho");
-        }
         deliverycount++;
         if (topicSubHandlersMap.containsKey(msgEntry.topic)) {
             //people trying to sub will be effectively added only
             //after we finished iterating over existing subs
             synchronized (topicSubHandlersMap.get(msgEntry.topic)) {
                 for (SubHandler sh : topicSubHandlersMap.get(msgEntry.topic)) {
+                    System.out.println("delivering"+msgEntry.topic+msgEntry.message+ " sz :"+sizeMessageMap());
                     actualdeliverycount++;
                     if (sh.filter != null) {
                         if (sh.filter.filter(msgEntry.message)) {
@@ -225,6 +224,8 @@ public class Broker extends AbstractComponent {
                 queue.add(m);
                 topicMessageStorageMap.put(topic, queue);
             }
+            System.out.println("Stored"+m+"TT"+topic+"TT");
+
             condEmpty.signal();
         } finally {
             lock.unlock();
@@ -304,23 +305,44 @@ public class Broker extends AbstractComponent {
     }
 
     public void publish(MessageI m, String[] topics) throws Exception {
-        for (String topic : topics) {
-            publish(m, topic);
-        }
+        this.handleRequestAsync(publishingExecutorURI, new AbstractComponent.AbstractService<Void>() {
+            @Override
+            public Void call() throws Exception {
+                for (String topic : topics) {
+                    ((Broker) this.getServiceOwner()). publish(m, topic);
+                }
+                return null;
+            }
+        });
+
     }
 
     public void publish(MessageI[] ms, String topic) throws Exception {
-        for (MessageI m : ms) {
-            publish(m, topic);
-        }
+        this.handleRequestAsync(publishingExecutorURI, new AbstractComponent.AbstractService<Void>() {
+            @Override
+            public Void call() throws Exception {
+                for (MessageI m : ms) {
+                    ((Broker) this.getServiceOwner()).publish(m, topic);
+                }
+                return null;
+            }
+        });
+
     }
 
     public void publish(MessageI[] ms, String[] topics) throws Exception {
-        for (MessageI m : ms) {
-            for (String topic : topics) {
-                publish(m, topic);
+        this.handleRequestAsync(publishingExecutorURI, new AbstractComponent.AbstractService<Void>() {
+            @Override
+            public Void call() throws Exception {
+                for (MessageI m : ms) {
+                    for (String topic : topics) {
+                        ((Broker) this.getServiceOwner()).publish(m, topic);
+                    }
+                }
+                return null;
             }
-        }
+        });
+
     }
 
     public void createTopic(String topic) {
@@ -354,6 +376,9 @@ public class Broker extends AbstractComponent {
                 });
             }
             topicMessageStorageMap.get(topic).clear();
+            topicMessageStorageMap.remove(topic);
+            topicSubHandlersMap.get(topic).clear();
+            topicSubHandlersMap.remove(topic);
         } finally {
             lock.unlock();
         }
@@ -366,11 +391,12 @@ public class Broker extends AbstractComponent {
     public String[] getTopics() {
         Set<String> tset = topicMessageStorageMap.keySet();
         String[] topics = new String[tset.size()];
-        return tset.toArray(topics);
+        topics =tset.toArray(topics);
+        return topics;
     }
-    
+
     public String getPublicationPortURI() {
-    	return null;
+        return brokerPublicationInboundPortURI;
     }
 
 

@@ -9,6 +9,8 @@ import plugins.PublisherManagementPlugin;
 import plugins.PublisherPublicationPlugin;
 import plugins.SubscriberManagementPlugin;
 
+import java.util.Arrays;
+
 public class PublisherFrance extends AbstractComponent {
     protected final static String FRANCE_PUB_PLUGIN_URI = "publisher-france-pub-plugin-uri";
     protected final static String FRANCE_MAN_PLUGIN_URI = "publisher-france-man-plugin-uri";
@@ -55,7 +57,24 @@ public class PublisherFrance extends AbstractComponent {
             }
             logMessage("Publishing message " + i + " for topic : " + topic);
             publish(new Message(msg), topic);
+
         }
+
+        Thread.sleep(2000);
+        logMessage("Topics available :"+ Arrays.toString(getTopics()));
+        createTopic("Acapulco");
+        logMessage("Topic created : "+ "Acapulco");
+        Thread.sleep(1000);
+        logMessage("Topics available :"+ Arrays.toString(getTopics()));
+        destroy("Acapulco");
+        logMessage("Topic destroyed : "+ "Acapulco");
+        Thread.sleep(1000);
+        logMessage("Topics available :"+ Arrays.toString(getTopics()));
+        logMessage("USA is a topic : "+ isTopic("USA"));
+        logMessage("Acapulco is a topic : "+ isTopic("Acapulco"));
+
+
+
     }
 
 

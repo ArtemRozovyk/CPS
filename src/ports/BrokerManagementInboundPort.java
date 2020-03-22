@@ -119,8 +119,7 @@ implements ManagementCI {
 
 				@Override
 				public Boolean call() throws Exception {
-					((Broker)this.getServiceOwner()).isTopic(topic);
-					return false;
+                    return ((Broker)this.getServiceOwner()).isTopic(topic);
 				}
 			
 		});
@@ -136,8 +135,7 @@ implements ManagementCI {
 
 					@Override
 					public String[] call() throws Exception {
-						((Broker)this.getServiceOwner()).getTopics();
-						return null;
+                        return ((Broker)this.getServiceOwner()).getTopics();
 					}
 				
 			});
@@ -153,8 +151,7 @@ implements ManagementCI {
 
 					@Override
 					public String call() throws Exception {
-						((Broker)this.getServiceOwner()).getPublicationPortURI();
-						return null;
+                        return ((Broker)this.getServiceOwner()).getPublicationPortURI();
 					}
 				
 			});

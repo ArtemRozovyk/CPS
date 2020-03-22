@@ -45,10 +45,9 @@ implements PublicationCI{
 	public void publish(MessageI m, String[] topics) throws Exception {
 		this.owner.handleRequestAsync(
 				new AbstractComponent.AbstractService<Void>() {
-					String[] a = {"no topics yet"};
 					@Override
 					public Void call() throws Exception {
-						((Broker)this.getServiceOwner()).publish(m, a);
+						((Broker)this.getServiceOwner()).publish(m, topics);
 						return null;
 					}
 				});
@@ -61,7 +60,7 @@ implements PublicationCI{
 
 					@Override
 					public Void call() throws Exception {
-						((Broker)this.getServiceOwner()).publish(ms, "notopic");
+						((Broker)this.getServiceOwner()).publish(ms, topic);
 						return null;
 					}
 				});
@@ -71,10 +70,9 @@ implements PublicationCI{
 	public void publish(MessageI[] ms, String[] topics) throws Exception {
 		this.owner.handleRequestAsync(
 				new AbstractComponent.AbstractService<Void>() {
-					String[] a = {"no topics yet"};
 					@Override
 					public Void call() throws Exception {
-						((Broker)this.getServiceOwner()).publish(ms, a);
+						((Broker)this.getServiceOwner()).publish(ms, topics);
 						return null;
 					}
 				});

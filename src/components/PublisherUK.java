@@ -11,6 +11,11 @@ import message.TimeStamp;
 import plugins.PublisherManagementPlugin;
 import plugins.PublisherPublicationPlugin;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 public class PublisherUK extends AbstractComponent {
     protected final static String UK_PUB_PLUGIN_URI = "publisher-uk-pub-plugin-uri";
     protected final static String UK_MAN_PLUGIN_URI = "publisher-uk-man-plugin-uri";
@@ -53,7 +58,7 @@ public class PublisherUK extends AbstractComponent {
                 topic = "Cambridge";
                 TimeStamp ts = new TimeStamp(System.currentTimeMillis(), "PbUK");
 
-                msg = new Message("PayloadUK", ts, "5 degrees in Cambridge1:"+i, new Properties());
+                msg = new Message("PayloadUK", ts, "5 degrees in Cambridge1:" + i, new Properties());
                 msg.getProperties().putProp("Integer", 3);
                 msg.getProperties().putProp("Long", 3L);
                 msg.getProperties().putProp("Character", '3');
@@ -72,38 +77,65 @@ public class PublisherUK extends AbstractComponent {
         }
 
 
-
         Thread.sleep(3000);
-        for (int k=0;k<3;k++){
+        for (int k = 0; k < 3; k++) {
+            for (int i = 0; i < 3; i++) {
+                topic = "Cambridge";
+                TimeStamp ts = new TimeStamp(System.currentTimeMillis(), "PbUK");
 
+                msg = new Message("PayloadUK" + k, ts, "5 degrees in Cambridge 2:" + i, new Properties());
+                //Now set different properies every odd send so that the filter fail sometimes
+                if (i % 2 == 0) {
+                    msg.getProperties().putProp("Integer", 3);
+                    msg.getProperties().putProp("Long", 3L);
+                    msg.getProperties().putProp("Character", '3');
+                } else {
+                    msg.getProperties().putProp("Integer", 5);
+                    msg.getProperties().putProp("Long", 5L);
+                    msg.getProperties().putProp("Character", '5');
+                }
 
-        for (int i = 0; i < 3; i++){
-            topic = "Cambridge";
-            TimeStamp ts = new TimeStamp(System.currentTimeMillis(), "PbUK");
+                msg.getProperties().putProp("Short", (short) 3);
+                msg.getProperties().putProp("Byte", (byte) 3);
+                msg.getProperties().putProp("Float", 3f);
+                msg.getProperties().putProp("String", "3");
+                msg.getProperties().putProp("Boolean", true);
+                msg.getProperties().putProp("Double", 3.0);
+                msg.getTimeStamp().setTime(System.currentTimeMillis());
+                msg.getTimeStamp().setTimestamper("PbUK");
 
-            msg = new Message("PayloadUK"+k, ts, "5 degrees in Cambridge 2:"+i, new Properties());
-            //Now set different properies every odd send so that the filter fail sometimes
-            if(i%2==0){
-                msg.getProperties().putProp("Integer", 3);
-                msg.getProperties().putProp("Long", 3L);
-                msg.getProperties().putProp("Character", '3');
-            }else{
-                msg.getProperties().putProp("Integer", 5);
-                msg.getProperties().putProp("Long", 5L);
-                msg.getProperties().putProp("Character", '5');
+                publish(msg, topic);
             }
-
-            msg.getProperties().putProp("Short", (short) 3);
-            msg.getProperties().putProp("Byte", (byte) 3);
-            msg.getProperties().putProp("Float", 3f);
-            msg.getProperties().putProp("String", "3");
-            msg.getProperties().putProp("Boolean", true);
-            msg.getProperties().putProp("Double", 3.0);
-            msg.getTimeStamp().setTime(System.currentTimeMillis());
-            msg.getTimeStamp().setTimestamper("PbUK");
-            publish(msg, topic);
+            Thread.sleep(3000);
         }
-        Thread.sleep(3000);
+        Map<String, Set<Message>> map = new HashMap<>();
+        for (int k = 0; k < 3; k++) {
+            for (int i = 0; i < 3; i++) {
+                TimeStamp ts = new TimeStamp(System.currentTimeMillis(), "PbUK");
+
+                //Now set different properies every odd send so that the filter fail sometimes
+                if (k > 1) {
+                    topic = "UK";
+                    msg = new Message("PayloadUKX" + k, ts, "56 degrees in average in the UK" + i, new Properties());
+                } else {
+                    topic = "London";
+                    msg = new Message("PayloadCambridgeX" + k, ts, "5 degrees in London 2:" + i, new Properties());
+                }
+
+                if (map.containsKey(topic)) {
+                    map.get(topic).add(msg);
+                } else {
+                    Set<Message> ms = new HashSet<>();
+                    ms.add(msg);
+                    map.put(topic, ms);
+                }
+            }
+            Thread.sleep(800);
+        }
+
+        for (Map.Entry<String, Set<Message>> e : map.entrySet()) {
+            Message[] msgArray = new Message[e.getValue().size()];
+            publish(e.getValue().toArray(msgArray), e.getKey());
         }
 
     }
@@ -144,7 +176,7 @@ public class PublisherUK extends AbstractComponent {
     public String[] getTopics() throws Exception {
         return ((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).getTopics();
     }
-    
+
     public String getPublicatinPortURI() throws Exception {
         return ((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).getPublicatinPortURI();
     }
