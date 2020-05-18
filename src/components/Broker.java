@@ -559,10 +559,15 @@ public class Broker extends AbstractComponent {
                         }) ;
 
             }
-            topicMessageStorageMap.get(topic).clear();
-            topicMessageStorageMap.remove(topic);
-            topicSubHandlersMap.get(topic).clear();
-            topicSubHandlersMap.remove(topic);
+            if(topicMessageStorageMap.containsKey(topic)){
+                topicMessageStorageMap.get(topic).clear();
+                topicMessageStorageMap.remove(topic);
+            }
+            if(topicSubHandlersMap.containsKey(topic)){
+                topicSubHandlersMap.get(topic).clear();
+                topicSubHandlersMap.remove(topic);
+            }
+
         } finally {
             lock.unlock();
         }
