@@ -4,8 +4,7 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.examples.pingpong.components.*;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
-import interfaces.MessageI;
-import interfaces.ReceptionCI;
+import interfaces.*;
 import plugins.*;
 
 public class SubscriberReceptionInboundPort
@@ -32,7 +31,7 @@ public class SubscriberReceptionInboundPort
                     @Override
                     public void run() {
                         try {
-                            ((ReceptionCI) this.getTaskProviderReference()).acceptMessage(m);
+                            ((ReceptionImplementationI) this.getTaskProviderReference()).acceptMessage(m);
                         } catch (Exception e) {
                             e.printStackTrace() ;
                         }
@@ -47,7 +46,7 @@ public class SubscriberReceptionInboundPort
                     @Override
                     public void run() {
                         try {
-                            ((ReceptionCI) this.getTaskProviderReference()).acceptMessage(ms);
+                            ((ReceptionImplementationI) this.getTaskProviderReference()).acceptMessage(ms);
                         } catch (Exception e) {
                             e.printStackTrace() ;
                         }

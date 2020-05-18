@@ -60,20 +60,22 @@ public class BrokerManagementInboundPort
         super(uri, ManagementCI.class, owner);
     }
 
+
     /**
      * @see interfaces.ManagementCI#createTopic(String)
      */
     @Override
     public void createTopic(String topic) throws Exception {
-        this.owner.runTask(
-                new AbstractComponent.AbstractTask() {
 
+        this.owner.handleRequestSync(
+                new AbstractComponent.AbstractService<Void>() {
                     @Override
-                    public void run() {
-                        ((Broker) this.getTaskOwner()).createTopic(topic);
-                        
+                    public Void call() throws Exception {
+                        ((Broker) this.getServiceOwner()).createTopic(topic);
+                        return null;
                     }
                 });
+
     }
 
     /**
@@ -81,13 +83,13 @@ public class BrokerManagementInboundPort
      */
     @Override
     public void createTopics(String[] topic) throws Exception {
-        this.owner.runTask(
-                new AbstractComponent.AbstractTask() {
 
+        this.owner.handleRequestSync(
+                new AbstractComponent.AbstractService<Void>() {
                     @Override
-                    public void run() {
-                        ((Broker) this.getTaskOwner()).createTopics(topic);
-                        
+                    public Void call() throws Exception {
+                        ((Broker) this.getServiceOwner()).createTopics(topic);
+                        return null;
                     }
                 });
     }
@@ -97,17 +99,12 @@ public class BrokerManagementInboundPort
      */
     @Override
     public void destroyTopic(String topic) throws Exception {
-        this.owner.runTask(
-                new AbstractComponent.AbstractTask() {
-
+         this.owner.handleRequestSync(
+                new AbstractComponent.AbstractService<Void>() {
                     @Override
-                    public void run() {
-                        try {
-                            ((Broker) this.getTaskProviderReference()).destroyTopic(topic);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
+                    public Void call() throws Exception {
+                        ((Broker) this.getServiceOwner()).destroyTopic(topic);
+                        return null;
                     }
                 });
     }
@@ -119,7 +116,6 @@ public class BrokerManagementInboundPort
     public boolean isTopic(String topic) throws Exception {
         return this.owner.handleRequestSync(
                 new AbstractComponent.AbstractService<Boolean>() {
-
                     @Override
                     public Boolean call() throws Exception {
                         return ((Broker) this.getServiceOwner()).isTopic(topic);
@@ -127,7 +123,20 @@ public class BrokerManagementInboundPort
 
                 });
     }
-
+    /**
+     * @see interfaces.ManagementCI#modifyFilter(String, MessageFilterI, String)
+     */
+    @Override
+    public void modifyFilter(String topic, MessageFilterI newFilter, String inboundPortUri) throws Exception {
+        this.owner.handleRequestSync(
+                new AbstractComponent.AbstractService<Void>() {
+                    @Override
+                    public Void call() throws Exception {
+                        ((Broker) this.getServiceOwner()).modifyFilter(topic, newFilter, inboundPortUri);
+                        return null;
+                    }
+                });
+    }
     /**
      * @see interfaces.ManagementCI#getTopics()
      */
@@ -135,12 +144,10 @@ public class BrokerManagementInboundPort
     public String[] getTopics() throws Exception {
         return this.owner.handleRequestSync(
                 new AbstractComponent.AbstractService<String[]>() {
-
                     @Override
                     public String[] call() throws Exception {
                         return ((Broker) this.getServiceOwner()).getTopics();
                     }
-
                 });
     }
 
@@ -175,7 +182,6 @@ public class BrokerManagementInboundPort
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-
                     }
                 });
     }
@@ -195,7 +201,6 @@ public class BrokerManagementInboundPort
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-
                     }
                 });
     }
@@ -240,20 +245,6 @@ public class BrokerManagementInboundPort
                 });
     }
 
-    /**
-     * @see interfaces.ManagementCI#modifyFilter(String, MessageFilterI, String)
-     */
-    @Override
-    public void modifyFilter(String topic, MessageFilterI newFilter, String inboundPortUri) throws Exception {
-        this.owner.runTask(
-                new AbstractComponent.AbstractTask() {
 
-                    @Override
-                    public void run() {
-                        ((Broker) this.getTaskOwner()).modifyFilter(topic, newFilter, inboundPortUri);
-                        
-                    }
-                });
-    }
 
 }

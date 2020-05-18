@@ -2,8 +2,7 @@ package plugins;
 
 import fr.sorbonne_u.components.AbstractPlugin;
 import fr.sorbonne_u.components.ComponentI;
-import interfaces.MessageI;
-import interfaces.ReceptionCI;
+import interfaces.*;
 import ports.SubscriberReceptionInboundPortForPlugin;
 
 /**
@@ -78,8 +77,8 @@ public class SubscriberReceptionPlugin
     /**
      * Returns the owner of the plugin
      */
-    private ReceptionCI getOwner() {
-        return (ReceptionCI) this.owner;
+    private ReceptionImplementationI getOwner() {
+        return (ReceptionImplementationI) this.owner;
     }
 
     /**

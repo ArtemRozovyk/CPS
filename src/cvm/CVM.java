@@ -55,7 +55,7 @@ public class CVM extends AbstractCVM {
                 Broker.class.getCanonicalName(),
                 new Object[]{BROKER_COMPONENT_URI,
                         BROKER_PUBLICATION_INBOUND_PORT,
-                        BROKER_MANAGEMENT_INBOUND_PORT});
+                        BROKER_MANAGEMENT_INBOUND_PORT,5,5});
 
         assert this.isDeployedComponent(this.brokerURI);
         this.toggleTracing(this.brokerURI);
@@ -158,12 +158,8 @@ public class CVM extends AbstractCVM {
         try {
             //while(true){
             CVM c = new CVM();
-            c.startStandardLifeCycle(30000L);
-            Thread.sleep(30000L);
-            System.out.println(Broker.deliverycount + " del count ");
-            System.out.println(Broker.popcount + " pop count ");
-            System.out.println(Broker.actualdeliverycount + " actual count ");
-            System.out.println(Broker.externCount + " exte count ");
+            c.startStandardLifeCycle(16000L);
+            Thread.sleep(20000L);
             System.exit(0);
         } catch (Exception e) {
             throw new RuntimeException(e);

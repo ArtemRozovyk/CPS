@@ -2,9 +2,7 @@ package components;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
-import interfaces.MessageFilterI;
-import interfaces.MessageI;
-import interfaces.ReceptionCI;
+import interfaces.*;
 import plugins.PublisherManagementPlugin;
 import plugins.SubscriberManagementPlugin;
 import plugins.SubscriberReceptionPlugin;
@@ -21,7 +19,7 @@ import plugins.SubscriberReceptionPlugin;
  * invariant		true
  * </pre>
  */
-public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
+public class SubscriberCuba extends AbstractComponent implements ReceptionImplementationI {
     protected final static String SUB_CUBA_RECEPT_PLUGIN_URI = "sub-cuba-recept-uri";
     protected final static String SUB_CUBA_MANAGE_PLUGIN_URI = "sub-cuba-manage-uri";
 

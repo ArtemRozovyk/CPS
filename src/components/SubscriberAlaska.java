@@ -2,9 +2,7 @@ package components;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
-import interfaces.MessageFilterI;
-import interfaces.MessageI;
-import interfaces.ReceptionCI;
+import interfaces.*;
 import plugins.PublisherManagementPlugin;
 import plugins.SubscriberManagementPlugin;
 import plugins.SubscriberReceptionPlugin;
@@ -21,13 +19,13 @@ import plugins.SubscriberReceptionPlugin;
  * invariant		true
  * </pre>
  */
-public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
+public class SubscriberAlaska extends AbstractComponent implements ReceptionImplementationI {
     protected final static String SUB_ALASKA_RECEPT_PLUGIN_URI = "sub-alaska-recept-uri";
     protected final static String SUB_ALASKA_MANAGE_PLUGIN_URI = "sub-alaska-manage-uri";
 
     static int i = 0;
     static final Object iGuard = new Object();
-    private String subscriberReceptionInboundPortURI = "subscriber-alaska-reception-inbound-port-uri-3";
+    private final String subscriberReceptionInboundPortURI = "subscriber-alaska-reception-inbound-port-uri-3";
 
 
     /**
@@ -59,6 +57,7 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
         SubscriberManagementPlugin smp = new SubscriberManagementPlugin();
         smp.setPluginURI(SUB_ALASKA_MANAGE_PLUGIN_URI);
         this.installPlugin(smp);
+
 
         //unstailling the plgin that will create port and publish it
         SubscriberReceptionPlugin subscriberPlugin
@@ -138,7 +137,6 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
     /**
      * @see interfaces.ReceptionCI#acceptMessage(MessageI[])
      */
-    @Override
     public void acceptMessage(MessageI[] ms) throws Exception {
         for (MessageI m : ms) {
             acceptMessage(m);

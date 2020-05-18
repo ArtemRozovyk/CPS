@@ -31,22 +31,7 @@ public class Publisher extends AbstractComponent {
     public final static String PUBLISHER_CLIENT_PUBLICATION_PLUGIN =
             "publisher-publication-plugin-uri";
 
-    /**
-     * Publisher creation
-     *
-     * <p><strong>Contract</strong></p>
-     *
-     * <pre>
-     * pre	nbThreads > 0
-     * post	true			// no postcondition.
-     * </pre>
-     *
-     * @param nbThreads            number of threads used by the component
-     * @param nbSchedulableThreads number of schedulable threads
-     */
-    protected Publisher(int nbThreads, int nbSchedulableThreads) {
-        super(nbThreads, nbSchedulableThreads);
-    }
+
 
     /**
      * Publisher creation

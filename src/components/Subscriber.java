@@ -7,9 +7,7 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
 import fr.sorbonne_u.components.exceptions.PreconditionException;
-import interfaces.ManagementCI;
-import interfaces.MessageI;
-import interfaces.ReceptionCI;
+import interfaces.*;
 import ports.SubscriberManagementOutbondPort;
 import ports.SubscriberReceptionInboundPort;
 
@@ -24,7 +22,7 @@ import ports.SubscriberReceptionInboundPort;
  * invariant		true
  * </pre>
  */
-public class Subscriber extends AbstractComponent implements ReceptionCI {
+public class Subscriber extends AbstractComponent implements ReceptionImplementationI {
 
     protected String subscriberReceptionInboundPortURI;
     protected String myManagementOutbondPortURI;

@@ -84,7 +84,9 @@ public class Broker extends AbstractComponent {
      */
     protected Broker(String uri,
                      String publicationInboundPortURI,
-                     String managmentInboundPortURI) throws Exception {
+                     String managmentInboundPortURI,
+                     int nbAccepingThreads,
+                     int nbPublishingThreads) throws Exception {
         super(uri, 1, 1);
 
         topicMessageStorageMap = new HashMap<>();
@@ -108,9 +110,9 @@ public class Broker extends AbstractComponent {
         } else {
             this.executionLog.setDirectory(System.getProperty("user.home"));
         }
-        this.createNewExecutorService(acceptionExecutorURI, 5, false);
-        this.createNewExecutorService(publishingExecutorURI, 5, false);
-        this.createNewExecutorService(subscriptionExecutorURI, 1, false);
+        this.createNewExecutorService(acceptionExecutorURI, nbAccepingThreads, false);
+        this.createNewExecutorService(publishingExecutorURI, nbPublishingThreads, false);
+        this.createNewExecutorService(subscriptionExecutorURI, 1, false); // 1 is for concurrency matters
         this.tracer.setTitle("broker");
         this.tracer.setRelativePosition(0, 3);
         Broker.checkInvariant(this);
@@ -155,7 +157,8 @@ public class Broker extends AbstractComponent {
         //System.out.println("Extern pub "+m+" in "+Thread.currentThread());
         externCount++;
         //FIXME 2
-
+        //TODO Vous pourriez éviter ce passage pas une tâche en vous inspirant des derniers exemples données avec le cours 8.
+        //
         this.runTask(acceptionExecutorURI,
                 new AbstractComponent.AbstractTask() {
                     @Override
@@ -352,12 +355,15 @@ public class Broker extends AbstractComponent {
     private void subscribeAux(String topic, MessageFilterI filter, String inboundPortURI) throws Exception {
         String outUri = "outbound-reception-broker-uri" + i;
         i++;
-
+        if(outUri.equals("outbound-reception-broker-uri3")){
+            System.out.println("here");
+        }
         BrokerReceptionOutboundPort brop =
                 new BrokerReceptionOutboundPort(outUri, this);
         brop.publishPort();
+
         this.doPortConnection(outUri, inboundPortURI, ReceptionConnector.class.getCanonicalName());
-        logMessage(inboundPortURI + " has subscribed  to " + topic);
+        logMessage(inboundPortURI + " has subscribed  to " + topic+"with"+outUri);
         //System.out.println("Subed to " + topic + " in " + Thread.currentThread() + " map sz: " + sizeMessageMap());
         if (topicSubHandlersMap.containsKey(topic)) {
             synchronized (topicSubHandlersMap.get(topic)) {
@@ -564,6 +570,11 @@ public class Broker extends AbstractComponent {
                 topicMessageStorageMap.remove(topic);
             }
             if(topicSubHandlersMap.containsKey(topic)){
+                for(SubHandler sh : topicSubHandlersMap.get(topic)){
+                    sh.port.unpublishPort();
+                    logMessage("Topic "+topic+" has been destroyed, destroying port "+sh.subUri);
+                    sh.port.destroyPort();
+                }
                 topicSubHandlersMap.get(topic).clear();
                 topicSubHandlersMap.remove(topic);
             }
@@ -640,20 +651,22 @@ public class Broker extends AbstractComponent {
                              String inboundPort) {
         synchronized (topicSubHandlersMap.get(topic)) {
             topicSubHandlersMap.get(topic).forEach((SubHandler sh) -> {
-                if (sh.subUri.equals(inboundPort)) sh.filter = newFilter;
+                if (sh.subUri.equals(inboundPort)){
+                    //System.out.println("Modifying filter for "+inboundPort+" with topic "+topic+"old "+sh.filter+" new "+newFilter);
+                    sh.filter = newFilter;
+                }
+
             });
         }
     }
 
-    /**
-     * Shutdown of the component, unpublish and destroy the ports
-     */
     @Override
-    public void shutdown() throws ComponentShutdownException {
+    public void finalise() throws Exception {
         try {
+            System.out.println("Destroying "+topicSubHandlersMap.values().size()+" ports");
             for (Set<SubHandler> shs : topicSubHandlersMap.values()) {
                 for (SubHandler sh : shs) {
-                    //System.out.println("Destroying " + sh.port.getPortURI());
+                    System.out.println("Destroying " + sh.port.getPortURI());
                     sh.port.unpublishPort();
                     sh.port.destroyPort();
                 }
@@ -665,6 +678,15 @@ public class Broker extends AbstractComponent {
         } catch (Exception e) {
             throw new ComponentShutdownException(e);
         }
+        super.finalise();
+    }
+
+    /**
+     * Shutdown of the component, unpublish and destroy the ports
+     */
+    @Override
+    public void shutdown() throws ComponentShutdownException {
+
         super.shutdown();
     }
 
