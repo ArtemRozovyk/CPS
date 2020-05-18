@@ -1,11 +1,7 @@
 package components;
 
 import fr.sorbonne_u.components.AbstractComponent;
-import interfaces.ManagementCI;
-import interfaces.MessageI;
-import interfaces.PublicationCI;
 import message.Message;
-import message.MessageFilterI;
 import message.Properties;
 import message.TimeStamp;
 import plugins.PublisherManagementPlugin;
@@ -19,11 +15,11 @@ import java.util.Set;
 /**
  * Variant of the Publisher component. It has a different behavior.
  * It is used to publish messages.
- * 
+ *
  * <p><strong>Description</strong></p>
- * 
+ *
  * <p><strong>Invariant</strong></p>
- * 
+ *
  * <pre>
  * invariant		true
  * </pre>
@@ -33,33 +29,33 @@ public class PublisherUK extends AbstractComponent {
     protected final static String UK_MAN_PLUGIN_URI = "publisher-uk-man-plugin-uri";
 
     /**
-   	 * Publisher creation
-   	 * 
-   	 * <p><strong>Contract</strong></p>
-   	 * 
-   	 * <pre>
-   	 * pre	nbThreads > 0
-   	 * post	true			// no postcondition.
-   	 * </pre>
-   	 * 
-   	 * @param nbThreads					number of threads used by the component
-   	 * @param nbSchedulableThreads		number of schedulable threads
-   	 */
+     * Publisher creation
+     *
+     * <p><strong>Contract</strong></p>
+     *
+     * <pre>
+     * pre	nbThreads > 0
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param nbThreads            number of threads used by the component
+     * @param nbSchedulableThreads number of schedulable threads
+     */
     protected PublisherUK(int nbThreads, int nbSchedulableThreads) {
         super(nbThreads, nbSchedulableThreads);
     }
 
     /**
      * Publisher creation
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	reflectionInboundPortURI != null
-	 * post	true			// no postcondition.
-	 * </pre>
-	 * 
-     * @param reflectionInboundPortURI		uri of the owner inbound port
+     *
+     * <p><strong>Contract</strong></p>
+     *
+     * <pre>
+     * pre	reflectionInboundPortURI != null
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param reflectionInboundPortURI uri of the owner inbound port
      * @throws Exception
      */
     protected PublisherUK(String reflectionInboundPortURI) throws Exception {
@@ -220,7 +216,7 @@ public class PublisherUK extends AbstractComponent {
     }
 
     /**
-     * @see interfaces.ManagementCI#createTopic(String[])
+     * @see interfaces.ManagementCI#createTopics(String[])
      */
     public void createTopic(String[] topics) throws Exception {
         ((PublisherManagementPlugin) this.getPlugin(UK_MAN_PLUGIN_URI)).createTopic(topics);

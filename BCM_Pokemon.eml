@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component inheritJdk="true">
+	<exclude-output/>
+	<contentEntry url="file://$MODULE_DIR$">
+		<testFolder url="file://$MODULE_DIR$/tests"/>
+		<testFolder url="file://$MODULE_DIR$/src/message/tests"/>
+		<excludeFolder url="file://$MODULE_DIR$/src/message/tests/e"/>
+	</contentEntry>
+	<lib name="JUnit4" scope="TEST"/>
+	<lib name="JUnit5.4" scope="TEST"/>
+	<levels>
+		<level name="com.guicedee.services:commons-math3:62" value="project"/>
+		<level name="BCM4Java-21042020" value="project"/>
+		<level name="javassist-3.12.1.GA" value="project"/>
+	</levels>
+</component>

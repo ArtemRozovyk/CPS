@@ -1,24 +1,20 @@
 package components;
 
 import fr.sorbonne_u.components.AbstractComponent;
-import interfaces.ManagementCI;
-import interfaces.PublicationCI;
 import message.Message;
-import message.MessageFilterI;
 import plugins.PublisherManagementPlugin;
 import plugins.PublisherPublicationPlugin;
-import plugins.SubscriberManagementPlugin;
 
 import java.util.Arrays;
 
 /**
  * Variant of the Publisher component. It has a different behavior.
  * It is used to publish messages.
- * 
+ *
  * <p><strong>Description</strong></p>
- * 
+ *
  * <p><strong>Invariant</strong></p>
- * 
+ *
  * <pre>
  * invariant		true
  * </pre>
@@ -28,33 +24,33 @@ public class PublisherFrance extends AbstractComponent {
     protected final static String FRANCE_MAN_PLUGIN_URI = "publisher-france-man-plugin-uri";
 
     /**
-   	 * Publisher creation
-   	 * 
-   	 * <p><strong>Contract</strong></p>
-   	 * 
-   	 * <pre>
-   	 * pre	nbThreads > 0
-   	 * post	true			// no postcondition.
-   	 * </pre>
-   	 * 
-   	 * @param nbThreads					number of threads used by the component
-   	 * @param nbSchedulableThreads		number of schedulable threads
-   	 */
+     * Publisher creation
+     *
+     * <p><strong>Contract</strong></p>
+     *
+     * <pre>
+     * pre	nbThreads > 0
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param nbThreads            number of threads used by the component
+     * @param nbSchedulableThreads number of schedulable threads
+     */
     protected PublisherFrance(int nbThreads, int nbSchedulableThreads) {
         super(nbThreads, nbSchedulableThreads);
     }
 
     /**
      * Publisher creation
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	reflectionInboundPortURI != null
-	 * post	true			// no postcondition.
-	 * </pre>
-	 * 
-     * @param reflectionInboundPortURI		uri of the owner inbound port
+     *
+     * <p><strong>Contract</strong></p>
+     *
+     * <pre>
+     * pre	reflectionInboundPortURI != null
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param reflectionInboundPortURI uri of the owner inbound port
      * @throws Exception
      */
     protected PublisherFrance(String reflectionInboundPortURI) throws Exception {
@@ -102,18 +98,17 @@ public class PublisherFrance extends AbstractComponent {
         }
 
         Thread.sleep(2000);
-        logMessage("Topics available :"+ Arrays.toString(getTopics()));
+        logMessage("Topics available :" + Arrays.toString(getTopics()));
         createTopic("Acapulco");
-        logMessage("Topic created : "+ "Acapulco");
+        logMessage("Topic created : " + "Acapulco");
         Thread.sleep(1000);
-        logMessage("Topics available :"+ Arrays.toString(getTopics()));
+        logMessage("Topics available :" + Arrays.toString(getTopics()));
         destroy("Acapulco");
-        logMessage("Topic destroyed : "+ "Acapulco");
+        logMessage("Topic destroyed : " + "Acapulco");
         Thread.sleep(1000);
-        logMessage("Topics available :"+ Arrays.toString(getTopics()));
-        logMessage("USA is a topic : "+ isTopic("USA"));
-        logMessage("Acapulco is a topic : "+ isTopic("Acapulco"));
-
+        logMessage("Topics available :" + Arrays.toString(getTopics()));
+        logMessage("USA is a topic : " + isTopic("USA"));
+        logMessage("Acapulco is a topic : " + isTopic("Acapulco"));
 
 
     }
@@ -125,63 +120,63 @@ public class PublisherFrance extends AbstractComponent {
     private void publish(Message message, String topic) throws Exception {
         ((PublisherPublicationPlugin) this.getPlugin(FRANCE_PUB_PLUGIN_URI)).publish(message, topic);
     }
-    
+
     /**
      * @see interfaces.PublicationCI#publish(interfaces.MessageI[], String)
      */
     private void publish(Message[] message, String topic) throws Exception {
         ((PublisherPublicationPlugin) this.getPlugin(FRANCE_PUB_PLUGIN_URI)).publish(message, topic);
     }
-    
+
     /**
      * @see interfaces.PublicationCI#publish(interfaces.MessageI, String[])
      */
     private void publish(Message message, String[] topic) throws Exception {
         ((PublisherPublicationPlugin) this.getPlugin(FRANCE_PUB_PLUGIN_URI)).publish(message, topic);
     }
-    
+
     /**
      * @see interfaces.PublicationCI#publish(interfaces.MessageI[], String[])
      */
     private void publish(Message[] message, String[] topic) throws Exception {
         ((PublisherPublicationPlugin) this.getPlugin(FRANCE_PUB_PLUGIN_URI)).publish(message, topic);
     }
-    
+
     /**
      * @see interfaces.ManagementCI#createTopic(String)
      */
     public void createTopic(String topic) throws Exception {
-    	((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).createTopic(topic);
+        ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).createTopic(topic);
     }
-    
+
     /**
-     * @see interfaces.ManagementCI#createTopic(String[])
+     * @see interfaces.ManagementCI#createTopics(String[])
      */
     public void createTopic(String[] topics) throws Exception {
-    	((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).createTopic(topics);
+        ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).createTopic(topics);
     }
-    
+
     /**
      * @see interfaces.ManagementCI#destroyTopic(String)
      */
     public void destroy(String topic) throws Exception {
-    	((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).destroyTopic(topic);
+        ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).destroyTopic(topic);
     }
-    
+
     /**
      * @see interfaces.ManagementCI#isTopic(String)
      */
     public boolean isTopic(String topic) throws Exception {
-    	return ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).isTopic(topic);
+        return ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).isTopic(topic);
     }
-    
+
     /**
      * @see interfaces.ManagementCI#getTopics()
      */
     public String[] getTopics() throws Exception {
-    	return ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).getTopics();
+        return ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).getTopics();
     }
-    
+
     /**
      * @see interfaces.ManagementCI#getPublicatinPortURI()
      */

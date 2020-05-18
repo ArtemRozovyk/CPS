@@ -1,25 +1,24 @@
 package components;
 
-import java.util.concurrent.TimeUnit;
-
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import interfaces.ManagementCI;
 import interfaces.MessageI;
 import interfaces.PublicationCI;
-import interfaces.ReceptionCI;
 import message.Message;
 import ports.PublisherManagementOutboundPort;
 import ports.PublisherPublicationOutboundPort;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Publisher component. It is used to publish messages.
- * 
+ *
  * <p><strong>Description</strong></p>
- * 
+ *
  * <p><strong>Invariant</strong></p>
- * 
+ *
  * <pre>
  * invariant		true
  * </pre>
@@ -33,35 +32,35 @@ public class Publisher extends AbstractComponent {
             "publisher-publication-plugin-uri";
 
     /**
-   	 * Publisher creation
-   	 * 
-   	 * <p><strong>Contract</strong></p>
-   	 * 
-   	 * <pre>
-   	 * pre	nbThreads > 0
-   	 * post	true			// no postcondition.
-   	 * </pre>
-   	 * 
-   	 * @param nbThreads					number of threads used by the component
-   	 * @param nbSchedulableThreads		number of schedulable threads
-   	 */
+     * Publisher creation
+     *
+     * <p><strong>Contract</strong></p>
+     *
+     * <pre>
+     * pre	nbThreads > 0
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param nbThreads            number of threads used by the component
+     * @param nbSchedulableThreads number of schedulable threads
+     */
     protected Publisher(int nbThreads, int nbSchedulableThreads) {
         super(nbThreads, nbSchedulableThreads);
     }
 
     /**
      * Publisher creation
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	uri != null && publicationOutboundPortURI != null && managementOutboundPort != null
-	 * post	true			// no postcondition.
-	 * </pre>
-	 * 
-     * @param uri							uri of the component
-     * @param publicationOutboundPortURI	uri of publication outbound port
-     * @param managementOutboundPort		uri of the management outbound port
+     *
+     * <p><strong>Contract</strong></p>
+     *
+     * <pre>
+     * pre	uri != null && publicationOutboundPortURI != null && managementOutboundPort != null
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param uri                        uri of the component
+     * @param publicationOutboundPortURI uri of publication outbound port
+     * @param managementOutboundPort     uri of the management outbound port
      * @throws Exception
      */
     protected Publisher(String uri,
@@ -198,18 +197,17 @@ public class Publisher extends AbstractComponent {
      * Shutdown of the component, unpublish and destroy the ports
      */
     @Override
-    public void	shutdown() throws ComponentShutdownException
-    {
+    public void shutdown() throws ComponentShutdownException {
         try {
-            this.ppop.unpublishPort() ;
-            this.ppop.destroyPort() ;
-            this.pmop.unpublishPort() ;
-            this.pmop.destroyPort() ;
+            this.ppop.unpublishPort();
+            this.ppop.destroyPort();
+            this.pmop.unpublishPort();
+            this.pmop.destroyPort();
 
         } catch (Exception e) {
-            throw new ComponentShutdownException(e) ;
+            throw new ComponentShutdownException(e);
         }
 
-        super.shutdown() ;
+        super.shutdown();
     }
 }

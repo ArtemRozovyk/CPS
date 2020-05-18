@@ -2,10 +2,9 @@ package components;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
-import interfaces.ManagementCI;
+import interfaces.MessageFilterI;
 import interfaces.MessageI;
 import interfaces.ReceptionCI;
-import message.MessageFilterI;
 import plugins.PublisherManagementPlugin;
 import plugins.SubscriberManagementPlugin;
 import plugins.SubscriberReceptionPlugin;
@@ -13,11 +12,11 @@ import plugins.SubscriberReceptionPlugin;
 /**
  * Variant of the Subscriber component. It has a different behavior.
  * It is used to publish messages.
- * 
+ *
  * <p><strong>Description</strong></p>
- * 
+ *
  * <p><strong>Invariant</strong></p>
- * 
+ *
  * <pre>
  * invariant		true
  * </pre>
@@ -33,15 +32,15 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
 
     /**
      * Subscriber creation
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	reflectionInboundPortURI != null
-	 * post	true			// no postcondition.
-	 * </pre>
-	 * 
-     * @param reflectionInboundPortURI		uri of the owner inbound port
+     *
+     * <p><strong>Contract</strong></p>
+     *
+     * <pre>
+     * pre	reflectionInboundPortURI != null
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param reflectionInboundPortURI uri of the owner inbound port
      * @throws Exception
      */
     protected SubscriberCuba(String reflectionInboundPortURI) throws Exception {
@@ -95,9 +94,9 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
      */
     @Override
     public void acceptMessage(MessageI[] ms) throws Exception {
-    	for (MessageI m : ms) {
-			acceptMessage(m);
-		}
+        for (MessageI m : ms) {
+            acceptMessage(m);
+        }
     }
 
     /**
@@ -107,8 +106,8 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
 
 
         logMessage("Unsubscribing from " + topic);
-     //   System.out.println(((SubscriberManagementPlugin) this.getPlugin(
-       //         SUB_CUBA_MANAGE_PLUGIN_URI)));
+        //   System.out.println(((SubscriberManagementPlugin) this.getPlugin(
+        //         SUB_CUBA_MANAGE_PLUGIN_URI)));
         ((SubscriberManagementPlugin) this.getPlugin(
                 SUB_CUBA_MANAGE_PLUGIN_URI)).unsubscribe(topic, subscriberReceptionInboundPortURI);
     }
@@ -137,63 +136,63 @@ public class SubscriberCuba extends AbstractComponent implements ReceptionCI {
                         + "port published with URI " + subscriberReceptionInboundPortURI);
 
     }
-    
+
     /**
      * @see interfaces.ManagementCI#subscribe(String[], String)
      */
     public void subscribe(String[] topics) throws Exception {
-    	((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).subscribe(topics, subscriberReceptionInboundPortURI);
+        ((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).subscribe(topics, subscriberReceptionInboundPortURI);
     }
-    
+
     /**
      * @see interfaces.ManagementCI#subscribe(String, MessageFilterI, String)
      */
     public void subscribe(String topic, MessageFilterI filter) throws Exception {
-    	((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).subscribe(topic, filter, subscriberReceptionInboundPortURI);
+        ((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).subscribe(topic, filter, subscriberReceptionInboundPortURI);
     }
 
     /**
      * @see interfaces.ManagementCI#modifyFilter(String, MessageFilterI, String)
      */
     public void modifyFilter(String topic, MessageFilterI newFilter) throws Exception {
-    	((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).modifyFilter(topic, newFilter, subscriberReceptionInboundPortURI);
+        ((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).modifyFilter(topic, newFilter, subscriberReceptionInboundPortURI);
     }
-    
+
     /**
      * @see interfaces.ManagementCI#createTopic(String)
      */
     public void createTopic(String topic) throws Exception {
-    	((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).createTopic(topic);
+        ((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).createTopic(topic);
     }
-    
+
     /**
      * @see interfaces.ManagementCI#createTopics(String[])
      */
     public void createTopic(String[] topics) throws Exception {
-    	((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).createTopic(topics);
+        ((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).createTopic(topics);
     }
-    
+
     /**
      * @see interfaces.ManagementCI#destroyTopic(String)
      */
     public void destroy(String topic) throws Exception {
-    	((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).destroyTopic(topic);
+        ((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).destroyTopic(topic);
     }
-    
+
     /**
      * @see interfaces.ManagementCI#isTopic(String)
      */
     public boolean isTopic(String topic) throws Exception {
-    	return ((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).isTopic(topic);
+        return ((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).isTopic(topic);
     }
-    
+
     /**
      * @see interfaces.ManagementCI#getTopics()
      */
     public String[] getTopics() throws Exception {
-    	return ((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).getTopics();
+        return ((SubscriberManagementPlugin) this.getPlugin(SUB_CUBA_MANAGE_PLUGIN_URI)).getTopics();
     }
-    
+
     /**
      * @see interfaces.ManagementCI#getPublicatinPortURI()
      */

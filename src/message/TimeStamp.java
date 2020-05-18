@@ -2,33 +2,33 @@ package message;
 
 public class TimeStamp {
 
-	protected long time=0;
+    protected long time = 0;
 
-	protected String timestamper;
-	
-	public TimeStamp(long t, String author) {
-		this.time = t;
-		this.timestamper = author;
-	}
+    protected String timestamper;
 
-	public boolean isInitialised() {
-		return time!= 0 && timestamper != null;
-	}
+    public TimeStamp(long t, String author) {
+        this.time = t;
+        this.timestamper = author;
+    }
 
-	public long getTime() {
-		return this.time;
-	}
+    public boolean isInitialised() {
+        return time != 0 && timestamper != null;
+    }
 
-	public void setTime(long t) {
-		this.time = t;
-	}
+    public long getTime() {
+        return this.time;
+    }
 
-	public String getTimestamper() {
-		return timestamper;
-	}
+    public void setTime(long t) {
+        this.time = t;
+    }
 
-	public void setTimestamper(String timestamper) {
-		this.timestamper = timestamper;
-	}
+    public String getTimestamper() {
+        return timestamper;
+    }
+
+    public void setTimestamper(String timestamper) {
+        this.timestamper = timestamper;
+    }
 
 }

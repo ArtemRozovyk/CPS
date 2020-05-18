@@ -1,9 +1,7 @@
 package cvm;
 
 import components.*;
-import connectors.ManagementConnector;
 import connectors.PublicationConnector;
-import connectors.ReceptionConnector;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 
@@ -11,7 +9,6 @@ import fr.sorbonne_u.components.cvm.AbstractCVM;
  * The class <code>CVM</code> implements the single JVM assembly
  */
 public class CVM extends AbstractCVM {
-
 
 
     public CVM(boolean isDistributed) throws Exception {
@@ -43,7 +40,6 @@ public class CVM extends AbstractCVM {
     public CVM() throws Exception {
         super();
     }
-
 
 
     /**
@@ -162,8 +158,8 @@ public class CVM extends AbstractCVM {
         try {
             //while(true){
             CVM c = new CVM();
-            c.startStandardLifeCycle(300000L);
-            Thread.sleep(300000L);
+            c.startStandardLifeCycle(30000L);
+            Thread.sleep(30000L);
             System.out.println(Broker.deliverycount + " del count ");
             System.out.println(Broker.popcount + " pop count ");
             System.out.println(Broker.actualdeliverycount + " actual count ");

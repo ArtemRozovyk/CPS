@@ -14,132 +14,128 @@ import ports.PublisherPublicationOutboundPort;
 /**
  * The plugin PublisherPublicationPlugin is used to implement the
  * publication services for a publisher
- * 
+ *
  * <p><strong>Description</strong></p>
- * 
+ *
  * <p><strong>Invariant</strong></p>
- * 
+ *
  * <pre>
  * invariant		true
  * </pre>
  */
 public class PublisherPublicationPlugin
-extends AbstractPlugin
-{
+        extends AbstractPlugin {
 
-	private static final long serialVersionUID = 1L;
-	
-	/** Outbound port required to connect to the Broker component **/
-	protected PublisherPublicationOutboundPort ppop;
+    private static final long serialVersionUID = 1L;
 
-	
-	/**
-	 * Used in components to install the plugin
-	 */
-	@Override
-	public void installOn(ComponentI owner) throws Exception
-	{
-		super.installOn(owner);
-		
-		// We add the required interface and publish the outbound port
-		this.addRequiredInterface(PublicationCI.class);
-		this.ppop = new PublisherPublicationOutboundPort(this.owner);
-		this.ppop.publishPort();
-
-	}
-	
-	/**
-	 * We assume that the plug-in on the server component has already been
-	 * installed and initialised.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	true				// no more preconditions.
-	 * post	true				// no more postconditions.
-	 * </pre>
-	 * 
-	 */
-	@Override
-	public void initialise() throws Exception
-	{
-		// We use the reflection approach to get the URI of the inbound port
-		// of the hash map component.
-		this.addRequiredInterface(ReflectionI.class);
-		ReflectionOutboundPort rop = new ReflectionOutboundPort(this.owner);
-		rop.publishPort();
-		
-		this.owner.doPortConnection(
-				rop.getPortURI(), 
-				CVM.BROKER_COMPONENT_URI,
-				ReflectionConnector.class.getCanonicalName());
-		//We could have also used getPublicaionPortURI() method call instead
-		String[] urisPub = rop.findPortURIsFromInterface(PublicationCI.class) ;
-		assert	urisPub != null && urisPub.length == 1 ;
-
-		
-		this.owner.doPortDisconnection(rop.getPortURI()) ;
-		rop.unpublishPort() ;
-		rop.destroyPort() ;
-		this.removeRequiredInterface(ReflectionI.class) ;
-		
-		// connect the outbound port.
-		this.owner.doPortConnection(
-				this.ppop.getPortURI(),
-				urisPub[0],
-				PublicationConnector.class.getCanonicalName()) ;
+    /**
+     * Outbound port required to connect to the Broker component
+     **/
+    protected PublisherPublicationOutboundPort ppop;
 
 
-		super.initialise();
-	}
-	
-	/**
-	 * @see interfaces.PublicationCI#publish(MessageI, String)
-	 */
-	public void publish(MessageI m, String topic) throws Exception {
-		this.ppop.publish(m, topic);
-	}
+    /**
+     * Used in components to install the plugin
+     */
+    @Override
+    public void installOn(ComponentI owner) throws Exception {
+        super.installOn(owner);
 
-	/**
-	 * @see interfaces.PublicationCI#publish(MessageI, String[])
-	 */
-	public void publish(MessageI m, String[] topics) throws Exception {
-		this.ppop.publish(m, topics);
-	}
+        // We add the required interface and publish the outbound port
+        this.addRequiredInterface(PublicationCI.class);
+        this.ppop = new PublisherPublicationOutboundPort(this.owner);
+        this.ppop.publishPort();
 
-	/**
-	 * @see interfaces.PublicationCI#publish(MessageI[], String)
-	 */
-	public void publish(MessageI[] ms, String topic) throws Exception {
-		this.ppop.publish(ms, topic);
-	}
-	
-	/**
-	 * Disconnect the ountbound port
-	 */
-	@Override
-	public void finalise() throws Exception
-	{
-		this.owner.doPortDisconnection(this.ppop.getPortURI());
-	}
+    }
 
-	/**
-	 * Unpublish the outbound port, destroy the port and remove
-	 * the required interface
-	 */
-	@Override
-	public void uninstall() throws Exception
-	{
-		this.ppop.unpublishPort();
-		this.ppop.destroyPort();
-		this.removeRequiredInterface(PublicationCI.class);
-	}
-	
-	/**
-	 * @see interfaces.PublicationCI#publish(MessageI[], String[])
-	 */
-	public void publish(MessageI[] ms, String[] topics) throws Exception {
-		this.ppop.publish(ms, topics);
-	}
-	
+    /**
+     * We assume that the plug-in on the server component has already been
+     * installed and initialised.
+     *
+     * <p><strong>Contract</strong></p>
+     *
+     * <pre>
+     * pre	true				// no more preconditions.
+     * post	true				// no more postconditions.
+     * </pre>
+     */
+    @Override
+    public void initialise() throws Exception {
+        // We use the reflection approach to get the URI of the inbound port
+        // of the hash map component.
+        this.addRequiredInterface(ReflectionI.class);
+        ReflectionOutboundPort rop = new ReflectionOutboundPort(this.owner);
+        rop.publishPort();
+
+        this.owner.doPortConnection(
+                rop.getPortURI(),
+                CVM.BROKER_COMPONENT_URI,
+                ReflectionConnector.class.getCanonicalName());
+        //We could have also used getPublicaionPortURI() method call via Management instead
+        String[] urisPub = rop.findPortURIsFromInterface(PublicationCI.class);
+        assert urisPub != null && urisPub.length == 1;
+
+
+        this.owner.doPortDisconnection(rop.getPortURI());
+        rop.unpublishPort();
+        rop.destroyPort();
+        this.removeRequiredInterface(ReflectionI.class);
+
+        // connect the outbound port.
+        this.owner.doPortConnection(
+                this.ppop.getPortURI(),
+                urisPub[0],
+                PublicationConnector.class.getCanonicalName());
+
+
+        super.initialise();
+    }
+
+    /**
+     * @see interfaces.PublicationCI#publish(MessageI, String)
+     */
+    public void publish(MessageI m, String topic) throws Exception {
+        this.ppop.publish(m, topic);
+    }
+
+    /**
+     * @see interfaces.PublicationCI#publish(MessageI, String[])
+     */
+    public void publish(MessageI m, String[] topics) throws Exception {
+        this.ppop.publish(m, topics);
+    }
+
+    /**
+     * @see interfaces.PublicationCI#publish(MessageI[], String)
+     */
+    public void publish(MessageI[] ms, String topic) throws Exception {
+        this.ppop.publish(ms, topic);
+    }
+
+    /**
+     * Disconnect the ountbound port
+     */
+    @Override
+    public void finalise() throws Exception {
+        this.owner.doPortDisconnection(this.ppop.getPortURI());
+    }
+
+    /**
+     * Unpublish the outbound port, destroy the port and remove
+     * the required interface
+     */
+    @Override
+    public void uninstall() throws Exception {
+        this.ppop.unpublishPort();
+        this.ppop.destroyPort();
+        this.removeRequiredInterface(PublicationCI.class);
+    }
+
+    /**
+     * @see interfaces.PublicationCI#publish(MessageI[], String[])
+     */
+    public void publish(MessageI[] ms, String[] topics) throws Exception {
+        this.ppop.publish(ms, topics);
+    }
+
 }

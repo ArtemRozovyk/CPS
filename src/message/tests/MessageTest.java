@@ -1,16 +1,9 @@
-package message.tests;
+import interfaces.*;
+import message.*;
+import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import interfaces.MessageI;
-import message.Message;
-import message.MessageFilterI;
-import message.Properties;
-import message.TimeStamp;
 
 class MessageTest {
 
@@ -64,7 +57,7 @@ class MessageTest {
             Short s = m.getProperties().getShortProp("Building");
             return bl != null && b != null && d != null && f != null && s != null
                     && bl && (b == 127) && (d < 1.4) && (f < 1.5f) & (s == 32767) &&
-                    m.getPayload()!=null;
+                    m.getPayload() != null;
         };
 
 

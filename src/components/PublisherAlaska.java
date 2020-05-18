@@ -1,21 +1,18 @@
 package components;
 
 import fr.sorbonne_u.components.AbstractComponent;
-import interfaces.ManagementCI;
-import interfaces.PublicationCI;
 import message.Message;
-import message.MessageFilterI;
 import plugins.PublisherManagementPlugin;
 import plugins.PublisherPublicationPlugin;
 
 /**
  * Variant of the Publisher component. It has a different behavior.
  * It is used to publish messages.
- * 
+ *
  * <p><strong>Description</strong></p>
- * 
+ *
  * <p><strong>Invariant</strong></p>
- * 
+ *
  * <pre>
  * invariant		true
  * </pre>
@@ -25,33 +22,33 @@ public class PublisherAlaska extends AbstractComponent {
     protected final static String ALASKA_MAN_PLUGIN_URI = "publisher-alaska-man-plugin-uri";
 
     /**
-   	 * Publisher creation
-   	 * 
-   	 * <p><strong>Contract</strong></p>
-   	 * 
-   	 * <pre>
-   	 * pre	nbThreads > 0
-   	 * post	true			// no postcondition.
-   	 * </pre>
-   	 * 
-   	 * @param nbThreads					number of threads used by the component
-   	 * @param nbSchedulableThreads		number of schedulable threads
-   	 */
+     * Publisher creation
+     *
+     * <p><strong>Contract</strong></p>
+     *
+     * <pre>
+     * pre	nbThreads > 0
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param nbThreads            number of threads used by the component
+     * @param nbSchedulableThreads number of schedulable threads
+     */
     protected PublisherAlaska(int nbThreads, int nbSchedulableThreads) {
         super(nbThreads, nbSchedulableThreads);
     }
 
     /**
      * Publisher creation
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	reflectionInboundPortURI != null
-	 * post	true			// no postcondition.
-	 * </pre>
-	 * 
-     * @param reflectionInboundPortURI		uri of the owner inbound port
+     *
+     * <p><strong>Contract</strong></p>
+     *
+     * <pre>
+     * pre	reflectionInboundPortURI != null
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param reflectionInboundPortURI uri of the owner inbound port
      * @throws Exception
      */
     protected PublisherAlaska(String reflectionInboundPortURI) throws Exception {
@@ -100,7 +97,6 @@ public class PublisherAlaska extends AbstractComponent {
             logMessage("Publishing message " + i + " for topic : " + topic);
             publish(new Message(msg), topic);
         }
-
 
 
         Thread.sleep(12000);
@@ -179,7 +175,7 @@ public class PublisherAlaska extends AbstractComponent {
     public String[] getTopics() throws Exception {
         return ((PublisherManagementPlugin) this.getPlugin(ALASKA_MAN_PLUGIN_URI)).getTopics();
     }
-    
+
     /**
      * @see interfaces.ManagementCI#getPublicatinPortURI()
      */

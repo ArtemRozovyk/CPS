@@ -2,24 +2,21 @@ package components;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
-import interfaces.ManagementCI;
+import interfaces.MessageFilterI;
 import interfaces.MessageI;
-import interfaces.PublicationCI;
 import interfaces.ReceptionCI;
-import message.MessageFilterI;
 import plugins.PublisherManagementPlugin;
 import plugins.SubscriberManagementPlugin;
 import plugins.SubscriberReceptionPlugin;
-import ports.SubscriberManagementOutbondPort;
 
 /**
  * Variant of the Subscriber component. It has a different behavior.
  * It is used to publish messages.
- * 
+ *
  * <p><strong>Description</strong></p>
- * 
+ *
  * <p><strong>Invariant</strong></p>
- * 
+ *
  * <pre>
  * invariant		true
  * </pre>
@@ -35,15 +32,15 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
 
     /**
      * Subscriber creation
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	reflectionInboundPortURI != null
-	 * post	true			// no postcondition.
-	 * </pre>
-	 * 
-     * @param reflectionInboundPortURI		uri of the owner inbound port
+     *
+     * <p><strong>Contract</strong></p>
+     *
+     * <pre>
+     * pre	reflectionInboundPortURI != null
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param reflectionInboundPortURI uri of the owner inbound port
      * @throws Exception
      */
     protected SubscriberAlaska(String reflectionInboundPortURI) throws Exception {
@@ -92,14 +89,13 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
                     lng == 3L && in == 3 && cr == '3' && by == 3
                     && bo && str.equals("3") && shrt == 3
                     && dbl == 3.0 && flt == 3.0f)
-                    && m.getPayload()!=null;
+                    && m.getPayload() != null;
         };
 
 
-
-        String [] topics ={"USA","Alaska","Anchorage","UK"};
+        String[] topics = {"USA", "Alaska", "Anchorage", "UK"};
         subscribe(topics); // 35 msg
-        subscribe("Cambridge",filter); // 35 msg
+        subscribe("Cambridge", filter); // 35 msg
 
         MessageFilterI filterModified = m -> {
             Long lng = m.getProperties().getLongProp("Long");
@@ -117,12 +113,10 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
                     lng == 5L && in == 5 && cr == '5' && by == 3
                     && bo && str.equals("3") && shrt == 3
                     && dbl == 3.0 && flt == 3.0f)
-                    && m.getPayload()!=null;
+                    && m.getPayload() != null;
         };
         Thread.sleep(5000);
-        modifyFilter("Cambridge",filterModified);
-
-
+        modifyFilter("Cambridge", filterModified);
 
 
     }
@@ -132,11 +126,11 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
      */
     public void acceptMessage(MessageI m) throws Exception {
         logMessage("Getting message " + m);
-        if(m.getPayload()!=null){
-            logMessage(" Pl : "+ m.getPayload());
+        if (m.getPayload() != null) {
+            logMessage(" Pl : " + m.getPayload());
         }
-        if(m.getTimeStamp()!=null){
-            logMessage(" Ts : "+ m.getTimeStamp().getTime()+":"+m.getTimeStamp().getTimestamper());
+        if (m.getTimeStamp() != null) {
+            logMessage(" Ts : " + m.getTimeStamp().getTime() + ":" + m.getTimeStamp().getTimestamper());
         }
 
     }
@@ -238,7 +232,7 @@ public class SubscriberAlaska extends AbstractComponent implements ReceptionCI {
     public String[] getTopics() throws Exception {
         return ((SubscriberManagementPlugin) this.getPlugin(SUB_ALASKA_MANAGE_PLUGIN_URI)).getTopics();
     }
-    
+
     /**
      * @see interfaces.ManagementCI#getPublicatinPortURI()
      */

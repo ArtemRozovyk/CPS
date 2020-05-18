@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eclipse-userlibraries>
+  <library name="BCM4Java-30012020">
+    <archive path="/home/human/Desktop/CPS/TMEs/archives/BCM4Java-19022020.jar" />
+  </library>
+  <library name="com.guicedee.services:commons-math3:62">
+    <archive path="/home/human/.m2/repository/com/guicedee/services/commons-math3/62/commons-math3-62.jar" />
+  </library>
+  <library name="Bundled Protobuf Distribution" />
+</eclipse-userlibraries>
+

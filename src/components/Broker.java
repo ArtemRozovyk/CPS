@@ -3,15 +3,11 @@ package components;
 import connectors.ReceptionConnector;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
+import fr.sorbonne_u.components.examples.pingpong.components.*;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.PostconditionException;
 import fr.sorbonne_u.components.exceptions.PreconditionException;
-import fr.sorbonne_u.components.ports.PortI;
-import interfaces.ManagementCI;
-import interfaces.MessageI;
-import interfaces.PublicationCI;
-import interfaces.ReceptionCI;
-import message.MessageFilterI;
+import interfaces.*;
 import ports.BrokerManagementInboundPort;
 import ports.BrokerPublicationInboundPort;
 import ports.BrokerReceptionOutboundPort;
@@ -20,16 +16,15 @@ import java.util.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Broker component. It is used to broadcast messages.
  * It can receive messages and publish them.
- * 
+ *
  * <p><strong>Description</strong></p>
- * 
+ *
  * <p><strong>Invariant</strong></p>
- * 
+ *
  * <pre>
  * invariant		true
  * </pre>
@@ -42,13 +37,11 @@ public class Broker extends AbstractComponent {
     public static int popcount = 0;
     private static int i;
     private final Lock lock = new ReentrantLock();
-    private final ReentrantReadWriteLock lockSubscribers = new ReentrantReadWriteLock();
     protected String brokerPublicationInboundPortURI;
     protected String acceptionExecutorURI = "handler1";
     protected String publishingExecutorURI = "handler2";
     protected String subscriptionExecutorURI = "handler3";
     Condition condEmpty = lock.newCondition();
-    Condition condEmptySubs = lockSubscribers.writeLock().newCondition();
 
     //On runtime, the values will be given HashSet type
     //that makes no guarantees as to the iteration order of the set.
@@ -58,35 +51,35 @@ public class Broker extends AbstractComponent {
     protected BrokerManagementInboundPort bmip;
 
     /**
-	 * Broker creation
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	nbThreads > 0
-	 * post	true			// no postcondition.
-	 * </pre>
-	 * 
-	 * @param nbThreads					number of threads used by the component
-	 * @param nbSchedulableThreads		number of schedulable threads
-	 */
+     * Broker creation
+     *
+     * <p><strong>Contract</strong></p>
+     *
+     * <pre>
+     * pre	nbThreads > 0
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param nbThreads            number of threads used by the component
+     * @param nbSchedulableThreads number of schedulable threads
+     */
     protected Broker(int nbThreads, int nbSchedulableThreads) {
         super(nbThreads, nbSchedulableThreads);
     }
 
     /**
      * Broker creation
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	uri != null && publicationInboundPortURI != null && managmentInboundPortURI != null
-	 * post	true			// no postcondition.
-	 * </pre>
-	 * 
-     * @param uri							uri of the component
-     * @param publicationInboundPortURI		uri of publication inbound port
-     * @param managmentInboundPortURI		uri of the management inbound port
+     *
+     * <p><strong>Contract</strong></p>
+     *
+     * <pre>
+     * pre	uri != null && publicationInboundPortURI != null && managmentInboundPortURI != null
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param uri                       uri of the component
+     * @param publicationInboundPortURI uri of publication inbound port
+     * @param managmentInboundPortURI   uri of the management inbound port
      * @throws Exception
      */
     protected Broker(String uri,
@@ -142,15 +135,17 @@ public class Broker extends AbstractComponent {
      */
     @Override
     public void execute() throws Exception {
-
-        handleRequestAsync(acceptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
-            @Override
-            public Void call() throws Exception {
-                ((Broker) this.getServiceOwner()).acceptMessages();
-                return null;
-            }
-        });
-
+        this.runTask(acceptionExecutorURI,
+                new AbstractComponent.AbstractTask() {
+                    @Override
+                    public void run() {
+                        try {
+                            ((Broker) this.getTaskOwner()).acceptMessages();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 
     /**
@@ -160,14 +155,18 @@ public class Broker extends AbstractComponent {
         //System.out.println("Extern pub "+m+" in "+Thread.currentThread());
         externCount++;
         //FIXME 2
-        this.handleRequestAsync(publishingExecutorURI, new AbstractComponent.AbstractService<Void>() {
-            @Override
-            public Void call() {
-                System.out.println("Bout to pub"+m+topic);
-                ((Broker) this.getServiceOwner()).storePublished(m, topic);
-                return null;
-            }
-        });
+
+        this.runTask(acceptionExecutorURI,
+                new AbstractComponent.AbstractTask() {
+                    @Override
+                    public void run() {
+                        try {
+                            ((Broker) this.getTaskOwner()).storePublished(m, topic);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
 
     }
 
@@ -175,27 +174,34 @@ public class Broker extends AbstractComponent {
      * @see interfaces.ManagementCI#subscribe(String, String)
      */
     public void subscribe(String topic, String inboundPortURI) throws Exception {
-
-        handleRequestAsync(subscriptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
-            @Override
-            public Void call() throws Exception {
-                ((Broker) this.getServiceOwner()).subscribeAux(topic, null, inboundPortURI);
-                return null;
-            }
-        });
+        this.runTask(acceptionExecutorURI,
+                new AbstractComponent.AbstractTask() {
+                    @Override
+                    public void run() {
+                        try {
+                            ((Broker) this.getTaskOwner()).subscribeAux(topic, null, inboundPortURI);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 
     /**
      * @see interfaces.ManagementCI#subscribe(String, MessageFilterI, String)
      */
     public void subscribe(String topic, MessageFilterI filter, String inboutPortURI) throws Exception {
-        handleRequestAsync(subscriptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
-            @Override
-            public Void call() throws Exception {
-                ((Broker) this.getServiceOwner()).subscribeAux(topic, filter, inboutPortURI);
-                return null;
-            }
-        });
+        this.runTask(acceptionExecutorURI,
+                new AbstractComponent.AbstractTask() {
+                    @Override
+                    public void run() {
+                        try {
+                            ((Broker) this.getTaskOwner()).subscribeAux(topic, filter, inboutPortURI);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
 
     }
 
@@ -212,17 +218,23 @@ public class Broker extends AbstractComponent {
      * @see interfaces.ManagementCI#unsubscribe(String, String)
      */
     public void unsubscribe(String topic, String inboundPortURI) throws Exception {
-        handleRequestAsync(subscriptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
-            @Override
-            public Void call() throws Exception {
-                ((Broker) this.getServiceOwner()).removeSubscriber(topic, inboundPortURI);
-                return null;
-            }
-        });
+
+        this.runTask(acceptionExecutorURI,
+                new AbstractComponent.AbstractTask() {
+                    @Override
+                    public void run() {
+                        try {
+                            ((Broker) this.getTaskOwner()).removeSubscriber(topic, inboundPortURI);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
     }
 
     /**
-     * TODO
+     * Iterate infinitely over map to deliver messages to subs.
      */
     public void acceptMessages() throws Exception {
         MsgEntry msgEntry;
@@ -239,28 +251,33 @@ public class Broker extends AbstractComponent {
                 lock.unlock();
             }
             MsgEntry finalMsgEntry = msgEntry;
-            handleRequestAsync(acceptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
-                @Override
-                public Void call() throws Exception {
-                    ((Broker) this.getServiceOwner()).deliver(finalMsgEntry);
-                    return null;
-                }
-            });
+            this.runTask(acceptionExecutorURI,
+                    new AbstractComponent.AbstractTask() {
+                        @Override
+                        public void run() {
+                            try {
+                                ((Broker) this.getTaskOwner()).deliver(finalMsgEntry);
+                            } catch (Exception e) {
+                                e.printStackTrace() ;
+                            }
+                        }
+                    }) ;
+
         }
     }
 
     /**
      * Delivers a message to the subscribers of the
      * message's topic
-     * 
+     *
      * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	msgEntry != null
-	 * post	true			// no postcondition.
-	 * </pre>
-	 * 
-     * @param msgEntry		the message to send
+     *
+     * <pre>
+     * pre	msgEntry != null
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param msgEntry the message to send
      * @throws Exception
      */
     public void deliver(MsgEntry msgEntry) throws Exception {
@@ -270,7 +287,7 @@ public class Broker extends AbstractComponent {
             //after we finished iterating over existing subs
             synchronized (topicSubHandlersMap.get(msgEntry.topic)) {
                 for (SubHandler sh : topicSubHandlersMap.get(msgEntry.topic)) {
-                    System.out.println("delivering"+msgEntry.topic+msgEntry.message+ " sz :"+sizeMessageMap());
+                    //System.out.println("delivering" + msgEntry.topic + msgEntry.message + " sz :" + sizeMessageMap());
                     actualdeliverycount++;
                     if (sh.filter != null) {
                         if (sh.filter.filter(msgEntry.message)) {
@@ -288,16 +305,16 @@ public class Broker extends AbstractComponent {
 
     /**
      * Store the publishe messages in the topic-message Map
-     * 
+     *
      * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	m != null && topic != null
-	 * post	topicMessageStorageMap.isEmpty() != false
-	 * </pre>
-	 * 
-     * @param m			the message to be stored
-     * @param topic		the topic of the message
+     *
+     * <pre>
+     * pre	m != null && topic != null
+     * post	topicMessageStorageMap.isEmpty() != false
+     * </pre>
+     *
+     * @param m     the message to be stored
+     * @param topic the topic of the message
      */
     public void storePublished(MessageI m, String topic) {
         lock.lock();
@@ -309,7 +326,7 @@ public class Broker extends AbstractComponent {
                 queue.add(m);
                 topicMessageStorageMap.put(topic, queue);
             }
-            System.out.println("Stored"+m+"TT"+topic+"TT");
+            //System.out.println("Stored" + m + "TT" + topic + "TT");
 
             condEmpty.signal();
         } finally {
@@ -321,15 +338,15 @@ public class Broker extends AbstractComponent {
     /**
      * Auxiliary method used to manage subscription
      * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	topic != null && inboundPortURI != null
-	 * post
-	 * </pre>
-	 * 
-     * @param topic				the topic the subscriber wants to subscribe to
-     * @param filter			the filter used in the subscription
-     * @param inboundPortURI	the inbound port of the subscriber
+     *
+     * <pre>
+     * pre	topic != null && inboundPortURI != null
+     * post
+     * </pre>
+     *
+     * @param topic          the topic the subscriber wants to subscribe to
+     * @param filter         the filter used in the subscription
+     * @param inboundPortURI the inbound port of the subscriber
      * @throws Exception
      */
     private void subscribeAux(String topic, MessageFilterI filter, String inboundPortURI) throws Exception {
@@ -341,7 +358,7 @@ public class Broker extends AbstractComponent {
         brop.publishPort();
         this.doPortConnection(outUri, inboundPortURI, ReceptionConnector.class.getCanonicalName());
         logMessage(inboundPortURI + " has subscribed  to " + topic);
-        System.out.println("Subed to " + topic + " in " + Thread.currentThread() + " map sz: " + sizeMessageMap());
+        //System.out.println("Subed to " + topic + " in " + Thread.currentThread() + " map sz: " + sizeMessageMap());
         if (topicSubHandlersMap.containsKey(topic)) {
             synchronized (topicSubHandlersMap.get(topic)) {
                 if (filter != null) {
@@ -364,15 +381,15 @@ public class Broker extends AbstractComponent {
 
     /**
      * Check if the topic-message map is empty
-     * 
+     *
      * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	topicMessageStorageMap != null
-	 * post	true			// no postcondition.
-	 * </pre>
-	 * 
-     * @return		true if the map if empty, false otherwise
+     *
+     * <pre>
+     * pre	topicMessageStorageMap != null
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @return true if the map if empty, false otherwise
      */
     private boolean isEmptyMap() {
         for (Map.Entry<String, Set<MessageI>>
@@ -386,15 +403,15 @@ public class Broker extends AbstractComponent {
 
     /**
      * Get the size of the topic-message Map
-     * 
+     *
      * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	topicMessageStorageMap != null
-	 * post	true			// no postcondition.
-	 * </pre>
-	 * 
-     * @return		the number of messages in the map
+     *
+     * <pre>
+     * pre	topicMessageStorageMap != null
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @return the number of messages in the map
      */
     private int sizeMessageMap() {
         int sz = 0;
@@ -408,7 +425,7 @@ public class Broker extends AbstractComponent {
     }
 
     /**
-     * TODO
+     * Pop(remove and return) message from the map
      */
     private MsgEntry popMessageMap() {
         MessageI toRet;
@@ -434,15 +451,21 @@ public class Broker extends AbstractComponent {
      * @see interfaces.PublicationCI#publish(MessageI, String[])
      */
     public void publish(MessageI m, String[] topics) throws Exception {
-        this.handleRequestAsync(publishingExecutorURI, new AbstractComponent.AbstractService<Void>() {
-            @Override
-            public Void call() throws Exception {
-                for (String topic : topics) {
-                    ((Broker) this.getServiceOwner()). publish(m, topic);
-                }
-                return null;
-            }
-        });
+        this.runTask(acceptionExecutorURI,
+                new AbstractComponent.AbstractTask() {
+                    @Override
+                    public void run() {
+                        try {
+                            for (String topic : topics) {
+                                ((Broker) this.getTaskOwner()).publish(m, topic);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace() ;
+                        }
+                    }
+                }) ;
+
+
 
     }
 
@@ -450,15 +473,21 @@ public class Broker extends AbstractComponent {
      * @see interfaces.PublicationCI#publish(MessageI[], String)
      */
     public void publish(MessageI[] ms, String topic) throws Exception {
-        this.handleRequestAsync(publishingExecutorURI, new AbstractComponent.AbstractService<Void>() {
-            @Override
-            public Void call() throws Exception {
-                for (MessageI m : ms) {
-                    ((Broker) this.getServiceOwner()).publish(m, topic);
-                }
-                return null;
-            }
-        });
+
+        this.runTask(acceptionExecutorURI,
+                new AbstractComponent.AbstractTask() {
+                    @Override
+                    public void run() {
+                        try {
+                            for (MessageI m : ms) {
+                                ((Broker) this.getTaskOwner()).publish(m, topic);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace() ;
+                        }
+                    }
+                }) ;
+
 
     }
 
@@ -466,17 +495,23 @@ public class Broker extends AbstractComponent {
      * @see interfaces.PublicationCI#publish(MessageI[], String[])
      */
     public void publish(MessageI[] ms, String[] topics) throws Exception {
-        this.handleRequestAsync(publishingExecutorURI, new AbstractComponent.AbstractService<Void>() {
-            @Override
-            public Void call() throws Exception {
-                for (MessageI m : ms) {
-                    for (String topic : topics) {
-                        ((Broker) this.getServiceOwner()).publish(m, topic);
+
+        this.runTask(acceptionExecutorURI,
+                new AbstractComponent.AbstractTask() {
+                    @Override
+                    public void run() {
+                        try {
+                            for (MessageI m : ms) {
+                                for (String topic : topics) {
+                                    ((Broker) this.getTaskOwner()).publish(m, topic);
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace() ;
+                        }
                     }
-                }
-                return null;
-            }
-        });
+                }) ;
+
 
     }
 
@@ -510,13 +545,19 @@ public class Broker extends AbstractComponent {
         lock.lock();
         try {
             for (MessageI m : topicMessageStorageMap.get(topic)) {
-                handleRequestAsync(acceptionExecutorURI, new AbstractComponent.AbstractService<Void>() {
-                    @Override
-                    public Void call() throws Exception {
-                        ((Broker) this.getServiceOwner()).deliver(new MsgEntry(m, topic));
-                        return null;
-                    }
-                });
+
+                this.runTask(acceptionExecutorURI,
+                        new AbstractComponent.AbstractTask() {
+                            @Override
+                            public void run() {
+                                try {
+                                    ((Broker) this.getTaskOwner()).deliver(new MsgEntry(m, topic));
+                                } catch (Exception e) {
+                                    e.printStackTrace() ;
+                                }
+                            }
+                        }) ;
+
             }
             topicMessageStorageMap.get(topic).clear();
             topicMessageStorageMap.remove(topic);
@@ -540,7 +581,7 @@ public class Broker extends AbstractComponent {
     public String[] getTopics() {
         Set<String> tset = topicMessageStorageMap.keySet();
         String[] topics = new String[tset.size()];
-        topics =tset.toArray(topics);
+        topics = tset.toArray(topics);
         return topics;
     }
 
@@ -554,18 +595,18 @@ public class Broker extends AbstractComponent {
     /**
      * Remove a subscriber during an unsubscription
      * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	topic != null && inboundPortURI != null
-	 * post	true			// no postcondition.
-	 * </pre>
-	 * 
-     * @param topic				the topic you want to unsubscribe fro
-     * @param inboundPortURI	the inbound port of the ubscriber
+     *
+     * <pre>
+     * pre	topic != null && inboundPortURI != null
+     * post	true			// no postcondition.
+     * </pre>
+     *
+     * @param topic          the topic you want to unsubscribe fro
+     * @param inboundPortURI the inbound port of the ubscriber
      * @throws Exception
      */
     private void removeSubscriber(String topic, String inboundPortURI) throws Exception {
-        logMessage(inboundPortURI + " WANTS TO UNSUB FROM " + topic);
+        logMessage(inboundPortURI + " wants to unsub from " + topic);
 
         if (topicSubHandlersMap.containsKey(topic)) {
             synchronized (topicSubHandlersMap.get(topic)) {
@@ -607,7 +648,7 @@ public class Broker extends AbstractComponent {
         try {
             for (Set<SubHandler> shs : topicSubHandlersMap.values()) {
                 for (SubHandler sh : shs) {
-                    System.out.println("Destroying " + sh.port.getPortURI());
+                    //System.out.println("Destroying " + sh.port.getPortURI());
                     sh.port.unpublishPort();
                     sh.port.destroyPort();
                 }
