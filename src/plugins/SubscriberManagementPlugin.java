@@ -1,5 +1,6 @@
 package plugins;
 
+import components.*;
 import connectors.ManagementConnector;
 import cvm.CVM;
 import fr.sorbonne_u.components.AbstractPlugin;
@@ -7,9 +8,7 @@ import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.reflection.connectors.ReflectionConnector;
 import fr.sorbonne_u.components.reflection.interfaces.ReflectionI;
 import fr.sorbonne_u.components.reflection.ports.ReflectionOutboundPort;
-import interfaces.ManagementCI;
-import interfaces.MessageFilterI;
-import interfaces.ReceptionCI;
+import interfaces.*;
 import ports.SubscriberManagementOutbondPort;
 
 /**
@@ -68,7 +67,7 @@ public class SubscriberManagementPlugin
 
         this.owner.doPortConnection(
                 rop.getPortURI(),
-                CVM.BROKER_COMPONENT_URI,
+                ((SubscriberTest)this.getOwner()).getUriCorrespondingBroker(),
                 ReflectionConnector.class.getCanonicalName());
 
 
@@ -95,7 +94,7 @@ public class SubscriberManagementPlugin
      */
     @Override
     public void finalise() throws Exception {
-        this.owner.doPortDisconnection(this.smop.getPortURI());
+        //this.owner.doPortDisconnection(this.smop.getPortURI());
     }
 
     /**
@@ -112,8 +111,8 @@ public class SubscriberManagementPlugin
     /**
      * Returns the owner of the plugin
      */
-    private ReceptionCI getOwner() {
-        return (ReceptionCI) this.getOwner();
+    private ReceptionImplementationI getOwner() {
+        return (ReceptionImplementationI) this.owner;
     }
 
 

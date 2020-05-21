@@ -30,7 +30,7 @@ public class CVM extends AbstractCVM {
     public static final String BROKER_COMPONENT_URI = "my-URI-broker";
     public static final String SUBSCRIBER2_COMPONENT_URI = "my-URI-subscriber2";
     public static final String BROKER_PUBLICATION_INBOUND_PORT = "i-broker-publication";
-    public static final String BROKER_MANAGEMENT_INBOUND_PORT = "i-broker-management";
+    //public static final String BROKER_MANAGEMENT_INBOUND_PORT = "i-broker-management";
     public static final String PUBLISHER_MANAGEMENT_INBOUND_PORT = "i-publisher-management";
     public static final String PUBLISHER_PUBLICATION_OUTBOUND_PORT = "o-publisher-publication";
     public static final String SUBSCRIBER2_MANAGEMENT_OUTBOUND_PORT = "o-subscriber2-management";
@@ -55,7 +55,7 @@ public class CVM extends AbstractCVM {
                 Broker.class.getCanonicalName(),
                 new Object[]{BROKER_COMPONENT_URI,
                         BROKER_PUBLICATION_INBOUND_PORT,
-                        BROKER_MANAGEMENT_INBOUND_PORT,5,5});
+                        "BROKER_MANAGEMENT_INBOUND_PORT",5,5});
 
         assert this.isDeployedComponent(this.brokerURI);
         this.toggleTracing(this.brokerURI);
@@ -78,7 +78,7 @@ public class CVM extends AbstractCVM {
                 Subscriber.class.getCanonicalName(),
                 new Object[]{SUBSCRIBER2_COMPONENT_URI,
                         SUBSCRIBER2_MANAGEMENT_OUTBOUND_PORT
-                        , BROKER_MANAGEMENT_INBOUND_PORT
+                        , "BROKER_MANAGEMENT_INBOUND_PORT"
                 });
 
         assert this.isDeployedComponent(this.subscriberURI2);

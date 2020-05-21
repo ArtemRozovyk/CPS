@@ -4,13 +4,16 @@ import connectors.ReceptionConnector;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 import fr.sorbonne_u.components.examples.pingpong.components.*;
-import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
-import fr.sorbonne_u.components.exceptions.PostconditionException;
-import fr.sorbonne_u.components.exceptions.PreconditionException;
+import fr.sorbonne_u.components.exceptions.*;
 import interfaces.*;
+import message.*;
+import org.junit.jupiter.api.extension.*;
 import ports.BrokerManagementInboundPort;
 import ports.BrokerPublicationInboundPort;
 import ports.BrokerReceptionOutboundPort;
+import util.replication.connectors.*;
+import util.replication.interfaces.*;
+import util.replication.ports.*;
 
 import java.util.*;
 import java.util.concurrent.locks.Condition;
@@ -29,7 +32,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * invariant		true
  * </pre>
  */
-public class Broker extends AbstractComponent {
+public class Broker extends AbstractComponent implements ReplicaI<String> {
 
     public static int externCount = 0;
     public static int deliverycount = 0;
@@ -49,6 +52,11 @@ public class Broker extends AbstractComponent {
     private Map<String, Set<SubHandler>> topicSubHandlersMap;
     protected BrokerPublicationInboundPort bpip;
     protected BrokerManagementInboundPort bmip;
+    //TODO replica2
+    protected ReplicableOutboundPort<String> rop ;
+    protected String							replicableInboundPortURI ;
+    protected ReplicableInboundPort<String>	rip ;
+
 
     /**
      * Broker creation
@@ -85,9 +93,24 @@ public class Broker extends AbstractComponent {
     protected Broker(String uri,
                      String publicationInboundPortURI,
                      String managmentInboundPortURI,
+                     String replicableInboundPortURI,
+                     String inboundPortURI,
                      int nbAccepingThreads,
                      int nbPublishingThreads) throws Exception {
         super(uri, 1, 1);
+
+        //TODO replica1
+        if(replicableInboundPortURI!=null){
+
+            this.replicableInboundPortURI = replicableInboundPortURI ;
+            this.rop = new ReplicableOutboundPort<String>(this) ;
+            this.rop.publishPort() ;
+
+            this.rip = new ReplicableInboundPort<String>(inboundPortURI, this) ;
+            this.rip.publishPort() ;
+        }
+
+
 
         topicMessageStorageMap = new HashMap<>();
         topicSubHandlersMap = new HashMap<>();
@@ -114,7 +137,8 @@ public class Broker extends AbstractComponent {
         this.createNewExecutorService(publishingExecutorURI, nbPublishingThreads, false);
         this.createNewExecutorService(subscriptionExecutorURI, 1, false); // 1 is for concurrency matters
         this.tracer.setTitle("broker");
-        this.tracer.setRelativePosition(0, 3);
+        System.out.println(uri);
+        this.tracer.setRelativePosition((Integer.parseInt(uri.substring(uri.length() - 1)) % 2), 3);
         Broker.checkInvariant(this);
 
         assert this.brokerPublicationInboundPortURI.equals(uri) :
@@ -150,6 +174,20 @@ public class Broker extends AbstractComponent {
                 });
     }
 
+    @Override
+    public void start() throws ComponentStartException {
+        super.start() ;
+        try {
+            this.doPortConnection(
+                    this.rop.getPortURI(),
+                    this.replicableInboundPortURI,
+                    ReplicableConnector.class.getCanonicalName()) ;
+        } catch (Exception e) {
+            throw new ComponentStartException(e) ;
+        }
+
+    }
+
     /**
      * @see interfaces.PublicationCI#publish(MessageI, String)
      */
@@ -159,12 +197,20 @@ public class Broker extends AbstractComponent {
         //FIXME 2
         //TODO Vous pourriez éviter ce passage pas une tâche en vous inspirant des derniers exemples données avec le cours 8.
         //
+
+        //TODO is Task needed here?
         this.runTask(acceptionExecutorURI,
                 new AbstractComponent.AbstractTask() {
                     @Override
                     public void run() {
                         try {
                             ((Broker) this.getTaskOwner()).storePublished(m, topic);
+                            try {
+                                String result = ((Broker) this.getTaskOwner()).rop.call(brokerPublicationInboundPortURI,m,topic) ;//TODO Change it
+                                logMessage("Transmitted messages to other brokers, got answer : ["+result+"]");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -321,6 +367,10 @@ public class Broker extends AbstractComponent {
      */
     public void storePublished(MessageI m, String topic) {
         lock.lock();
+            logMessage("Storing "+m+" for "+topic);
+
+
+
         try {
             if (topicMessageStorageMap.containsKey(topic)) {
                 topicMessageStorageMap.get(topic).add(m);
@@ -675,6 +725,8 @@ public class Broker extends AbstractComponent {
             bpip.destroyPort();
             bmip.unpublishPort();
             bmip.destroyPort();
+            this.doPortDisconnection(this.rop.getPortURI()) ;
+
         } catch (Exception e) {
             throw new ComponentShutdownException(e);
         }
@@ -686,8 +738,29 @@ public class Broker extends AbstractComponent {
      */
     @Override
     public void shutdown() throws ComponentShutdownException {
-
+        try {
+            this.rop.unpublishPort() ;
+            this.rip.unpublishPort() ;
+        } catch (Exception e) {
+            throw new ComponentShutdownException(e) ;
+        }
         super.shutdown();
+    }
+
+    @Override
+    public String call(Object... parameters) throws Exception {
+        if(!parameters[0].equals(brokerPublicationInboundPortURI)){
+            //TODO proper selector
+            //logMessage("Getting message "+parameters[0]+parameters[1]);
+            if(parameters[1] instanceof MessageI && parameters[2] instanceof String){
+                storePublished((MessageI)parameters[1],(String)parameters[2]);
+            }else{
+                throw new ParameterResolutionException("Bad call, not instance of MessageI or String");
+            }
+
+        }
+
+        return "I stored your message,  "+parameters[0];
     }
 
     /**

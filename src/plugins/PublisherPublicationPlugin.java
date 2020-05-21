@@ -1,5 +1,6 @@
 package plugins;
 
+import components.*;
 import connectors.PublicationConnector;
 import cvm.CVM;
 import fr.sorbonne_u.components.AbstractPlugin;
@@ -69,7 +70,7 @@ public class PublisherPublicationPlugin
 
         this.owner.doPortConnection(
                 rop.getPortURI(),
-                CVM.BROKER_COMPONENT_URI,
+                ((PublisherTest)this.owner).getUriCorrespondingBroker(),
                 ReflectionConnector.class.getCanonicalName());
         //We could have also used getPublicaionPortURI() method call via Management instead
         String[] urisPub = rop.findPortURIsFromInterface(PublicationCI.class);

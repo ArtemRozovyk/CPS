@@ -1,11 +1,10 @@
 package components;
 
-import fr.sorbonne_u.components.AbstractComponent;
-import message.Message;
-import plugins.PublisherManagementPlugin;
-import plugins.PublisherPublicationPlugin;
+import fr.sorbonne_u.components.*;
+import message.*;
+import plugins.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * Variant of the Publisher component. It has a different behavior.
@@ -19,9 +18,13 @@ import java.util.Arrays;
  * invariant		true
  * </pre>
  */
-public class PublisherFrance extends AbstractComponent {
-    protected final static String FRANCE_PUB_PLUGIN_URI = "publisher-france-pub-plugin-uri";
-    protected final static String FRANCE_MAN_PLUGIN_URI = "publisher-france-man-plugin-uri";
+public class PublisherTest extends AbstractComponent {
+    protected final static String TEST_PUB_PLUGIN_URI = "publisher-test-pub-plugin-uri";
+    protected final static String TEST_MAN_PLUGIN_URI = "publisher-test-man-plugin-uri";
+
+
+
+    String uriCorrespondingBroker;
 
     /**
      * Publisher creation
@@ -36,7 +39,7 @@ public class PublisherFrance extends AbstractComponent {
      * @param nbThreads            number of threads used by the component
      * @param nbSchedulableThreads number of schedulable threads
      */
-    protected PublisherFrance(int nbThreads, int nbSchedulableThreads) {
+    protected PublisherTest(int nbThreads, int nbSchedulableThreads) {
         super(nbThreads, nbSchedulableThreads);
     }
 
@@ -53,11 +56,11 @@ public class PublisherFrance extends AbstractComponent {
      * @param reflectionInboundPortURI uri of the owner inbound port
      * @throws Exception
      */
-    protected PublisherFrance(String reflectionInboundPortURI) throws Exception {
+    protected PublisherTest(String reflectionInboundPortURI,String brokerUri) throws Exception {
         super(reflectionInboundPortURI, 0, 1);
-
-        this.tracer.setTitle("publisher-france");
-        this.tracer.setRelativePosition(1, 1);
+        this.uriCorrespondingBroker=brokerUri;
+        this.tracer.setTitle("publisher-test");
+        this.tracer.setRelativePosition(0, 2);
     }
 
     /**
@@ -67,24 +70,25 @@ public class PublisherFrance extends AbstractComponent {
     public void execute() throws Exception {
         super.execute();
         PublisherPublicationPlugin pluginPublication = new PublisherPublicationPlugin();
-        pluginPublication.setPluginURI(FRANCE_PUB_PLUGIN_URI);
+        pluginPublication.setPluginURI(TEST_PUB_PLUGIN_URI);
         this.installPlugin(pluginPublication);
 
         PublisherManagementPlugin managementPlugin = new PublisherManagementPlugin();
-        managementPlugin.setPluginURI(FRANCE_MAN_PLUGIN_URI);
+        managementPlugin.setPluginURI(TEST_MAN_PLUGIN_URI);
         this.installPlugin(managementPlugin);
 
         String topic;
         String msg;
         Thread.sleep(3000);
-        /*createTopic("France");
+
+        /*createTopic("Test");
         createTopic("IDF");
         createTopic("Paris");*/
-        // 15 msg France, 15 msg IDF, 20 msg Paris
+        // 15 msg Test, 15 msg IDF, 20 msg Paris
         for (int i = 0; i < 10; i++) {
             if (i < 4) {
-                topic = "France";
-                msg = "13 degrees in average in France";
+                topic = "Test";
+                msg = "13 degrees in average in Test";
             } else if (i < 7) {
                 topic = "IDF";
                 msg = "10 degrees in average in IDF";
@@ -118,70 +122,72 @@ public class PublisherFrance extends AbstractComponent {
      * @see interfaces.PublicationCI#publish(interfaces.MessageI, String)
      */
     private void publish(Message message, String topic) throws Exception {
-        ((PublisherPublicationPlugin) this.getPlugin(FRANCE_PUB_PLUGIN_URI)).publish(message, topic);
+        ((PublisherPublicationPlugin) this.getPlugin(TEST_PUB_PLUGIN_URI)).publish(message, topic);
     }
-
+    public String getUriCorrespondingBroker() {
+        return uriCorrespondingBroker;
+    }
     /**
      * @see interfaces.PublicationCI#publish(interfaces.MessageI[], String)
      */
     private void publish(Message[] message, String topic) throws Exception {
-        ((PublisherPublicationPlugin) this.getPlugin(FRANCE_PUB_PLUGIN_URI)).publish(message, topic);
+        ((PublisherPublicationPlugin) this.getPlugin(TEST_PUB_PLUGIN_URI)).publish(message, topic);
     }
 
     /**
      * @see interfaces.PublicationCI#publish(interfaces.MessageI, String[])
      */
     private void publish(Message message, String[] topic) throws Exception {
-        ((PublisherPublicationPlugin) this.getPlugin(FRANCE_PUB_PLUGIN_URI)).publish(message, topic);
+        ((PublisherPublicationPlugin) this.getPlugin(TEST_PUB_PLUGIN_URI)).publish(message, topic);
     }
 
     /**
      * @see interfaces.PublicationCI#publish(interfaces.MessageI[], String[])
      */
     private void publish(Message[] message, String[] topic) throws Exception {
-        ((PublisherPublicationPlugin) this.getPlugin(FRANCE_PUB_PLUGIN_URI)).publish(message, topic);
+        ((PublisherPublicationPlugin) this.getPlugin(TEST_PUB_PLUGIN_URI)).publish(message, topic);
     }
 
     /**
      * @see interfaces.ManagementCI#createTopic(String)
      */
     public void createTopic(String topic) throws Exception {
-        ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).createTopic(topic);
+        ((PublisherManagementPlugin) this.getPlugin(TEST_MAN_PLUGIN_URI)).createTopic(topic);
     }
 
     /**
      * @see interfaces.ManagementCI#createTopics(String[])
      */
     public void createTopic(String[] topics) throws Exception {
-        ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).createTopic(topics);
+        ((PublisherManagementPlugin) this.getPlugin(TEST_MAN_PLUGIN_URI)).createTopic(topics);
     }
 
     /**
      * @see interfaces.ManagementCI#destroyTopic(String)
      */
     public void destroy(String topic) throws Exception {
-        ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).destroyTopic(topic);
+        ((PublisherManagementPlugin) this.getPlugin(TEST_MAN_PLUGIN_URI)).destroyTopic(topic);
     }
 
     /**
-     * @see interfaces.ManagementCI#isTopic(String)
+     * @see interfaces.ManagementCI#isTopicr(String)
      */
     public boolean isTopic(String topic) throws Exception {
-        return ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).isTopic(topic);
+        return ((PublisherManagementPlugin) this.getPlugin(TEST_MAN_PLUGIN_URI)).isTopic(topic);
     }
 
     /**
      * @see interfaces.ManagementCI#getTopics()
      */
     public String[] getTopics() throws Exception {
-        return ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).getTopics();
+        return ((PublisherManagementPlugin) this.getPlugin(TEST_MAN_PLUGIN_URI)).getTopics();
     }
 
     /**
      * @see interfaces.ManagementCI#getPublicatinPortURI()
      */
     public String getPublicatinPortURI() throws Exception {
-        return ((PublisherManagementPlugin) this.getPlugin(FRANCE_MAN_PLUGIN_URI)).getPublicatinPortURI();
+        return ((PublisherManagementPlugin) this.getPlugin(TEST_MAN_PLUGIN_URI)).getPublicatinPortURI();
     }
 }
 
