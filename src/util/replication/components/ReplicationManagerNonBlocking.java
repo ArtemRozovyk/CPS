@@ -36,6 +36,7 @@ package util.replication.components;
 import util.replication.interfaces.*;
 import fr.sorbonne_u.components.annotations.*;
 import fr.sorbonne_u.components.ports.*;
+import util.replication.selectors.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -163,7 +164,9 @@ extends		ReplicationManager<T>
 	{
 		super(1, ownInboundPortURI, selector, combinator,
 			  portCreator, serverInboundPortURIs) ;
-
+		if(selector instanceof ExclusiveSelector){
+			((ExclusiveSelector)selector).setKnownPorts(numbers);
+		}
 		assert	mode != null ;
 
 		this.initialise(mode, nbThreads) ;
@@ -226,7 +229,9 @@ extends		ReplicationManager<T>
 	{
 		super(reflectionInboundPortURI, 1, ownInboundPortURI,
 			  selector, combinator, portCreator, serverInboundPortURIs) ;
-
+		if(selector instanceof ExclusiveSelector){
+			((ExclusiveSelector)selector).setKnownPorts(numbers);
+		}
 		assert	mode != null ;
 
 		this.initialise(mode, nbThreads) ;
@@ -258,6 +263,9 @@ extends		ReplicationManager<T>
 	@Override
 	public T			call(Object... parameters) throws Exception
 	{
+		if(selector instanceof ExclusiveSelector){
+			((ExclusiveSelector)selector).setCallerId((int)parameters[0]);
+		}
 		// This method is meant to be executed by the thread of the caller
 		// component (the inbound port does not call handleRequest by directly
 		// this method.
@@ -286,7 +294,7 @@ extends		ReplicationManager<T>
 					new AbstractService<T>() {
 						@Override
 						public T call() throws Exception {
-							return (T)((ReplicableCI<T>)p).call(parameters) ;
+							return (T)((ReplicableCI<T>)p).call(new Object[]{parameters[1],parameters[2]}) ;
 						}
 					} ;
 			request.setOwnerReference(this) ;

@@ -225,20 +225,20 @@ public class DistributedCVM_final
     public void			instantiateAndPublish() throws Exception
     {
         if (thisJVMURI.equals(BROKER1_JVM_URI)) {
-            int i = 0;
+            
             this.brokerURI = AbstractComponent.createComponent(
                     Broker.class.getCanonicalName(),
-                    new Object[]{BROKER_COMPONENT_URIs[i],
-                            BROKER_PUBLICATION_INBOUND_PORT+i,//will be found by reflexion
-                            BROKER_MANAGEMENT_INBOUND_PORT+i,
+                    new Object[]{0,BROKER_COMPONENT_URIs[0],
+                            BROKER_PUBLICATION_INBOUND_PORT+0,//will be found by reflexion
+                            BROKER_MANAGEMENT_INBOUND_PORT+0,
                             MANAGER_INBOUND_PORT_URI,
-                            SERVER_BROKER_INBOUND_PORT_URIS[i]
+                            SERVER_BROKER_INBOUND_PORT_URIS[0]
                             ,5
                             ,5});
 
-            assert this.isDeployedComponent(BROKER_COMPONENT_URIs[i]);
-            this.toggleTracing(BROKER_COMPONENT_URIs[i]);
-            this.toggleLogging(BROKER_COMPONENT_URIs[i]);
+            assert this.isDeployedComponent(BROKER_COMPONENT_URIs[0]);
+            this.toggleTracing(BROKER_COMPONENT_URIs[0]);
+            this.toggleLogging(BROKER_COMPONENT_URIs[0]);
 
             this.subscriberTestUri = AbstractComponent.createComponent(
                     SubscriberTest.class.getCanonicalName(),
@@ -250,20 +250,20 @@ public class DistributedCVM_final
 
         }
         if (thisJVMURI.equals(BROKER2_JVM_URI)) {
-            int i =1;
+            
             this.brokerURI = AbstractComponent.createComponent(
                     Broker.class.getCanonicalName(),
-                    new Object[]{BROKER_COMPONENT_URIs[i],
-                            BROKER_PUBLICATION_INBOUND_PORT+i,//will be found by reflexion
-                            BROKER_MANAGEMENT_INBOUND_PORT+i,
+                    new Object[]{1,BROKER_COMPONENT_URIs[1],
+                            BROKER_PUBLICATION_INBOUND_PORT+1,//will be found by reflexion
+                            BROKER_MANAGEMENT_INBOUND_PORT+1,
                             MANAGER_INBOUND_PORT_URI,
-                            SERVER_BROKER_INBOUND_PORT_URIS[i]
+                            SERVER_BROKER_INBOUND_PORT_URIS[1]
                             ,5
                             ,5});
 
-            assert this.isDeployedComponent(BROKER_COMPONENT_URIs[i]);
-            this.toggleTracing(BROKER_COMPONENT_URIs[i]);
-            this.toggleLogging(BROKER_COMPONENT_URIs[i]);
+            assert this.isDeployedComponent(BROKER_COMPONENT_URIs[1]);
+            this.toggleTracing(BROKER_COMPONENT_URIs[1]);
+            this.toggleLogging(BROKER_COMPONENT_URIs[1]);
             this.publisherTestURI = AbstractComponent.createComponent(
                     PublisherTest.class.getCanonicalName(),
                     new Object[]{PUBLISHER_FRANCE_COMPONENT_URI,BROKER_COMPONENT_URIs[1]});
@@ -290,11 +290,9 @@ public class DistributedCVM_final
                 new Object[]{
                         SERVER_BROKER_INBOUND_PORT_URIS.length,
                         MANAGER_INBOUND_PORT_URI,
-                        new WholeSelector()
-                        ,
+                        new ExclusiveSelector(),
                         this.currentCallMode,
-
-                        new RandomCombinator<String>(),
+                        new RandomCombinator<String>(), //lone combinator
                         PC,
                         SERVER_BROKER_INBOUND_PORT_URIS
                 }) ;

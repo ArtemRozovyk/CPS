@@ -39,6 +39,7 @@ public class Broker extends AbstractComponent implements ReplicaI<String> {
     public static int actualdeliverycount = 0;
     public static int popcount = 0;
     private static int i;
+    private int brokerId;
     private final Lock lock = new ReentrantLock();
     protected String brokerPublicationInboundPortURI;
     protected String acceptionExecutorURI = "handler1";
@@ -90,7 +91,8 @@ public class Broker extends AbstractComponent implements ReplicaI<String> {
      * @param managmentInboundPortURI   uri of the management inbound port
      * @throws Exception
      */
-    protected Broker(String uri,
+    protected Broker(int id,
+                     String uri,
                      String publicationInboundPortURI,
                      String managmentInboundPortURI,
                      String replicableInboundPortURI,
@@ -100,6 +102,17 @@ public class Broker extends AbstractComponent implements ReplicaI<String> {
         super(uri, 1, 1);
 
         //TODO replica1
+
+
+
+        brokerId=id;
+        topicMessageStorageMap = new HashMap<>();
+        topicSubHandlersMap = new HashMap<>();
+        addOfferedInterface(ManagementCI.class);
+        addOfferedInterface(PublicationCI.class);
+        addRequiredInterface(ReceptionCI.class);
+        addRequiredInterface(ReplicableCI.class);
+        addOfferedInterface(ReplicableCI.class);
         if(replicableInboundPortURI!=null){
 
             this.replicableInboundPortURI = replicableInboundPortURI ;
@@ -109,14 +122,6 @@ public class Broker extends AbstractComponent implements ReplicaI<String> {
             this.rip = new ReplicableInboundPort<String>(inboundPortURI, this) ;
             this.rip.publishPort() ;
         }
-
-
-
-        topicMessageStorageMap = new HashMap<>();
-        topicSubHandlersMap = new HashMap<>();
-        addOfferedInterface(ManagementCI.class);
-        addOfferedInterface(PublicationCI.class);
-        addRequiredInterface(ReceptionCI.class);
         assert uri != null :
                 new PreconditionException("uri can't be null!");
         assert publicationInboundPortURI != null :
@@ -206,7 +211,7 @@ public class Broker extends AbstractComponent implements ReplicaI<String> {
                         try {
                             ((Broker) this.getTaskOwner()).storePublished(m, topic);
                             try {
-                                String result = ((Broker) this.getTaskOwner()).rop.call(brokerPublicationInboundPortURI,m,topic) ;//TODO Change it
+                                String result = ((Broker) this.getTaskOwner()).rop.call(brokerId,m,topic) ;//TODO Change it
                                 logMessage("Transmitted messages to other brokers, got answer : ["+result+"]");
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -749,16 +754,16 @@ public class Broker extends AbstractComponent implements ReplicaI<String> {
 
     @Override
     public String call(Object... parameters) throws Exception {
-        if(!parameters[0].equals(brokerPublicationInboundPortURI)){
+
             //TODO proper selector
             //logMessage("Getting message "+parameters[0]+parameters[1]);
-            if(parameters[1] instanceof MessageI && parameters[2] instanceof String){
-                storePublished((MessageI)parameters[1],(String)parameters[2]);
+            if(parameters[0] instanceof MessageI && parameters[1] instanceof String){
+                storePublished((MessageI)parameters[0],(String)parameters[1]);
             }else{
                 throw new ParameterResolutionException("Bad call, not instance of MessageI or String");
             }
 
-        }
+
 
         return "I stored your message,  "+parameters[0];
     }
